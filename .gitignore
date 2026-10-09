@@ -6,4 +6,3 @@ dist/
 *.tsbuildinfo
 .env
 .env.local
-AGENTS.md

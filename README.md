@@ -1,74 +1,78 @@
 # Ciro Code
 
-Local coding agent harness — policy-aware tools, session memory, and a streaming HTTP API you can run on your machine.
+Ciro Code is a local coding agent with a Web workbench. It understands your workspace, runs tools under a policy sandbox, and supports Ask / Plan / Agent / Debug modes.
 
-## Features
+Requires **Node.js 20+**.
 
-- **Modes** — Ask, Plan, Agent, and Debug, with tool allowlists and permission presets per mode
-- **Safe by default** — workspace sandbox, shell policy, and approval flows for sensitive commands
-- **Persistent sessions** — resume, rewind, and fork chats with event-log backed history
-- **Memory & skills** — project rules, facts, and on-demand skill injection with token budgets
-- **Extensible** — MCP servers, Feature Packs (start with Git), and a clean Kernel API
-- **CLI first** — `ciro web` for the local server; Mock backend for smoke tests without an API key
+## Get started
 
-## Requirements
-
-- Node.js 20+
-- [pnpm](https://pnpm.io) 9+
-
-## Quick start
-
-```sh
-git clone https://github.com/Raysolid/ciro-code.git
-cd ciro-code
-pnpm install
-pnpm run build
-
-# Mock agent (no API key)
-pnpm run dev:web:mock
-
-# Or with a real model — set DEEPSEEK_API_KEY / OPENAI_API_KEY
-pnpm run dev:web
+```bash
+npm install -g @ciro-code/code
+ciro web
 ```
 
-Health check: [http://127.0.0.1:3080/health](http://127.0.0.1:3080/health)
+The CLI binary is `ciro`. On Windows, prefer **pwsh**:
 
-```sh
-pnpm --filter @ciro/cli exec node dist/cli.js --help
-pnpm --filter @ciro/cli exec node dist/cli.js web --mock --no-open -w .
+```powershell
+npm install -g @ciro-code/code
+ciro web
 ```
 
-## Repository layout
+Workbench: [http://127.0.0.1:3080](http://127.0.0.1:3080) · health check: `/health`.
 
+Configure a model via Settings, or set `DEEPSEEK_API_KEY` / `OPENAI_API_KEY`. To try the UI without a key:
+
+```bash
+ciro web --mock
 ```
-apps/ciro-cli/          # `ciro` CLI
-packages/
-  shared/               # Shared types & contracts
-  harness-core/         # Config, policy, memory, skills, session
-  harness-pi/           # Agent runtime (Pi + Mock)
-  harness-web/          # Hono HTTP + SSE API
-  ext-git/              # Official Git Feature Pack
-examples/               # Starter workspaces (`ciro init --example …`)
-profiles/               # Optional config overlays
+
+> Install the scoped package `@ciro-code/code` (or `@ciro-code/cli`). Do not use `npm i -g ciro`.
+
+## Usage
+
+```bash
+ciro --help
+ciro web                    # start workbench (opens browser)
+ciro web --mock             # no API key
+ciro web --mock --no-open   # smoke / CI
+ciro web -w <workspace>     # set workspace
+ciro pack add @ciro-code/ext-git
 ```
 
 ## Development
 
-```sh
+```bash
+git clone https://github.com/Raysolid/ciro-code.git
+cd ciro-code
 pnpm install
 pnpm run build
-pnpm test
-pnpm --filter @ciro/harness-pi test
-pnpm --filter @ciro/harness-shared test
+pnpm run dev:web:mock    # local API + mock agent
+# pnpm run dev:web       # real model (needs API key)
 ```
 
 | Command | Description |
 |---------|-------------|
 | `pnpm run build` | Build all packages |
-| `pnpm run dev:web:mock` | Local API with Mock agent |
-| `pnpm run dev:web` | Local API with Pi / LLM |
-| `pnpm test` | Run workspace tests |
+| `pnpm run dev:web:mock` | Local server with mock agent |
+| `pnpm run dev:web` | Local server with a real model |
+| `pnpm test` | Run tests |
+
+```
+apps/ciro-cli/       # CLI
+packages/
+  shared/            # Shared types & contracts
+  harness-core/      # Config, policy, memory, skills, session
+  harness-pi/        # Agent runtime
+  harness-web/       # HTTP + SSE API
+  ext-git/           # Git feature pack
+examples/            # Starter workspaces
+```
+
+## Security & agents
+
+- Security policy: [SECURITY.md](./SECURITY.md)
+- Install guidance for coding agents: [AGENTS.md](./AGENTS.md)
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](./LICENSE) · npm [@ciro-code/code](https://www.npmjs.com/package/@ciro-code/code)
