@@ -1,0 +1,9 @@
+{
+  "id": "@ciro/ext-git",
+  "displayName": "Git",
+  "version": "0.1.0",
+  "engines": { "ciro": ">=0.1.0" },
+  "contributions": {
+    "sidePanels": [{ "id": "git", "label": "Git" }]
+  }
+}

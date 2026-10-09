@@ -1,0 +1,31 @@
+{
+  "name": "@ciro/harness-pi",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "dev": "tsc -b --watch"
+  },
+  "dependencies": {
+    "@ciro/harness-core": "workspace:*",
+    "@ciro/harness-shared": "workspace:*",
+    "@earendil-works/pi-coding-agent": "=0.84.4",
+    "typebox": "^1.0.27"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

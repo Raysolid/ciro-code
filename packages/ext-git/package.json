@@ -1,0 +1,7 @@
+{
+  "name": "@ciro/ext-git",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Official Git Feature Pack",
+  "type": "module"
+}

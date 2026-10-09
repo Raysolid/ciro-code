@@ -1,0 +1,26 @@
+{
+  "name": "ciro-code",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ciro Code — local coding agent harness (CLI, runtime, policy, HTTP API)",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:web": "pnpm run build && pnpm --filter @ciro/cli exec node dist/cli.js web --no-open",
+    "dev:web:mock": "pnpm run build && pnpm --filter @ciro/cli exec node dist/cli.js web --mock --no-open",
+    "dev:api:watch": "pnpm --filter @ciro/cli run dev:api:watch",
+    "test": "turbo run test",
+    "test:e2e": "pnpm --filter @ciro/harness-web test:e2e",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "pack:cli": "pnpm --filter @ciro/cli pack:smoke"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

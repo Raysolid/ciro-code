@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.turbo/
+.pi/
+.tmp-*/
+*.tsbuildinfo
+.env
+.env.local
+AGENTS.md
