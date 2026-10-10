@@ -1,0 +1,22 @@
+{
+  "name": "ciro-code-docs",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "package:pages": "node scripts/package-pages.mjs",
+    "build:pages": "npm run check:i18n && npm run build && npm run package:pages"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.35.2",
+    "astro": "^5.13.2",
+    "sharp": "^0.34.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
