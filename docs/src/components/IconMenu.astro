@@ -1,0 +1,139 @@
+---
+interface Option {
+  label: string;
+  value: string;
+  selected?: boolean;
+}
+
+interface Props {
+  label: string;
+  iconPath: string;
+  options: Option[];
+  keepNativeSelect?: boolean;
+}
+
+const { label, iconPath, options, keepNativeSelect = false } = Astro.props;
+---
+
+<ciro-icon-menu class="ciro-menu">
+  <button
+    type="button"
+    class="ciro-menu__trigger"
+    aria-label={label}
+    aria-haspopup="listbox"
+    aria-expanded="false"
+  >
+    <svg
+      class="label-icon"
+      aria-hidden="true"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      set:html={iconPath}
+    />
+  </button>
+  <ul class="ciro-menu__list" role="listbox" hidden>
+    {
+      options.map((opt) => (
+        <li role="option" aria-selected={opt.selected ? 'true' : 'false'}>
+          <button type="button" class="ciro-menu__item" data-value={opt.value} set:html={opt.label} />
+        </li>
+      ))
+    }
+  </ul>
+  {
+    keepNativeSelect && (
+      <select class="ciro-menu__native" autocomplete="off" tabindex="-1" aria-hidden="true">
+        {options.map((opt) => (
+          <option value={opt.value} selected={opt.selected} set:html={opt.label} />
+        ))}
+      </select>
+    )
+  }
+</ciro-icon-menu>
+
+<script>
+  function closeAllMenus(except?: Element | null) {
+    document.querySelectorAll('ciro-icon-menu').forEach((menu) => {
+      if (except && menu === except) return;
+      const trigger = menu.querySelector<HTMLButtonElement>('.ciro-menu__trigger');
+      const list = menu.querySelector<HTMLElement>('.ciro-menu__list');
+      trigger?.setAttribute('aria-expanded', 'false');
+      list?.setAttribute('hidden', '');
+    });
+  }
+
+  class CiroIconMenu extends HTMLElement {
+    #trigger: HTMLButtonElement | null = null;
+    #list: HTMLElement | null = null;
+
+    connectedCallback() {
+      this.#trigger = this.querySelector('.ciro-menu__trigger');
+      this.#list = this.querySelector('.ciro-menu__list');
+
+      this.#trigger?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const open = this.#trigger?.getAttribute('aria-expanded') === 'true';
+        if (open) {
+          this.#close();
+          return;
+        }
+        closeAllMenus(this);
+        this.#open();
+      });
+
+      this.#list?.addEventListener('click', (e) => e.stopPropagation());
+
+      this.#list?.querySelectorAll<HTMLButtonElement>('.ciro-menu__item').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.dispatchEvent(
+            new CustomEvent('ciro-menu-select', {
+              bubbles: true,
+              detail: { value: btn.dataset.value ?? '' },
+            }),
+          );
+          this.#close();
+        });
+      });
+
+      document.addEventListener('click', this.#onDocClick);
+      document.addEventListener('keydown', this.#onKey);
+    }
+
+    disconnectedCallback() {
+      document.removeEventListener('click', this.#onDocClick);
+      document.removeEventListener('keydown', this.#onKey);
+    }
+
+    #onDocClick = () => this.#close();
+    #onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeAllMenus();
+    };
+
+    #open() {
+      this.#trigger?.setAttribute('aria-expanded', 'true');
+      this.#list?.removeAttribute('hidden');
+    }
+
+    #close() {
+      this.#trigger?.setAttribute('aria-expanded', 'false');
+      this.#list?.setAttribute('hidden', '');
+    }
+
+    syncSelected(value: string) {
+      this.#list?.querySelectorAll<HTMLElement>('[role="option"]').forEach((li) => {
+        const v = li.querySelector<HTMLButtonElement>('.ciro-menu__item')?.dataset.value;
+        li.setAttribute('aria-selected', v === value ? 'true' : 'false');
+      });
+      const select = this.querySelector<HTMLSelectElement>('.ciro-menu__native');
+      if (select) select.value = value;
+    }
+  }
+
+  if (!customElements.get('ciro-icon-menu')) {
+    customElements.define('ciro-icon-menu', CiroIconMenu);
+  }
+</script>

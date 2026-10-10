@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { rehypeBaseLocaleLinks } from './plugins/rehype-base-locale-links.mjs';
 
 /** @type {import('@astrojs/starlight/types').StarlightUserConfig['sidebar']} */
 const sidebar = [
@@ -47,6 +48,10 @@ const sidebar = [
 export default defineConfig({
   site: 'https://raysolid.github.io',
   base: '/ciro-code/docs',
+  trailingSlash: 'always',
+  markdown: {
+    rehypePlugins: [rehypeBaseLocaleLinks],
+  },
   integrations: [
     starlight({
       title: 'Ciro Code',
@@ -70,6 +75,12 @@ export default defineConfig({
         baseUrl: 'https://github.com/Raysolid/ciro-code/edit/main/docs/',
       },
       customCss: ['./src/styles/custom.css'],
+      components: {
+        Hero: './src/components/Hero.astro',
+        ThemeSelect: './src/components/ThemeSelect.astro',
+        LanguageSelect: './src/components/LanguageSelect.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
+      },
     }),
   ],
 });

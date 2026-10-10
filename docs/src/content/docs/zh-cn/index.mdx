@@ -7,34 +7,45 @@ hero:
   tagline: 本机优先的编码 Agent。在你的机器上打开 Web 工作台，直接在项目里干活，数据留在本地。
   actions:
     - text: 快速开始
-      link: /getting-started/quickstart/
-      icon: rocket
+      link: /ciro-code/docs/zh-cn/getting-started/quickstart/
+      icon: right-arrow
       variant: primary
-    - text: 安装
-      link: /getting-started/install/
-      icon: download
+    - text: GitHub
+      link: https://github.com/Raysolid/ciro-code
       variant: minimal
+      attrs:
+        rel: me
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+## Open Core 边界说明
+
+<div class="home-callout">
+
+**Kernel 与 CLI 完全开源**，本地执行逻辑均可审计。**Web UI 与官方 Profile 以 npm 安装产物交付**，以维持项目可持续开发。**你的配置、密钥与会话留在本机**，不会未经允许上传。
+
+[查看仓库](https://github.com/Raysolid/ciro-code) · [贡献指南](/ciro-code/docs/zh-cn/project/contributing/) · [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) · [llms.txt](/ciro-code/docs/llms.txt)
+
+</div>
+
 ## 下一步
 
 <CardGrid>
-  <Card title="安装" icon="download">
-    用 npm 装好 `ciro`，启动本地工作台。
-    [安装说明 →](/getting-started/install/)
+  <Card title="我是第一次用" icon="rocket">
+    从零完成安装、连接模型，并发出第一条任务。
+    <span class="home-eta">[约 5 分钟上手 →](/ciro-code/docs/zh-cn/getting-started/quickstart/)</span>
   </Card>
-  <Card title="快速开始" icon="rocket">
-    选文件夹、发第一条任务，看 Agent 怎么工作。
-    [约 5 分钟上手 →](/getting-started/quickstart/)
+  <Card title="我想开发扩展" icon="puzzle">
+    了解 Feature Pack、manifest，以及 CLI / 配置参考。
+    <span class="home-eta">[扩展 Pack →](/ciro-code/docs/zh-cn/guides/packs/) · [命令行 →](/ciro-code/docs/zh-cn/reference/cli/)</span>
   </Card>
-  <Card title="连接模型" icon="setting">
-    在设置里添加 API Key；也可以先用 Mock 浏览界面。
-    [连接模型 →](/getting-started/first-provider/)
+  <Card title="我想了解开源边界" icon="open-book">
+    Kernel 可审计范围、Open Core 边界，以及如何从源码构建。
+    <span class="home-eta">[贡献指南 →](/ciro-code/docs/zh-cn/project/contributing/)</span>
   </Card>
-  <Card title="工作模式" icon="puzzle">
-    Ask / Plan / Agent / Debug — 决定 Agent 能改多少。
-    [了解模式 →](/guides/modes/)
+  <Card title="我遇到问题了" icon="information">
+    安装失败、端口占用、找不到 `ciro`？Windows 优先排障。
+    <span class="home-eta">[立即排查 →](/ciro-code/docs/zh-cn/guides/troubleshooting/)</span>
   </Card>
 </CardGrid>

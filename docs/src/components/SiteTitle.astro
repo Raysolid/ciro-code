@@ -1,0 +1,19 @@
+---
+import config from 'virtual:starlight/user-config';
+
+const href = Astro.locals.starlightRoute.siteTitleHref;
+const title = typeof config.title === 'string' ? config.title : 'Ciro Code';
+---
+
+<a href={href} class="site-title sl-flex ciro-site-title">
+  <span class="ciro-mark" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="2" width="20" height="20" rx="5" fill="currentColor" class="ciro-mark__bg"></rect>
+      <path
+        d="M7.5 15.5 10.2 8h2.1l2.7 7.5h-2.05l-.5-1.55H10.1l-.52 1.55H7.5Zm3.05-3.15h1.85L11.5 9.4h-.05l-.9 2.95Z"
+        fill="#0b1220"
+        class="ciro-mark__glyph"></path>
+    </svg>
+  </span>
+  <span class="ciro-site-title__text" translate="no">{title}</span>
+</a>

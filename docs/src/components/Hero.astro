@@ -1,0 +1,94 @@
+---
+import Default from '@astrojs/starlight/components/Hero.astro';
+import { LinkButton } from '@astrojs/starlight/components';
+import InstallCopy from './InstallCopy.astro';
+import TerminalDemo from './TerminalDemo.astro';
+
+const PAGE_TITLE_ID = '_top';
+
+const { entry, locale } = Astro.locals.starlightRoute;
+const { data } = entry;
+const hero = data.hero;
+const isHome = data.template === 'splash';
+const isZh = locale === 'zh-cn';
+
+const { title = data.title, tagline, actions = [] } = hero || {};
+
+const badges = isZh
+  ? ['Open Core', 'Node.js ≥ 20', 'Windows / macOS', 'MIT', 'Local-first']
+  : ['Open Core', 'Node.js ≥ 20', 'Windows / macOS', 'MIT', 'Local-first'];
+
+const installCopy = isZh
+  ? {
+      copyLabel: '复制',
+      copiedLabel: '已复制',
+      commentInstall: '# 安装 CLI',
+      commentStart: '# 启动本地工作台',
+    }
+  : {
+      copyLabel: 'Copy',
+      copiedLabel: 'Copied',
+      commentInstall: '# Install CLI',
+      commentStart: '# Start local workbench',
+    };
+
+const terminal = isZh
+  ? {
+      title: 'PowerShell — ciro web',
+      lines: [
+        { kind: 'cmd' as const, prompt: 'PS C:\\Users\\dev\\project>', text: ' ciro web' },
+        { kind: 'dim' as const, text: '[info] 正在启动 Ciro Code 本地工作台…' },
+        { kind: 'dim' as const, text: '[info] 检测到工作区: ./my-project' },
+        { kind: 'info' as const, text: '[server] 本地服务已启动: http://127.0.0.1:3080' },
+        { kind: 'success' as const, text: '[ready] 请在浏览器中打开上述地址开始工作' },
+        { kind: 'dim' as const, text: '[hint] 按 Ctrl+C 可随时停止服务' },
+      ],
+    }
+  : {
+      title: 'PowerShell — ciro web',
+      lines: [
+        { kind: 'cmd' as const, prompt: 'PS C:\\Users\\dev\\project>', text: ' ciro web' },
+        { kind: 'dim' as const, text: '[info] Starting Ciro Code local workbench…' },
+        { kind: 'dim' as const, text: '[info] Workspace detected: ./my-project' },
+        { kind: 'info' as const, text: '[server] Listening at http://127.0.0.1:3080' },
+        { kind: 'success' as const, text: '[ready] Open the URL in your browser to start' },
+        { kind: 'dim' as const, text: '[hint] Press Ctrl+C to stop' },
+      ],
+    };
+---
+
+{
+  isHome && hero ? (
+    <div class="hero home-hero">
+      <div class="home-hero__content">
+        <h1 id={PAGE_TITLE_ID} data-page-title set:html={title} />
+        {tagline && <p class="home-hero__subtitle" set:html={tagline} />}
+        <div class="home-badges" role="list">
+          {badges.map((b) => (
+            <span class="home-badge" role="listitem">
+              {b}
+            </span>
+          ))}
+        </div>
+        <InstallCopy {...installCopy} />
+        {actions.length > 0 && (
+          <div class="home-hero__actions">
+            {actions.map(
+              ({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant }) => (
+                <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
+                  {text}
+                  {icon?.html && <Fragment set:html={icon.html} />}
+                </LinkButton>
+              ),
+            )}
+          </div>
+        )}
+      </div>
+      <TerminalDemo title={terminal.title} lines={terminal.lines} />
+    </div>
+  ) : (
+    <Default>
+      <slot />
+    </Default>
+  )
+}

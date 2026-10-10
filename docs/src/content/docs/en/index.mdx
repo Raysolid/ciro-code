@@ -7,34 +7,45 @@ hero:
   tagline: A local-first coding agent. Open a Web workbench on your machine, work in your project, keep data on disk.
   actions:
     - text: Quickstart
-      link: /getting-started/quickstart/
-      icon: rocket
+      link: /ciro-code/docs/en/getting-started/quickstart/
+      icon: right-arrow
       variant: primary
-    - text: Install
-      link: /getting-started/install/
-      icon: download
+    - text: GitHub
+      link: https://github.com/Raysolid/ciro-code
       variant: minimal
+      attrs:
+        rel: me
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+## Open Core boundary
+
+<div class="home-callout">
+
+**Kernel and CLI are fully open source** — local execution is auditable. **Web UI and official Profiles ship as npm install artifacts** so the project can stay sustainable. **Your config, keys, and sessions stay on your machine** and are never uploaded without your permission.
+
+[Repository](https://github.com/Raysolid/ciro-code) · [Contributing](/ciro-code/docs/en/project/contributing/) · [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) · [llms.txt](/ciro-code/docs/llms.txt)
+
+</div>
+
 ## Next steps
 
 <CardGrid>
-  <Card title="Install" icon="download">
-    Put `ciro` on your PATH with npm, then open the workbench.
-    [Install guide →](/getting-started/install/)
+  <Card title="I'm new here" icon="rocket">
+    Install `ciro`, connect a provider, and finish a first session.
+    <span class="home-eta">[~5 min →](/ciro-code/docs/en/getting-started/quickstart/)</span>
   </Card>
-  <Card title="Quickstart" icon="rocket">
-    Pick a folder, send a first task, and see the agent work.
-    [Start in 5 minutes →](/getting-started/quickstart/)
+  <Card title="I want to extend it" icon="puzzle">
+    Feature Packs, manifests, and CLI / config reference.
+    <span class="home-eta">[Packs →](/ciro-code/docs/en/guides/packs/) · [CLI →](/ciro-code/docs/en/reference/cli/)</span>
   </Card>
-  <Card title="Connect a model" icon="setting">
-    Add an API key in Settings, or explore the UI with Mock first.
-    [Connect a model →](/getting-started/first-provider/)
+  <Card title="What is open source?" icon="open-book">
+    Kernel architecture, Open Core scope, and how to build from source.
+    <span class="home-eta">[Contributing →](/ciro-code/docs/en/project/contributing/)</span>
   </Card>
-  <Card title="How modes work" icon="puzzle">
-    Ask, Plan, Agent, and Debug — choose how much the agent may change.
-    [Modes →](/guides/modes/)
+  <Card title="Something broke" icon="information">
+    PATH, port 3080, missing `ciro` — Windows-first fixes.
+    <span class="home-eta">[Troubleshoot →](/ciro-code/docs/en/guides/troubleshooting/)</span>
   </Card>
 </CardGrid>
