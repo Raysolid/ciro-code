@@ -1,25 +1,13 @@
 {
-  "name": "ciro-code",
+  "name": "ciro-code-public",
   "private": true,
-  "version": "0.1.0",
-  "description": "Ciro Code — local coding agent harness (CLI, runtime, policy, HTTP API)",
+  "type": "module",
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "dev:web": "pnpm run build && pnpm --filter @ciro/cli exec node dist/cli.js web --no-open",
-    "dev:web:mock": "pnpm run build && pnpm --filter @ciro/cli exec node dist/cli.js web --mock --no-open",
-    "dev:api:watch": "pnpm --filter @ciro/cli run dev:api:watch",
-    "test": "turbo run test",
-    "test:e2e": "pnpm --filter @ciro/harness-web test:e2e",
-    "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck",
-    "pack:cli": "pnpm --filter @ciro/cli pack:smoke"
+    "build:website": "npm run build --prefix website",
+    "build:docs": "npm run check:i18n --prefix docs && npm run build --prefix docs && npm run check:base-links --prefix docs",
+    "package:pages": "node scripts/package-pages.mjs",
+    "build:pages": "npm run build:website && npm run build:docs && npm run package:pages"
   },
-  "devDependencies": {
-    "turbo": "^2.5.4",
-    "typescript": "^5.8.3"
-  },
-  "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=20"
   }

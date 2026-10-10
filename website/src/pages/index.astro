@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LandingPage from '../components/LandingPage.astro';
+import { en } from '../i18n/en';
+import '../styles/global.css';
+---
+
+<BaseLayout title="Ciro Code" description={en.hero.tagline} lang={en.lang}>
+  <LandingPage t={en} homeHref="/ciro-code/" />
+</BaseLayout>

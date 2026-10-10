@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LandingPage from '../../components/LandingPage.astro';
+import { zhCn } from '../../i18n/zh-cn';
+import '../../styles/global.css';
+---
+
+<BaseLayout title="Ciro Code" description={zhCn.hero.tagline} lang={zhCn.lang}>
+  <LandingPage t={zhCn} homeHref="/ciro-code/zh-cn/" />
+</BaseLayout>

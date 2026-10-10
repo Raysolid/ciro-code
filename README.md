@@ -4,7 +4,7 @@ Ciro Code is a local coding agent with a Web workbench. It understands your work
 
 Requires **Node.js 20+**.
 
-**Docs:** [raysolid.github.io/ciro-code/docs](https://raysolid.github.io/ciro-code/docs/)
+**Site:** [raysolid.github.io/ciro-code](https://raysolid.github.io/ciro-code/) · **Docs:** [raysolid.github.io/ciro-code/docs](https://raysolid.github.io/ciro-code/docs/)
 
 ## Get started
 

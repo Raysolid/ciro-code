@@ -1,0 +1,113 @@
+---
+import type { Messages } from '../i18n/en';
+import Header from './Header.astro';
+import InstallCopy from './InstallCopy.astro';
+import WorkbenchVisual from './WorkbenchVisual.astro';
+
+interface Props {
+  t: Messages;
+  homeHref: string;
+}
+
+const { t, homeHref } = Astro.props;
+const github = 'https://github.com/Raysolid/ciro-code';
+const npm = 'https://www.npmjs.com/package/@ciro-code/code';
+---
+
+<Header t={t} homeHref={homeHref} />
+
+<main>
+  <section class="hero" id="hero">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <h1>{t.hero.title}</h1>
+        <p class="hero__tagline">{t.hero.tagline}</p>
+        <InstallCopy
+          copyLabel={t.hero.copyLabel}
+          copiedLabel={t.hero.copiedLabel}
+          commentInstall={t.hero.commentInstall}
+          commentStart={t.hero.commentStart}
+        />
+        <div class="hero__actions">
+          <a class="btn btn--primary" href={t.docsQuickstartHref}>{t.hero.ctaDocs}</a>
+          <a class="btn btn--ghost" href={github} rel="me" target="_blank">{t.hero.ctaGithub}</a>
+        </div>
+      </div>
+      <WorkbenchVisual caption={t.product.caption} locale={t.locale} />
+    </div>
+  </section>
+
+  <section class="section" id="capabilities">
+    <div class="wrap">
+      <h2>{t.capabilities.title}</h2>
+      <div class="cap-grid">
+        {
+          t.capabilities.items.map((item) => (
+            <article class="cap-card">
+              <h3>{item.title}</h3>
+              <p set:html={item.body.replace(/`([^`]+)`/g, '<code>$1</code>')} />
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="open-core">
+    <div class="wrap">
+      <h2>{t.openCore.title}</h2>
+      <div class="open-core">
+        <p><strong>{t.openCore.p1}</strong></p>
+        <p><strong>{t.openCore.p2}</strong></p>
+        <p>{t.openCore.p3}</p>
+        <a href={t.docsOverviewHref}>{t.openCore.link} →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="quickstart">
+    <div class="wrap">
+      <h2>{t.quickstart.title}</h2>
+      <ol class="steps">
+        {
+          t.quickstart.steps.map((step) => (
+            <li>
+              <div>
+                <strong>{step.label}</strong>
+                <span>{step.detail}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <a class="btn btn--ghost" href={t.docsQuickstartHref}>{t.quickstart.more} →</a>
+    </div>
+  </section>
+
+  <section class="section faq" id="faq">
+    <div class="wrap">
+      <h2>{t.faq.title}</h2>
+      {
+        t.faq.items.map((item) => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="site-footer__links">
+      <a href={github} rel="me" target="_blank">GitHub</a>
+      <a href={npm} target="_blank">{t.footer.npm}</a>
+      <a href={t.llmsHref}>{t.footer.llms}</a>
+      <a href={t.docsHref}>{t.footer.docs}</a>
+      <a href={`${github}/blob/main/LICENSE`}>{t.footer.license}</a>
+    </div>
+    <p>© {new Date().getFullYear()} Ciro Code. {t.footer.blurb}</p>
+  </div>
+</footer>

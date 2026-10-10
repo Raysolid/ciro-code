@@ -1,11 +1,13 @@
-name: Deploy docs
+name: Deploy Pages
 
 on:
   push:
     branches: [main]
     paths:
+      - 'website/**'
       - 'docs/**'
-      - '.github/workflows/deploy-docs.yml'
+      - 'scripts/package-pages.mjs'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -27,18 +29,31 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-          cache-dependency-path: docs/package-lock.json
+          cache-dependency-path: |
+            website/package-lock.json
+            docs/package-lock.json
 
-      - name: Install and build
+      - name: Build website
+        working-directory: website
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build docs
         working-directory: docs
         run: |
           npm ci
-          npm run build:pages
+          npm run check:i18n
+          npm run build
+          npm run check:base-links
+
+      - name: Merge site artifact
+        run: node scripts/package-pages.mjs
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/_site
+          path: _site
 
   deploy:
     needs: build

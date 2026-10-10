@@ -1,0 +1,55 @@
+---
+interface Props {
+  caption: string;
+  locale: 'en' | 'zh-cn';
+}
+
+const { caption, locale } = Astro.props;
+const isZh = locale === 'zh-cn';
+---
+
+<figure class="hero__visual">
+  <div class="wb" aria-hidden="true">
+    <div class="wb__bar">
+      <span class="wb__dot wb__dot--r"></span>
+      <span class="wb__dot wb__dot--y"></span>
+      <span class="wb__dot wb__dot--g"></span>
+      <span class="wb__url">127.0.0.1:3080</span>
+    </div>
+    <div class="wb__body">
+      <aside class="wb__side">
+        <div class="wb__brand">Ciro</div>
+        <div class="wb__nav is-active">{isZh ? '对话' : 'Chat'}</div>
+        <div class="wb__nav">{isZh ? '变更' : 'Changes'}</div>
+        <div class="wb__nav">{isZh ? '文件' : 'Files'}</div>
+      </aside>
+      <main class="wb__main">
+        <div class="wb__mode">Ask</div>
+        <div class="wb__bubble wb__bubble--user">
+          {
+            isZh
+              ? '概括这个仓库，并列出主要包。'
+              : 'Summarize this repository and list its main packages.'
+          }
+        </div>
+        <div class="wb__bubble wb__bubble--ai">
+          {
+            isZh ? (
+              <>
+                正在读取工作区… Kernel 包大致为 <code>shared</code>、<code>core</code>、
+                <code>pi</code>、<code>web</code>、<code>cli</code>。
+              </>
+            ) : (
+              <>
+                Reading the workspace… Kernel packages look like <code>shared</code>,{' '}
+                <code>core</code>, <code>pi</code>, <code>web</code>, and <code>cli</code>.
+              </>
+            )
+          }
+        </div>
+        <div class="wb__composer">{isZh ? '给 Agent 发消息…' : 'Message your agent…'}</div>
+      </main>
+    </div>
+  </div>
+  <figcaption class="wb__caption">{caption}</figcaption>
+</figure>
