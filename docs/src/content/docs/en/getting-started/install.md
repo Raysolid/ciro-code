@@ -3,6 +3,8 @@ title: Install
 description: Install Ciro Code with npm on Windows, macOS, and Linux.
 ---
 
+Get `ciro` on your machine, then continue with [Quickstart](/getting-started/quickstart/).
+
 ## Requirements
 
 - **Node.js 20+**
@@ -12,16 +14,10 @@ description: Install Ciro Code with npm on Windows, macOS, and Linux.
 
 ```bash
 npm install -g @ciro-code/code
-```
-
-The CLI binary is `ciro`. `@ciro-code/cli` is an equivalent package with the same `bin`.
-
-```bash
-ciro --help
 ciro web
 ```
 
-Default workbench: [http://127.0.0.1:3080](http://127.0.0.1:3080) · health: `/health`.
+The CLI binary is `ciro` (same for `@ciro-code/cli`). Workbench: [http://127.0.0.1:3080](http://127.0.0.1:3080) · health: `/health`.
 
 :::caution
 Install the scoped package `@ciro-code/code`. Do **not** use `npm i -g ciro`.

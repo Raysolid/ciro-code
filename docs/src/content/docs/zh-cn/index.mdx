@@ -1,19 +1,40 @@
 ---
-title: Ciro Code 文档
-description: 本机 Coding Agent 与本地 Web 工作台。
+title: Ciro Code
+description: 本机优先的编码 Agent 与本地 Web 工作台。
+template: splash
+hero:
+  title: Ciro Code
+  tagline: 本机优先的编码 Agent。在你的机器上打开 Web 工作台，直接在项目里干活，数据留在本地。
+  actions:
+    - text: 快速开始
+      link: /getting-started/quickstart/
+      icon: rocket
+      variant: primary
+    - text: 安装
+      link: /getting-started/install/
+      icon: download
+      variant: minimal
 ---
 
-Ciro Code 在你的机器上运行：带策略沙箱的编码助手，以及本地 Web 工作台。
+import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## 从这里开始
+## 下一步
 
-1. [安装](/getting-started/install/)
-2. [快速开始](/getting-started/quickstart/)
-3. [配置模型](/getting-started/first-provider/)
-
-```bash
-npm install -g @ciro-code/code
-ciro web
-```
-
-工作台：[http://127.0.0.1:3080](http://127.0.0.1:3080)
+<CardGrid>
+  <Card title="安装" icon="download">
+    用 npm 装好 `ciro`，启动本地工作台。
+    [安装说明 →](/getting-started/install/)
+  </Card>
+  <Card title="快速开始" icon="rocket">
+    选文件夹、发第一条任务，看 Agent 怎么工作。
+    [约 5 分钟上手 →](/getting-started/quickstart/)
+  </Card>
+  <Card title="连接模型" icon="setting">
+    在设置里添加 API Key；也可以先用 Mock 浏览界面。
+    [连接模型 →](/getting-started/first-provider/)
+  </Card>
+  <Card title="工作模式" icon="puzzle">
+    Ask / Plan / Agent / Debug — 决定 Agent 能改多少。
+    [了解模式 →](/guides/modes/)
+  </Card>
+</CardGrid>

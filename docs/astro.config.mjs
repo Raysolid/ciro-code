@@ -4,42 +4,42 @@ import starlight from '@astrojs/starlight';
 /** @type {import('@astrojs/starlight/types').StarlightUserConfig['sidebar']} */
 const sidebar = [
   {
-    label: 'Getting started',
-    translations: { 'zh-CN': '入门' },
+    label: 'Get started',
+    translations: { 'zh-CN': '开始使用' },
     items: [
-      { label: 'Overview', translations: { 'zh-CN': '概览' }, slug: 'getting-started/overview' },
-      { label: 'Install', translations: { 'zh-CN': '安装' }, slug: 'getting-started/install' },
+      { label: 'What is Ciro Code', translations: { 'zh-CN': '产品概览' }, slug: 'getting-started/overview' },
       { label: 'Quickstart', translations: { 'zh-CN': '快速开始' }, slug: 'getting-started/quickstart' },
-      { label: 'First provider', translations: { 'zh-CN': '配置模型' }, slug: 'getting-started/first-provider' },
+      { label: 'Install', translations: { 'zh-CN': '安装' }, slug: 'getting-started/install' },
+      { label: 'Connect a model', translations: { 'zh-CN': '连接模型' }, slug: 'getting-started/first-provider' },
     ],
   },
   {
-    label: 'Guides',
-    translations: { 'zh-CN': '指南' },
+    label: 'Using Ciro',
+    translations: { 'zh-CN': '使用指南' },
     items: [
-      { label: 'Modes', translations: { 'zh-CN': '模式' }, slug: 'guides/modes' },
+      { label: 'Modes', translations: { 'zh-CN': '工作模式' }, slug: 'guides/modes' },
       { label: 'Workspace & sessions', translations: { 'zh-CN': '工作区与会话' }, slug: 'guides/workspace-session' },
-      { label: 'Rules & skills', translations: { 'zh-CN': 'Rules 与 Skills' }, slug: 'guides/rules-skills' },
-      { label: 'MCP', translations: { 'zh-CN': 'MCP' }, slug: 'guides/mcp' },
-      { label: 'Packs', translations: { 'zh-CN': 'Feature Packs' }, slug: 'guides/packs' },
-      { label: 'Permissions', translations: { 'zh-CN': '权限' }, slug: 'guides/permissions' },
-      { label: 'Troubleshooting', translations: { 'zh-CN': '排障' }, slug: 'guides/troubleshooting' },
+      { label: 'Rules & skills', translations: { 'zh-CN': '规则与 Skills' }, slug: 'guides/rules-skills' },
+      { label: 'MCP tools', translations: { 'zh-CN': 'MCP 工具' }, slug: 'guides/mcp' },
+      { label: 'Feature packs', translations: { 'zh-CN': '扩展 Pack' }, slug: 'guides/packs' },
+      { label: 'Permissions', translations: { 'zh-CN': '权限与安全' }, slug: 'guides/permissions' },
+      { label: 'Troubleshooting', translations: { 'zh-CN': '常见问题' }, slug: 'guides/troubleshooting' },
     ],
   },
   {
     label: 'Reference',
     translations: { 'zh-CN': '参考' },
     items: [
-      { label: 'CLI', translations: { 'zh-CN': 'CLI' }, slug: 'reference/cli' },
+      { label: 'CLI', translations: { 'zh-CN': '命令行' }, slug: 'reference/cli' },
       { label: 'Config', translations: { 'zh-CN': '配置' }, slug: 'reference/config' },
       { label: 'Changelog', translations: { 'zh-CN': '更新日志' }, slug: 'reference/changelog' },
     ],
   },
   {
-    label: 'Project',
-    translations: { 'zh-CN': '项目' },
+    label: 'Contribute',
+    translations: { 'zh-CN': '参与贡献' },
     items: [
-      { label: 'Contributing', translations: { 'zh-CN': '贡献' }, slug: 'project/contributing' },
+      { label: 'Build from source', translations: { 'zh-CN': '从源码构建' }, slug: 'project/contributing' },
     ],
   },
 ];
@@ -69,6 +69,7 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/Raysolid/ciro-code/edit/main/docs/',
       },
+      customCss: ['./src/styles/custom.css'],
     }),
   ],
 });

@@ -1,9 +1,9 @@
 ---
-title: First provider
-description: Configure an API key or try the workbench with --mock.
+title: Connect a model
+description: Add an API key in Settings, or explore the UI with Mock first.
 ---
 
-Ciro Code needs a model provider for real answers. You can explore the UI first with Mock.
+Real answers need a model. You can open the workbench with Mock first, then connect a provider when you are ready.
 
 ## Option A — Mock (no key)
 

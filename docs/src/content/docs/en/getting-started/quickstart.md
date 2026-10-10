@@ -1,51 +1,53 @@
 ---
 title: Quickstart
-description: From install to your first session and Changes.
+description: Open the workbench and finish your first task in a few minutes.
 ---
 
-## 1. Install
+Goal: install (if needed), open the workbench, pick a project, and run one real task.
 
-```bash
-npm install -g @ciro-code/code
-```
+## 1. Open the workbench
 
-## 2. Start the workbench
-
-Without a model key (UI only):
-
-```bash
-ciro web --mock
-```
-
-With a real model (after [First provider](/getting-started/first-provider/)):
+If `ciro` is not installed yet, follow [Install](/getting-started/install/), then:
 
 ```bash
 ciro web
 ```
 
-The CLI prints the workbench URL (default [http://127.0.0.1:3080](http://127.0.0.1:3080)) and opens the browser unless you pass `--no-open`.
-
-## 3. Choose a workspace
-
-If no workspace is selected, use the center prompt or sidebar **+** to pick a local folder. Recent workspaces are remembered for the next launch (when you omit `-w`).
-
-You can also pin a workspace from the CLI:
+No API key yet? Explore the UI safely:
 
 ```bash
-ciro web -w /path/to/your/project
+ciro web --mock
 ```
 
-## 4. Send a first message
+Your browser should open [http://127.0.0.1:3080](http://127.0.0.1:3080). Use `--no-open` if you prefer to open it yourself.
 
-Type a short task in the composer and send. A session is created when the first message is sent.
+## 2. Choose a workspace
 
-In **Ask** mode the agent stays read-oriented. Switch to **Agent** when you want edits (see [Modes](/guides/modes/)).
+Until a folder is selected, the composer stays locked.
+
+- Click the center prompt or sidebar **+** and pick your project
+- Or start with a path: `ciro web -w /path/to/your/project`
+
+## 3. Connect a model (skip if using Mock)
+
+Open **Settings → Models**, add a provider and key, enable a model.
+
+Or set `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` before `ciro web`. Details: [Connect a model](/getting-started/first-provider/).
+
+## 4. Run a first task
+
+Stay in **Ask** for a read-only pass. Try:
+
+> Summarize this repository and list its main packages.
+
+Send the message. Ciro creates a session on the first send.
+
+Want the agent to edit files? Switch to **Agent**, then ask for a small, concrete change. See [Modes](/guides/modes/).
 
 ## 5. Review Changes
 
-When the agent edits files, open the **Changes** view in the workbench to inspect diffs before you commit in git yourself.
+If files were edited, open **Changes** in the workbench. Inspect the diff, then commit with your own git workflow.
 
-## Next
+## You are in
 
-- [Modes](/guides/modes/)
-- [Troubleshooting](/guides/troubleshooting/)
+Next useful pages: [Modes](/guides/modes/) · [Feature packs](/guides/packs/) · [Troubleshooting](/guides/troubleshooting/)

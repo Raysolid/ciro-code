@@ -1,22 +1,32 @@
 ---
 title: Modes
-description: Ask, Plan, Agent, and Debug — workflow and permissions.
+description: Pick Ask, Plan, Agent, or Debug for the job at hand.
 ---
 
-Mode controls **workflow and tool permissions**. Model choice (provider + model id) is separate under Settings.
+Mode answers: **how should the agent behave right now?**  
+Model answers: **which model runs** — configure that in Settings.
 
-| Mode | Intent | Typical tools |
-|------|--------|----------------|
-| **Ask** | Explain and explore without edits | Read-oriented tools; Task explore only |
-| **Plan** | Design a change plan | Explore / verify / shell (no browser) |
-| **Agent** | Implement changes | Write / edit / shell; browser when Playwright MCP is ready |
-| **Debug** | Investigate failures | Similar to Agent, tuned for diagnosis |
+## Pick by intent
 
-Switch modes from the workbench UI, or start with a CLI override:
+| Situation | Mode | What happens |
+|-----------|------|----------------|
+| Explain code, explore a repo, no edits | **Ask** | Read-oriented tools; safe default |
+| Design an approach before touching files | **Plan** | Planning workflow; limited write risk |
+| Implement a feature or fix | **Agent** | Can edit files and run shell under policy |
+| Hunt a bug or failing test | **Debug** | Agent-like tools, tuned for diagnosis |
+
+You can switch modes in the workbench at any time, or start with:
 
 ```bash
 ciro web --mode ask
 ciro web --mode agent
 ```
 
-Always review **Changes** before committing. Prefer Ask/Plan when you are unsure; use Agent when you want the agent to edit files.
+## Tips
+
+- Start in **Ask** when you are unfamiliar with the repo.
+- Use **Plan** when the change is large or risky.
+- Always open **Changes** before you commit.
+- Approvals may still appear for sensitive commands — that is expected.
+
+Full CLI flags: [CLI reference](/reference/cli/).

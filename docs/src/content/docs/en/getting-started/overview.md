@@ -1,22 +1,31 @@
 ---
-title: Overview
-description: What Ciro Code is and how it fits with Ciro Chat.
+title: What is Ciro Code
+description: What Ciro Code is and when to use it.
 ---
 
-Ciro Code is a **local coding agent** with a Web workbench. It works in your project directory, runs tools under a policy sandbox, and supports four modes: **Ask**, **Plan**, **Agent**, and **Debug**.
+Ciro Code is a local-first coding agent that works in your project directory.
 
-## Surfaces
+You start a local Web workbench with the CLI. The agent runs tools under a policy sandbox you control.
 
-| Surface | Role |
-|---------|------|
-| **CLI** | `ciro` — install packs, start the server, doctor / migrate / debug |
-| **Web UI** | Local workbench at `http://127.0.0.1:3080` |
-| **Packs** | Optional Feature Packs (for example Git) installed into `~/.ciro/packs/` |
+Your config, API keys, and sessions stay on your machine. Ciro Code only calls model providers you enable; tools do not open the network on their own.
 
-## Local-first
+Ready to try it? Go to [Quickstart](/getting-started/quickstart/). Need the install command first? See [Install](/getting-started/install/).
 
-Configuration, credentials, and sessions stay on your machine under `.ciro` (workspace) and `~/.ciro` (user). Outbound network use is limited to model providers and tools you enable. See [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md).
+## When to use each mode
 
-## Ciro Chat
+| You want to… | Use |
+|--------------|-----|
+| Ask questions without editing files | **Ask** |
+| Shape a plan before changing code | **Plan** |
+| Let the agent implement changes | **Agent** |
+| Dig into a failure or bug | **Debug** |
 
-Ciro Chat is a separate multi-model chat product. Chat does **not** host this documentation site or the Ciro Code workbench. Install and run Ciro Code on your machine with npm — see [Install](/getting-started/install/).
+Mode sets the workflow and tool permissions. You pick the model separately in Settings. Details: [Modes](/guides/modes/).
+
+## Extend the workbench
+
+Optional Feature Packs add panels and tools (for example Git). Install with the CLI, then enable in Settings — install does not turn a pack on by itself. See [Feature packs](/guides/packs/).
+
+## Privacy in one line
+
+Everything product-related lives under `{workspace}/.ciro/` and `~/.ciro/`. See [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) if you need paths and egress details.

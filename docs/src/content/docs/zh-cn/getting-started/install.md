@@ -3,6 +3,8 @@ title: 安装
 description: 在 Windows / macOS / Linux 上用 npm 安装 Ciro Code。
 ---
 
+装好 `ciro` 后，继续看 [快速开始](/getting-started/quickstart/)。
+
 ## 要求
 
 - **Node.js 20+**
@@ -12,16 +14,10 @@ description: 在 Windows / macOS / Linux 上用 npm 安装 Ciro Code。
 
 ```bash
 npm install -g @ciro-code/code
-```
-
-CLI 命令为 `ciro`。`@ciro-code/cli` 为等价包（同一 `bin`）。
-
-```bash
-ciro --help
 ciro web
 ```
 
-默认工作台：[http://127.0.0.1:3080](http://127.0.0.1:3080) · 健康检查：`/health`。
+CLI 命令为 `ciro`（`@ciro-code/cli` 等价）。工作台：[http://127.0.0.1:3080](http://127.0.0.1:3080) · 健康检查：`/health`。
 
 :::caution
 请安装作用域包 `@ciro-code/code`。不要使用 `npm i -g ciro`。

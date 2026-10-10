@@ -1,9 +1,9 @@
 ---
-title: 配置模型
-description: 配置 API Key，或用 --mock 先体验界面。
+title: 连接模型
+description: 在设置里添加 API Key，或先用 Mock 浏览界面。
 ---
 
-真实对话需要模型服务商。也可先用 Mock 浏览界面。
+要得到真实回答，需要连接模型。你可以先用 Mock 打开工作台，准备好后再添加 Provider。
 
 ## 方式 A — Mock（无 Key）
 
