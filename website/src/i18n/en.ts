@@ -34,8 +34,8 @@ export const en = {
       { id: 'terminal', label: 'CLI' },
     ],
     video: {
-      title: '2-minute product tour',
-      caption: 'From CLI launch to local Web workbench in seconds',
+      title: 'One-minute product tour',
+      caption: 'From ciro web to multi-mode workbench and Diff review',
       play: 'Play demo',
     },
     mediaNote: 'Actual product UI · All inference and file edits remain visible and auditable locally',

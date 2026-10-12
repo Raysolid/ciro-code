@@ -1,5 +1,6 @@
 ---
 import type { Messages } from '../i18n/en';
+import { mediaPaths } from '../lib/media';
 import WorkbenchVisual from './WorkbenchVisual.astro';
 
 interface Props {
@@ -8,11 +9,7 @@ interface Props {
 }
 
 const { t, base } = Astro.props;
-const media = {
-  workbench: `${base}media/placeholder-workbench.svg`,
-  diff: `${base}media/placeholder-diff.svg`,
-  terminal: `${base}media/placeholder-terminal.svg`,
-};
+const media = mediaPaths(base);
 ---
 
 <section class="stage section section--band" id="product" data-reveal data-anchor="product">
@@ -43,8 +40,25 @@ const media = {
       </div>
 
       <div class="stage__panel" data-stage-panel="video" role="tabpanel" hidden>
-        <div class="media-frame media-frame--video">
-          <img src={media.workbench} alt="" width="1280" height="720" loading="lazy" />
+        <div class="media-frame media-frame--video" data-tour>
+          <video
+            class="media-frame__video"
+            src={media.tour}
+            poster={media.tourPoster}
+            width="1280"
+            height="720"
+            playsinline
+            preload="metadata"
+            controlslist="nodownload"
+          ></video>
+          <img
+            class="media-frame__poster-only"
+            src={media.tourPoster}
+            alt=""
+            width="1280"
+            height="720"
+            loading="lazy"
+          />
           <button type="button" class="media-play" data-media-play aria-label={t.stage.video.play}>
             <span class="media-play__icon" aria-hidden="true"></span>
             <span>{t.stage.video.play}</span>
@@ -99,15 +113,34 @@ const media = {
       });
     });
 
-    root.querySelectorAll<HTMLButtonElement>('[data-media-play]').forEach((btn) => {
-      btn.addEventListener('click', () => {
+    root.querySelectorAll<HTMLElement>('[data-tour]').forEach((frame) => {
+      const video = frame.querySelector<HTMLVideoElement>('video');
+      const btn = frame.querySelector<HTMLButtonElement>('[data-media-play]');
+      if (!video || !btn) return;
+
+      const showPlay = () => {
+        btn.hidden = false;
+        btn.classList.remove('is-playing');
+      };
+      const hidePlay = () => {
+        btn.hidden = true;
         btn.classList.add('is-playing');
-        const label = btn.querySelector('span:last-child');
-        if (label) label.textContent = '…';
-        setTimeout(() => {
-          btn.classList.remove('is-playing');
-          if (label) label.textContent = btn.getAttribute('aria-label') || 'Play';
-        }, 1200);
+      };
+
+      btn.addEventListener('click', () => {
+        void video.play().then(hidePlay).catch(showPlay);
+      });
+      video.addEventListener('click', () => {
+        if (video.paused) {
+          void video.play().then(hidePlay).catch(showPlay);
+        } else {
+          video.pause();
+          showPlay();
+        }
+      });
+      video.addEventListener('ended', showPlay);
+      video.addEventListener('pause', () => {
+        if (!video.ended) showPlay();
       });
     });
   }

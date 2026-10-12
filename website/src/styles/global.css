@@ -1259,6 +1259,24 @@ html[data-theme='dark'] .diff-add {
   isolation: isolate;
 }
 
+.media-frame__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--ink, #161715);
+  cursor: pointer;
+}
+
+.media-frame__poster-only {
+  display: none;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
 .media-play {
   position: absolute;
   top: 50%;
@@ -2274,6 +2292,15 @@ html[data-theme='dark'] .faq-agent__dot {
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .media-frame--video .media-frame__video,
+  .media-frame--video .media-play {
+    display: none !important;
+  }
+
+  .media-frame--video .media-frame__poster-only {
+    display: block !important;
   }
 
   .scroll-rail {

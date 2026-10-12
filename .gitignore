@@ -7,3 +7,7 @@ dist/
 .env
 .env.local
 apps/ciro-cli/vendor/
+# Root uses pnpm; do not commit accidental npm lockfiles here.
+/package-lock.json
+# Remotion intermediate renders (source lives under promo/)
+promo/out/

@@ -36,8 +36,8 @@ export const zhCn: Messages = {
       { id: 'terminal', label: '命令行' },
     ],
     video: {
-      title: '两分钟产品导览',
-      caption: '2 分钟直观了解：从终端启动到 Web 工作台多模式协同',
+      title: '约一分钟产品导览',
+      caption: '从终端 ciro web 到工作台多模式协同与 Diff 审阅',
       play: '播放演示',
     },
     mediaNote: '真实运行界面 · 所有推理与文件改动均在本地可感可视',

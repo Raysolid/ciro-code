@@ -1,5 +1,6 @@
 ---
 import type { Messages } from '../i18n/en';
+import { mediaPaths } from '../lib/media';
 
 interface Props {
   t: Messages;
@@ -7,13 +8,7 @@ interface Props {
 }
 
 const { t, base } = Astro.props;
-
-const media: Record<string, string> = {
-  Ask: `${base}media/mode-ask.svg`,
-  Plan: `${base}media/mode-plan.svg`,
-  Agent: `${base}media/mode-agent.svg`,
-  Debug: `${base}media/mode-debug.svg`,
-};
+const media = mediaPaths(base).modes;
 ---
 
 <section class="modes-rail" id="modes" data-anchor="modes">

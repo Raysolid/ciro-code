@@ -1,0 +1,20 @@
+{
+  "name": "ciro-code-promo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts CiroTour out/tour.mp4 --codec=h264",
+    "still": "remotion still src/index.ts CiroTour"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.484",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "remotion": "4.0.484"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "typescript": "5.8.2"
+  }
+}

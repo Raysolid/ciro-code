@@ -1,5 +1,6 @@
 ---
 import type { Messages } from '../i18n/en';
+import { mediaPaths } from '../lib/media';
 
 interface Props {
   t: Messages;
@@ -7,11 +8,7 @@ interface Props {
 }
 
 const { t, base } = Astro.props;
-const src: Record<string, string> = {
-  workbench: `${base}media/placeholder-workbench.svg`,
-  diff: `${base}media/placeholder-diff.svg`,
-  terminal: `${base}media/placeholder-terminal.svg`,
-};
+const src = mediaPaths(base);
 ---
 
 <section class="showcase section" id="showcase" data-reveal>
