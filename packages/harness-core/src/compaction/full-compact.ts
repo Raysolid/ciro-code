@@ -1,4 +1,4 @@
-import type { CompactionResult, HarnessMode } from '@ciro/harness-shared';
+import type { CompactionResult, HarnessMode } from '@ciro-code/harness-shared';
 import { roughTokenEstimate } from '../context/token-estimate.js';
 import { readSessionMemory } from './session-memory.js';
 

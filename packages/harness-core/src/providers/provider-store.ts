@@ -13,7 +13,7 @@ import type {
   ProvidersFile,
   ProvidersListResponse,
   UpdateProviderRequest,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import { hasApiKey } from '../config/load-config.js';
 import {
   legacyPathWarning,

@@ -2,10 +2,10 @@ import { serve } from '@hono/node-server';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadConfig, ExtensionHost, ExtensionTrustStore, McpManager, ProviderStore, SessionStore, SkillRegistry } from '@ciro/harness-core';
-import type { HarnessMode, ModeProfileProvider } from '@ciro/harness-shared';
-import { createMinimalModeProfiles } from '@ciro/harness-shared';
-import { createAgentRuntime } from '@ciro/harness-pi';
+import { loadConfig, ExtensionHost, ExtensionTrustStore, McpManager, ProviderStore, SessionStore, SkillRegistry } from '@ciro-code/harness-core';
+import type { HarnessMode, ModeProfileProvider } from '@ciro-code/harness-shared';
+import { createMinimalModeProfiles } from '@ciro-code/harness-shared';
+import { createAgentRuntime } from '@ciro-code/harness-pi';
 import { createHarnessApp } from './app.js';
 
 function resolveDefaultUiDist(): string | undefined {
@@ -75,16 +75,12 @@ export async function startHarnessServer(options: StartServerOptions = {}) {
     workspacePinned: options.workspacePinned,
   });
 
-  const server = serve(
-    {
-      fetch: app.fetch,
-      port: config.bind.port,
-      hostname: config.bind.host,
-    },
-    (info) => {
-      console.log(`Ciro Harness running at http://${info.address}:${info.port}`);
-    },
-  );
+  // Product UX (banner / URLs / browser) is owned by `@ciro-code/cli`.
+  const server = serve({
+    fetch: app.fetch,
+    port: config.bind.port,
+    hostname: config.bind.host,
+  });
 
   server.on('error', (err: NodeJS.ErrnoException) => {
     console.error(

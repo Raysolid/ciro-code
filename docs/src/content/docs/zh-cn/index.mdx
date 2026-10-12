@@ -1,51 +1,93 @@
 ---
-title: Ciro Code
-description: 本机优先的编码 Agent 与本地 Web 工作台。
+title: 文档
+description: Ciro Code 文档——安装、快速开始、模式、Pack 与参考。
 template: splash
 hero:
-  title: Ciro Code
-  tagline: 本机优先的编码 Agent。在你的机器上打开 Web 工作台，直接在项目里干活，数据留在本地。
-  actions:
-    - text: 快速开始
-      link: /ciro-code/docs/zh-cn/getting-started/quickstart/
-      icon: right-arrow
-      variant: primary
-    - text: GitHub
-      link: https://github.com/Raysolid/ciro-code
-      variant: minimal
-      attrs:
-        rel: me
+  title: 文档
+  tagline: Ciro Code 是本机优先的编码 Agent，提供本地 Web 工作台。
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import InstallCopy from '../../../components/InstallCopy.astro';
 
-## Open Core 边界说明
+<InstallCopy
+  copyLabel="复制"
+  copiedLabel="已复制"
+  label="快速开始"
+  eta="约 5 分钟"
+  hint='需要 Node.js 20+。还没有 API Key？可运行 <code>ciro web --mock</code>。'
+/>
 
-<div class="home-callout">
+## 从这里开始
 
-**Kernel 与 CLI 完全开源**，本地执行逻辑均可审计。**Web UI 与官方 Profile 以 npm 安装产物交付**，以维持项目可持续开发。**你的配置、密钥与会话留在本机**，不会未经允许上传。
-
-[查看仓库](https://github.com/Raysolid/ciro-code) · [贡献指南](/ciro-code/docs/zh-cn/project/contributing/) · [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) · [llms.txt](/ciro-code/docs/llms.txt)
-
+<div class="home-start-grid">
+  <a class="home-start-card" href="/ciro-code/docs/zh-cn/getting-started/quickstart/">
+    <p class="home-start-card__tag">new</p>
+    <h3>我是第一次用</h3>
+    <p>安装 <code>ciro</code>，连接模型，完成第一次会话。约 5 分钟。</p>
+    <p class="home-start-card__cta">快速开始 →</p>
+  </a>
+  <a class="home-start-card" href="/ciro-code/docs/zh-cn/guides/packs/">
+    <p class="home-start-card__tag">extend</p>
+    <h3>我想扩展能力</h3>
+    <p>Feature Packs、manifest，以及 CLI / 配置参考。</p>
+    <p class="home-start-card__cta">扩展 Pack → · 命令行 →</p>
+  </a>
+  <a class="home-start-card" href="/ciro-code/docs/zh-cn/open-core/what-is-open/">
+    <p class="home-start-card__tag">source</p>
+    <h3>开源范围是什么？</h3>
+    <p>Kernel 架构、Open Core 边界与本地数据承诺。</p>
+    <p class="home-start-card__cta">开源范围与承诺 →</p>
+  </a>
+  <a class="home-start-card" href="/ciro-code/docs/zh-cn/guides/troubleshooting/">
+    <p class="home-start-card__tag">help</p>
+    <h3>我遇到问题了</h3>
+    <p>PATH、端口 3080、找不到 <code>ciro</code>——Windows 优先排障。</p>
+    <p class="home-start-card__cta">立即排查 →</p>
+  </a>
 </div>
 
-## 下一步
+## 常用页面
 
-<CardGrid>
-  <Card title="我是第一次用" icon="rocket">
-    从零完成安装、连接模型，并发出第一条任务。
-    <span class="home-eta">[约 5 分钟上手 →](/ciro-code/docs/zh-cn/getting-started/quickstart/)</span>
-  </Card>
-  <Card title="我想开发扩展" icon="puzzle">
-    了解 Feature Pack、manifest，以及 CLI / 配置参考。
-    <span class="home-eta">[扩展 Pack →](/ciro-code/docs/zh-cn/guides/packs/) · [命令行 →](/ciro-code/docs/zh-cn/reference/cli/)</span>
-  </Card>
-  <Card title="我想了解开源边界" icon="open-book">
-    Kernel 可审计范围、Open Core 边界，以及如何从源码构建。
-    <span class="home-eta">[贡献指南 →](/ciro-code/docs/zh-cn/project/contributing/)</span>
-  </Card>
-  <Card title="我遇到问题了" icon="information">
-    安装失败、端口占用、找不到 `ciro`？Windows 优先排障。
-    <span class="home-eta">[立即排查 →](/ciro-code/docs/zh-cn/guides/troubleshooting/)</span>
-  </Card>
-</CardGrid>
+<ul class="home-popular">
+  <li>
+    <a href="/ciro-code/docs/zh-cn/guides/modes/">
+      <span>工作模式：Ask / Plan / Agent / Debug</span>
+      <span class="slug">guides/modes</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/zh-cn/guides/packs/">
+      <span>Feature Packs 与 manifest</span>
+      <span class="slug">guides/packs</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/zh-cn/guides/permissions/">
+      <span>权限与策略沙箱</span>
+      <span class="slug">guides/permissions</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/zh-cn/reference/cli/">
+      <span>CLI 参考</span>
+      <span class="slug">reference/cli</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/zh-cn/guides/troubleshooting/">
+      <span>Windows 安装与 PATH</span>
+      <span class="slug">troubleshooting</span>
+    </a>
+  </li>
+</ul>
+
+<div class="home-help">
+  <div>
+    <p class="home-help__title">找不到需要的内容？</p>
+    <p class="home-help__sub">可以开 Issue，或查看 SECURITY.md 了解漏洞报告方式。</p>
+  </div>
+  <div class="home-help__actions">
+    <a class="ghost" href="https://github.com/Raysolid/ciro-code/issues">GitHub Issues</a>
+    <a class="solid" href="https://github.com/Raysolid/ciro-code">仓库</a>
+  </div>
+</div>

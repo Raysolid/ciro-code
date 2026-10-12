@@ -1,55 +1,66 @@
 ---
+import type { Messages } from '../i18n/en';
+
 interface Props {
-  caption: string;
-  locale: 'en' | 'zh-cn';
+  t: Messages;
 }
 
-const { caption, locale } = Astro.props;
-const isZh = locale === 'zh-cn';
+const { t } = Astro.props;
+const w = t.workbench;
 ---
 
-<figure class="hero__visual">
-  <div class="wb" aria-hidden="true">
-    <div class="wb__bar">
-      <span class="wb__dot wb__dot--r"></span>
-      <span class="wb__dot wb__dot--y"></span>
-      <span class="wb__dot wb__dot--g"></span>
-      <span class="wb__url">127.0.0.1:3080</span>
-    </div>
-    <div class="wb__body">
-      <aside class="wb__side">
-        <div class="wb__brand">Ciro</div>
-        <div class="wb__nav is-active">{isZh ? '对话' : 'Chat'}</div>
-        <div class="wb__nav">{isZh ? '变更' : 'Changes'}</div>
-        <div class="wb__nav">{isZh ? '文件' : 'Files'}</div>
-      </aside>
-      <main class="wb__main">
-        <div class="wb__mode">Ask</div>
-        <div class="wb__bubble wb__bubble--user">
-          {
-            isZh
-              ? '概括这个仓库，并列出主要包。'
-              : 'Summarize this repository and list its main packages.'
-          }
+<div class="wb">
+  <div class="wb__bar">
+    <span class="wb__dot"></span>
+    <span class="wb__dot"></span>
+    <span class="wb__dot"></span>
+    <span class="wb__url">{w.url}</span>
+    <span class="wb__live" aria-hidden="true"><i></i> live</span>
+  </div>
+  <div class="wb__grid">
+    <aside class="wb__side">
+      <p class="wb__side-label">{w.workspace}</p>
+      <ul style="margin:0;padding:0">
+        <li class="wb__file is-active">src/app.ts</li>
+        <li class="wb__file">src/policy.ts</li>
+        <li class="wb__file">ciro.config.json</li>
+        <li class="wb__file">AGENTS.md</li>
+      </ul>
+      <p class="wb__side-label">{w.packs}</p>
+      <ul style="margin:0;padding:0">
+        <li class="wb__file">@ciro-code/ext-git</li>
+      </ul>
+    </aside>
+    <div class="wb__main">
+      <div class="wb__modes">
+        <span class="wb__mode">Ask</span>
+        <span class="wb__mode">Plan</span>
+        <span class="wb__mode is-active">Agent</span>
+        <span class="wb__mode">Debug</span>
+      </div>
+      <div class="wb__msg">
+        <div class="wb__avatar wb__avatar--you">You</div>
+        <p set:html={w.userMsgHtml} />
+      </div>
+      <div class="wb__msg">
+        <div class="wb__avatar wb__avatar--ai">C</div>
+        <div>
+          <p set:html={w.agentMsgHtml} />
+          <div class="wb__diff wb__diff--in">
+            <div class="wb__diff-head">
+              <span class="font-mono">{w.diffFile}</span>
+              <span class="stat">{w.diffStat}</span>
+            </div>
+            <pre set:html={w.diffPre} />
+          </div>
+          <p class="wb__test" set:html={w.testLineHtml} />
         </div>
-        <div class="wb__bubble wb__bubble--ai">
-          {
-            isZh ? (
-              <>
-                正在读取工作区… Kernel 包大致为 <code>shared</code>、<code>core</code>、
-                <code>pi</code>、<code>web</code>、<code>cli</code>。
-              </>
-            ) : (
-              <>
-                Reading the workspace… Kernel packages look like <code>shared</code>,{' '}
-                <code>core</code>, <code>pi</code>, <code>web</code>, and <code>cli</code>.
-              </>
-            )
-          }
-        </div>
-        <div class="wb__composer">{isZh ? '给 Agent 发消息…' : 'Message your agent…'}</div>
-      </main>
+      </div>
+      <div class="wb__composer">
+        {w.composer}
+        <span class="wb__caret" aria-hidden="true"></span>
+        <kbd>{w.send}</kbd>
+      </div>
     </div>
   </div>
-  <figcaption class="wb__caption">{caption}</figcaption>
-</figure>
+</div>

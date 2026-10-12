@@ -10,7 +10,7 @@ import {
   resolveWorkspacePath,
   SandboxError,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 
 const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', 'build', '.turbo', 'coverage']);
 const TEXT_EXTS = new Set([

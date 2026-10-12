@@ -3,7 +3,7 @@ import { mkdtempSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { ContextAccountant } from '../context/context-accountant.js';
-import { DEFAULT_COMPACTION_CONFIG } from '@ciro/harness-shared';
+import { DEFAULT_COMPACTION_CONFIG } from '@ciro-code/harness-shared';
 import { ToolResultStore, buildPreview } from './tool-result-store.js';
 import { runMicroCompact } from './micro-compact.js';
 import {

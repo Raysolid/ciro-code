@@ -8,7 +8,7 @@ import {
   type ContextBucketId,
   type ContextUrgency,
   type ContextUsageSnapshot,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import { roughTokenEstimate } from './token-estimate.js';
 
 export interface ContextAccountantOptions {

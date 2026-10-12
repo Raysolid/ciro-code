@@ -5,8 +5,8 @@ import {
   policyBlockMessage,
   type PlanStore,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
-import type { PlanRecord } from '@ciro/harness-shared';
+} from '@ciro-code/harness-core';
+import type { PlanRecord } from '@ciro-code/harness-shared';
 import { makeEnvelope } from '../sse/envelope.js';
 import { normalizeTodos, type PlanSsePush, type PlanToolContext } from './plan-tools.js';
 

@@ -1,23 +1,40 @@
 ---
-import IconMenu from './IconMenu.astro';
-
-const laptopIcon =
-  '<path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/>';
-
-const options = [
-  { label: Astro.locals.t('themeSelect.dark'), selected: false, value: 'dark' },
-  { label: Astro.locals.t('themeSelect.light'), selected: false, value: 'light' },
-  { label: Astro.locals.t('themeSelect.auto'), selected: true, value: 'auto' },
-];
+const label = Astro.locals.t('themeSelect.accessibleLabel');
+const toLight = Astro.locals.t('themeSelect.light');
+const toDark = Astro.locals.t('themeSelect.dark');
 ---
 
 <starlight-theme-select>
-  <IconMenu
-    label={Astro.locals.t('themeSelect.accessibleLabel')}
-    iconPath={laptopIcon}
-    options={options}
-    keepNativeSelect
-  />
+  <button
+    type="button"
+    class="icon-btn theme-toggle"
+    id="theme-toggle"
+    aria-label={label}
+    title={label}
+    data-label-light={toLight}
+    data-label-dark={toDark}
+  >
+    <svg class="theme-toggle__sun" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.75"></circle>
+      <path
+        d="M12 2.5v2.2M12 19.3v2.2M4.7 4.7l1.6 1.6M17.7 17.7l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.7 19.3l1.6-1.6M17.7 6.3l1.6-1.6"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"></path>
+    </svg>
+    <svg class="theme-toggle__moon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5 7.4 7.4 0 1 0 20.5 14.2Z"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linejoin="round"></path>
+    </svg>
+  </button>
+  <!-- Starlight 内部 picker 同步用，对用户隐藏 -->
+  <select class="theme-toggle__native" autocomplete="off" tabindex="-1" aria-hidden="true">
+    <option value="light">{toLight}</option>
+    <option value="dark">{toDark}</option>
+  </select>
 </starlight-theme-select>
 
 <script is:inline>
@@ -25,43 +42,65 @@ const options = [
 </script>
 
 <script>
-  type Theme = 'auto' | 'dark' | 'light';
+  type Theme = 'light' | 'dark';
   const storageKey = 'starlight-theme';
 
-  const parseTheme = (theme: unknown): Theme =>
-    theme === 'auto' || theme === 'dark' || theme === 'light' ? theme : 'auto';
+  const systemTheme = (): Theme =>
+    matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
-  const loadTheme = (): Theme =>
-    parseTheme(typeof localStorage !== 'undefined' && localStorage.getItem(storageKey));
+  const loadTheme = (): Theme => {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(storageKey) : null;
+    if (raw === 'light' || raw === 'dark') return raw;
+    return systemTheme();
+  };
 
-  function storeTheme(theme: Theme): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(storageKey, theme === 'light' || theme === 'dark' ? theme : '');
+  const storeTheme = (theme: Theme) => {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey, theme);
+  };
+
+  const syncButton = (btn: HTMLButtonElement, theme: Theme) => {
+    btn.dataset.theme = theme;
+    const next = theme === 'dark' ? btn.dataset.labelLight : btn.dataset.labelDark;
+    if (next) {
+      btn.setAttribute('aria-label', next);
+      btn.setAttribute('title', next);
     }
-  }
+  };
 
-  const getPreferredColorScheme = (): Theme =>
-    matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-
-  function onThemeChange(theme: Theme): void {
-    StarlightThemeProvider.updatePickers(theme);
-    document.documentElement.dataset.theme = theme === 'auto' ? getPreferredColorScheme() : theme;
+  function onThemeChange(theme: Theme, origin?: DOMRect): void {
     storeTheme(theme);
-    document.querySelectorAll('starlight-theme-select ciro-icon-menu').forEach((menu) => {
-      (menu as HTMLElement & { syncSelected?: (v: string) => void }).syncSelected?.(theme);
-    });
-  }
+    const run = () => {
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      StarlightThemeProvider.updatePickers(theme);
+      document.querySelectorAll<HTMLButtonElement>('#theme-toggle').forEach((b) => syncButton(b, theme));
+      document.querySelectorAll<HTMLSelectElement>('.theme-toggle__native').forEach((s) => {
+        s.value = theme;
+      });
+    };
 
-  matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
-    if (loadTheme() === 'auto') onThemeChange('auto');
-  });
+    if (
+      origin &&
+      !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      'startViewTransition' in document
+    ) {
+      document.documentElement.style.setProperty('--theme-x', `${origin.left + origin.width / 2}px`);
+      document.documentElement.style.setProperty('--theme-y', `${origin.top + origin.height / 2}px`);
+      (document as Document & { startViewTransition: (cb: () => void) => void }).startViewTransition(run);
+      return;
+    }
+    run();
+  }
 
   class StarlightThemeSelect extends HTMLElement {
     connectedCallback() {
-      onThemeChange(loadTheme());
-      this.addEventListener('ciro-menu-select', ((e: CustomEvent<{ value: string }>) => {
-        onThemeChange(parseTheme(e.detail.value));
-      }) as EventListener);
+      const btn = this.querySelector<HTMLButtonElement>('#theme-toggle');
+      const theme = loadTheme();
+      onThemeChange(theme);
+      btn?.addEventListener('click', () => {
+        const next: Theme = loadTheme() === 'dark' ? 'light' : 'dark';
+        onThemeChange(next, btn.getBoundingClientRect());
+      });
     }
   }
 

@@ -12,7 +12,7 @@ import {
   type SubagentType,
   type SubagentsConfig,
   type SummarySchemaV1,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   appendSubagentEvent,
   listSubagentMetas,

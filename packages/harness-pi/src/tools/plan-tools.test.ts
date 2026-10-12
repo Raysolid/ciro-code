@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { PlanStore, PlanQuestionBroker, PolicyEngine, createSessionPolicyGate } from '@ciro/harness-core';
+import { PlanStore, PlanQuestionBroker, PolicyEngine, createSessionPolicyGate } from '@ciro-code/harness-core';
 import {
   createAskQuestionTool,
   createCreatePlanTool,

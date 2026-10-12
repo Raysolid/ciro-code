@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { dirname, join } from 'node:path';
-import type { ChangeDisposition } from '@ciro/harness-shared';
+import type { ChangeDisposition } from '@ciro-code/harness-shared';
 import { assertWritable } from '../sandbox/path-sandbox.js';
 
 export interface ChangeReviewMeta {

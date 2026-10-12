@@ -1,22 +1,25 @@
+import { execFileSync } from 'node:child_process';
 import {
   cpSync,
   existsSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
   readdirSync,
   rmSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { HARNESS_VERSION, type PackListItem, type PackManifest, type PacksListResponse } from '@ciro/harness-shared';
+import { HARNESS_VERSION, type PackListItem, type PackManifest, type PacksListResponse } from '@ciro-code/harness-shared';
 import {
   packsDir,
   packsModulesDir,
 } from '../paths/product-paths.js';
 import { PackContributionRegistry } from './contribution-registry.js';
 
-const OFFICIAL_PACK_RE = /^@ciro\/ext-[a-z][a-z0-9-]*$/;
+const OFFICIAL_PACK_RE = /^@ciro-code\/ext-[a-z][a-z0-9-]*$/;
 
 export function isOfficialPackId(id: string): boolean {
   return OFFICIAL_PACK_RE.test(id);
@@ -25,9 +28,18 @@ export function isOfficialPackId(id: string): boolean {
 export function assertOfficialPackId(id: string): void {
   if (!isOfficialPackId(id)) {
     throw new Error(
-      `Only official packs matching @ciro/ext-* are allowed (got: ${id})`,
+      `Only official packs matching @ciro-code/ext-* are allowed (got: ${id})`,
     );
   }
+}
+
+/** `@ciro-code/ext-git` or `@ciro-code/ext-git@0.1.1` → id + version/tag */
+export function parsePackSpec(spec: string): { id: string; version: string } {
+  if (!spec.startsWith('@')) return { id: spec, version: 'latest' };
+  const body = spec.slice(1);
+  const at = body.lastIndexOf('@');
+  if (at <= 0) return { id: spec, version: 'latest' };
+  return { id: `@${body.slice(0, at)}`, version: body.slice(at + 1) };
 }
 
 type EnabledFile = { enabled: string[] };
@@ -104,12 +116,12 @@ export class PackStore {
   }
 
   listInstalledIds(): string[] {
-    const scopeDir = join(this.modulesRoot, '@ciro');
+    const scopeDir = join(this.modulesRoot, '@ciro-code');
     if (!existsSync(scopeDir)) return [];
     try {
       return readdirSync(scopeDir)
         .filter((name) => name.startsWith('ext-'))
-        .map((name) => `@ciro/${name}`)
+        .map((name) => `@ciro-code/${name}`)
         .filter((id) => {
           try {
             return statSync(this.installPathFor(id)).isDirectory();
@@ -193,7 +205,7 @@ export class PackStore {
 
   /**
    * 从本地目录安装官方 Pack（复制到 ~/.ciro/packs/modules）。
-   * 要求目录内 package.json / ciro.pack.json 的 id 与 packId 一致且为 @ciro/ext-*。
+   * 要求目录内 package.json / ciro.pack.json 的 id 与 packId 一致且为 @ciro-code/ext-*。
    */
   addFromDirectory(packId: string, sourceDir: string): PackListItem {
     assertOfficialPackId(packId);
@@ -229,6 +241,33 @@ export class PackStore {
     const item = this.list().packs.find((p) => p.id === packId);
     if (!item) throw new Error(`Pack install failed: ${packId}`);
     return item;
+  }
+
+  /** 从 npm 安装官方 Pack（npm pack → tar 解压 → addFromDirectory）。 */
+  addFromNpm(packId: string, version = 'latest'): PackListItem {
+    assertOfficialPackId(packId);
+    const work = mkdtempSync(join(tmpdir(), 'ciro-pack-npm-'));
+    const shell = process.platform === 'win32';
+    try {
+      const spec = version === 'latest' ? packId : `${packId}@${version}`;
+      execFileSync('npm', ['pack', spec, '--pack-destination', work], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell,
+      });
+      const tgz = readdirSync(work).find((f) => f.endsWith('.tgz'));
+      if (!tgz) throw new Error(`npm pack produced no tarball for ${spec}`);
+      const extractRoot = join(work, 'extract');
+      mkdirSync(extractRoot);
+      execFileSync('tar', ['-xzf', join(work, tgz), '-C', extractRoot], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell,
+      });
+      const pkgRoot = join(extractRoot, 'package');
+      if (!existsSync(pkgRoot)) throw new Error(`Unexpected npm pack layout for ${spec}`);
+      return this.addFromDirectory(packId, pkgRoot);
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
   }
 
   remove(packId: string): void {

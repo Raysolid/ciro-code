@@ -11,7 +11,7 @@ import {
   revealPathInFolder,
   searchWorkspacePaths,
   statWorkspaceFile,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import type { AppContext } from '../app-context.js';
 
 export function registerFileRoutes(app: Hono, ctx: AppContext): void {

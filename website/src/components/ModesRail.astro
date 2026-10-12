@@ -1,0 +1,60 @@
+---
+import type { Messages } from '../i18n/en';
+
+interface Props {
+  t: Messages;
+  base: string;
+}
+
+const { t, base } = Astro.props;
+
+const media: Record<string, string> = {
+  Ask: `${base}media/mode-ask.svg`,
+  Plan: `${base}media/mode-plan.svg`,
+  Agent: `${base}media/mode-agent.svg`,
+  Debug: `${base}media/mode-debug.svg`,
+};
+---
+
+<section class="modes-rail" id="modes" data-anchor="modes">
+  <div class="modes-rail__pin">
+    <div class="wrap modes-rail__head">
+      <p class="eyebrow">{t.modes.eyebrow}</p>
+      <h2>{t.modes.title}</h2>
+      <p class="section__lead">{t.modes.lead}</p>
+    </div>
+    <div class="modes-rail__viewport">
+      <div class="modes-rail__track" data-modes-track>
+        {
+          t.modes.items.map((m) => (
+            <article class:list={['modes-rail__card', m.highlight && 'is-hot']}>
+              <figure class="modes-rail__media">
+                <img src={media[m.title] ?? media.Ask} alt="" width="640" height="360" loading="lazy" />
+              </figure>
+              <div class="modes-rail__body">
+                <div class="modes-rail__card-top">
+                  <p class="n">{m.n}</p>
+                  <span class="modes-rail__cue">{m.cue}</span>
+                </div>
+                <h3>{m.title}</h3>
+                <p>{m.body}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+    <div class="modes-rail__footer wrap">
+      <p class="modes-rail__hint">
+        <svg class="modes-rail__hint-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
+          <path d="M8 16l4 4 4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        {t.modes.hint}
+      </p>
+      <div class="modes-rail__dots" data-modes-dots aria-hidden="true">
+        {t.modes.items.map((_, i) => <i class:list={[i === 0 && 'is-active']} />)}
+      </div>
+    </div>
+  </div>
+</section>

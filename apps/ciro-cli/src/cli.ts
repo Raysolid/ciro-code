@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+import './suppress-sqlite-warning.js';
 import { Command } from 'commander';
-import { exec, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import {
   AuditLog,
@@ -10,12 +11,14 @@ import {
   loadEffectiveConfig,
   migrateProductDirs,
   PackStore,
+  parsePackSpec,
   runDoctor,
   validateConfig,
   SkillRegistry,
-} from '@ciro/harness-core';
-import { HARNESS_VERSION, createMinimalModeProfiles } from '@ciro/harness-shared';
-import { startHarnessServer } from '@ciro/harness-web';
+} from '@ciro-code/harness-core';
+import { HARNESS_VERSION, createMinimalModeProfiles } from '@ciro-code/harness-shared';
+import { startHarnessServer } from '@ciro-code/harness-web';
+import { openBrowser, printCiroBanner, printWebReady } from './banner.js';
 
 const program = new Command();
 
@@ -28,7 +31,7 @@ program
   .option('-p, --port <number>', 'Port', '3080')
   .option('--mode <mode>', 'Initial mode override: ask | agent | plan | debug')
   .option('--profile <id>', 'Profile overlay (e.g. developer)')
-  .option('--no-open', 'Do not open browser')
+  .option('--no-open', 'Do not open browser (default: open workbench)')
   .option('--mock', 'Use mock agent runtime (no API key needed)')
   .action(
     async (opts: {
@@ -39,6 +42,8 @@ program
       open: boolean;
       mock?: boolean;
     }) => {
+      printCiroBanner(HARNESS_VERSION);
+
       if (!opts.mock && process.env.CIRO_AGENT_BACKEND !== 'mock' && !hasApiKey()) {
         console.warn(
           'Warning: No API key found. Set DEEPSEEK_API_KEY / OPENAI_API_KEY, configure 模型设置, or use --mock / CIRO_AGENT_BACKEND=mock.',
@@ -68,23 +73,18 @@ program
           modeProfiles: createMinimalModeProfiles(),
         });
 
-        console.log(`[ciro web] agentBackend=${useMock ? 'mock' : 'pi'}`);
-        if (opts.profile) console.log(`[ciro web] profile=${opts.profile}`);
-
         const url = `http://${config.bind.host}:${config.bind.port}`;
 
-        if (opts.open) {
-          const cmd =
-            process.platform === 'win32'
-              ? `start ${url}`
-              : process.platform === 'darwin'
-                ? `open ${url}`
-                : `xdg-open ${url}`;
-          exec(cmd);
-        }
+        printWebReady({
+          url,
+          workspace: config.workspace,
+          agentBackend: useMock ? 'mock' : 'pi',
+          mode: config.mode,
+          profile: opts.profile,
+          willOpen: opts.open,
+        });
 
-        console.log(`Workspace: ${config.workspace}`);
-        console.log(`Mode: ${config.mode}`);
+        if (opts.open) openBrowser(url);
       } catch (err) {
         console.error(err instanceof Error ? err.message : String(err));
         process.exitCode = 1;
@@ -232,7 +232,7 @@ program
     }
   });
 
-const packCmd = program.command('pack').description('Official Feature Packs (@ciro/ext-*)');
+const packCmd = program.command('pack').description('Official Feature Packs (@ciro-code/ext-*)');
 
 packCmd
   .command('list')
@@ -245,14 +245,17 @@ packCmd
 
 packCmd
   .command('add')
-  .description('Install an official pack (does not enable)')
-  .argument('<id>', 'Pack id, e.g. @ciro/ext-smoke')
-  .requiredOption('--from <path>', 'Local package directory (must contain ciro.pack.json)')
-  .action((id: string, opts: { from: string }) => {
+  .description('Install an official pack from npm (or --from local dir); does not enable')
+  .argument('<id>', 'Pack id, e.g. @ciro-code/ext-git or @ciro-code/ext-git@0.1.1')
+  .option('--from <path>', 'Local package directory (must contain ciro.pack.json); skips npm')
+  .action((rawId: string, opts: { from?: string }) => {
     try {
       const store = new PackStore();
       store.ensureLayout();
-      const item = store.addFromDirectory(id, resolve(opts.from));
+      const { id, version } = parsePackSpec(rawId);
+      const item = opts.from
+        ? store.addFromDirectory(id, resolve(opts.from))
+        : store.addFromNpm(id, version);
       console.log(JSON.stringify(item, null, 2));
       console.log('[ciro pack] installed (not enabled). Enable in Settings → Feature packs.');
     } catch (err) {
@@ -264,7 +267,7 @@ packCmd
 packCmd
   .command('remove')
   .description('Uninstall a pack')
-  .argument('<id>', 'Pack id, e.g. @ciro/ext-smoke')
+  .argument('<id>', 'Pack id, e.g. @ciro-code/ext-smoke')
   .action((id: string) => {
     try {
       const store = new PackStore();

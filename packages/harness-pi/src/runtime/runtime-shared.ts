@@ -12,7 +12,7 @@ import {
   type SseEnvelope,
   type ToolFilter,
   type ToolDefinition,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   assembleMemoryInjection,
   assembleRulesInjection,
@@ -38,7 +38,7 @@ import {
   type RecoveredChatMessage,
   type RecoveredSessionState,
   type ToolResultRecord,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import { makeEnvelope } from '../sse/envelope.js';
 
 export function toolsForMode(profiles: ModeProfileProvider, mode: HarnessMode): string[] {

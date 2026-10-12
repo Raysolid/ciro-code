@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { SessionStore, hasApiKey } from '@ciro/harness-core';
-import { createHarnessConfig } from '@ciro/harness-shared';
+import { SessionStore, hasApiKey } from '@ciro-code/harness-core';
+import { createHarnessConfig } from '@ciro-code/harness-shared';
 import { PiAgentRuntime } from './pi-agent-runtime.js';
 
 async function collect<T>(iter: AsyncIterable<T>): Promise<T[]> {
@@ -52,7 +52,7 @@ describe('PiAgentRuntime smoke', () => {
     const keysPath = join(root, 'keys.json');
     writeFileSync(providersPath, JSON.stringify({ providers: [], defaultModelRef: null }), 'utf-8');
     writeFileSync(keysPath, '{}', 'utf-8');
-    const { ProviderStore } = await import('@ciro/harness-core');
+    const { ProviderStore } = await import('@ciro-code/harness-core');
     const runtime = new PiAgentRuntime(config, {
       sessionStore: new SessionStore({ sessionsRoot: mkdtempSync(join(tmpdir(), 'pi-nomodel-s-')) }),
       providerStore: new ProviderStore({ providersPath, keysPath }),

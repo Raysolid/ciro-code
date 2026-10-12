@@ -1,7 +1,8 @@
 {
-  "name": "@ciro/harness-web",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@ciro-code/harness-web",
+  "version": "0.1.5",
+  "description": "Ciro Code local HTTP/SSE API server",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,6 +12,16 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "!**/*.map",
+    "!**/*.tsbuildinfo",
+    "!**/*.test.js",
+    "!**/*.test.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b --noEmit",
@@ -19,9 +30,9 @@
     "dev": "tsc -b --watch"
   },
   "dependencies": {
-    "@ciro/harness-core": "workspace:*",
-    "@ciro/harness-pi": "workspace:*",
-    "@ciro/harness-shared": "workspace:*",
+    "@ciro-code/harness-core": "workspace:*",
+    "@ciro-code/harness-pi": "workspace:*",
+    "@ciro-code/harness-shared": "workspace:*",
     "@hono/node-server": "^1.14.4",
     "hono": "^4.8.3"
   },

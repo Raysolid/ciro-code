@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import type { HarnessConfig } from '@ciro/harness-shared';
-import { createMinimalModeProfiles } from '@ciro/harness-shared';
+import type { HarnessConfig } from '@ciro-code/harness-shared';
+import { createMinimalModeProfiles } from '@ciro-code/harness-shared';
 import {
   ContextAccountant,
   MemoryStore,
@@ -16,8 +16,8 @@ import {
   SkillRegistry,
   readRecentWorkspaces,
   type AgentRuntime,
-} from '@ciro/harness-core';
-import { createAgentRuntime } from '@ciro/harness-pi';
+} from '@ciro-code/harness-core';
+import { createAgentRuntime } from '@ciro-code/harness-pi';
 import {
   bindSetWorkspace,
   createListSessionsJson,

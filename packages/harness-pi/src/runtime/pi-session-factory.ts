@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import type { ChatImageContent } from '@ciro/harness-shared';
+import type { ChatImageContent } from '@ciro-code/harness-shared';
 import {
   createAgentSession,
   DefaultResourceLoader,

@@ -1,4 +1,4 @@
-import type { ProviderModelEntry, ProviderPreset } from '@ciro/harness-shared';
+import type { ProviderModelEntry, ProviderPreset } from '@ciro-code/harness-shared';
 import { validateProviderBaseUrl } from './validate-provider-url.js';
 
 export interface RemoteModelInfo {

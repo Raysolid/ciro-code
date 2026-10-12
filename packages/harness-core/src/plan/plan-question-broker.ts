@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { PlanQuestionAnswer, PlanQuestionItem } from '@ciro/harness-shared';
+import type { PlanQuestionAnswer, PlanQuestionItem } from '@ciro-code/harness-shared';
 
 export function normalizePlanQuestions(questions: PlanQuestionItem[]): PlanQuestionItem[] {
   return questions.map((q, i) => ({

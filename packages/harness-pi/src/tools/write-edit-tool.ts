@@ -9,8 +9,8 @@ import {
   policyBlockMessage,
   buildUnifiedDiff,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
-import type { FileChangeRecord, FileEditOperation } from '@ciro/harness-shared';
+} from '@ciro-code/harness-core';
+import type { FileChangeRecord, FileEditOperation } from '@ciro-code/harness-shared';
 
 export type OnFileEdit = (
   change: FileChangeRecord,

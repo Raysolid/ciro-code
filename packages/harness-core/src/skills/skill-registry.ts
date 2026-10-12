@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { MAX_INJECT_TOKENS } from '@ciro/harness-shared';
+import { MAX_INJECT_TOKENS } from '@ciro-code/harness-shared';
 import {
   globalSkillsDir,
   legacyGlobalSkillsDir,

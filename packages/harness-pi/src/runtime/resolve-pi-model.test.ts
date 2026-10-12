@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ModelRuntime } from '@earendil-works/pi-coding-agent';
-import { ProviderStore } from '@ciro/harness-core';
+import { ProviderStore } from '@ciro-code/harness-core';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';

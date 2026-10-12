@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { HarnessMode, SessionEvent, SessionHandle, SessionMeta } from '@ciro/harness-shared';
+import type { HarnessMode, SessionEvent, SessionHandle, SessionMeta } from '@ciro-code/harness-shared';
 import type { ToolResultRecord } from '../compaction/micro-compact.js';
 import { ToolResultStore } from '../compaction/tool-result-store.js';
 import type { SessionEventLog } from './session-event-log.js';

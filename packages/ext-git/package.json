@@ -1,7 +1,14 @@
 {
-  "name": "@ciro/ext-git",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@ciro-code/ext-git",
+  "version": "0.1.5",
   "description": "Official Git Feature Pack",
-  "type": "module"
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "ciro.pack.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -18,11 +18,11 @@ import {
   gitUnstage,
   listGitBranches,
   listGitLog,
-} from '@ciro/harness-core';
-import type { GitDiffSide, GitFileArea } from '@ciro/harness-shared';
+} from '@ciro-code/harness-core';
+import type { GitDiffSide, GitFileArea } from '@ciro-code/harness-shared';
 import type { AppContext } from '../app-context.js';
 
-const GIT_PACK_ID = '@ciro/ext-git';
+const GIT_PACK_ID = '@ciro-code/ext-git';
 const policy = new PolicyEngine();
 
 type WriteGate =

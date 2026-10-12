@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { MAX_RULES_TOKENS } from '@ciro/harness-shared';
+import { MAX_RULES_TOKENS } from '@ciro-code/harness-shared';
 import { roughTokenEstimate } from '../context/token-estimate.js';
 import type { RuleMeta, RuleRegistry } from './rule-registry.js';
 import { parseRuleFrontmatter } from './rule-registry.js';

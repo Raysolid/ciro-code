@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { BROWSER_MCP_NOT_READY_MESSAGE } from '@ciro/harness-shared';
-import type { SubagentOrchestrator } from '@ciro/harness-core';
+import { BROWSER_MCP_NOT_READY_MESSAGE } from '@ciro-code/harness-shared';
+import type { SubagentOrchestrator } from '@ciro-code/harness-core';
 import { createTaskTool } from './task-tool.js';
 
 function stubOrchestrator(): SubagentOrchestrator {

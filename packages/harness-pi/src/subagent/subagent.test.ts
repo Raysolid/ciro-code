@@ -10,14 +10,14 @@ import {
   getSubagentKind,
   isSubagentType,
   SUBAGENT_KIND_TABLE,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   SubagentOrchestrator,
   SessionStore,
   PolicyEngine,
   readSubagentEvents,
   type ExploreRunner,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import { MockAgentRuntime } from '../runtime/mock-agent-runtime.js';
 import { createMockExploreRunner } from './mock-explore-runner.js';
 import {

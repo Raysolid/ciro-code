@@ -5,7 +5,7 @@ import {
   type PermissionPreset,
   type PolicyContext,
   type PolicyResult,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import type { PolicyEngine } from './policy-engine.js';
 import type { AuditLog } from '../audit/audit-log.js';
 import type { PermissionBroker } from '../permission/permission-broker.js';

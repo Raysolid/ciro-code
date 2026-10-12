@@ -4,7 +4,7 @@ import type {
   CompactionResult,
   ContextUrgency,
   HarnessMode,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import type { ContextAccountant } from '../context/context-accountant.js';
 import { runMicroCompact, type ToolResultRecord } from './micro-compact.js';
 import { ToolResultStore } from './tool-result-store.js';

@@ -3,8 +3,8 @@ import {
   EXPLORE_TOOLS,
   parseSummarySchemaV1,
   type SummarySchemaV1,
-} from '@ciro/harness-shared';
-import type { ExploreRunner, ExploreRunInput } from '@ciro/harness-core';
+} from '@ciro-code/harness-shared';
+import type { ExploreRunner, ExploreRunInput } from '@ciro-code/harness-core';
 
 async function sleep(ms: number, signal: AbortSignal): Promise<void> {
   if (signal.aborted) throw new DOMException('Aborted', 'AbortError');

@@ -1,4 +1,4 @@
-/** Workspace Git 状态（@ciro/ext-git 面板） */
+/** Workspace Git 状态（@ciro-code/ext-git 面板） */
 
 /** porcelain 推导的工作区分区 */
 export type GitFileArea = 'staged' | 'unstaged' | 'unmerged' | 'untracked';

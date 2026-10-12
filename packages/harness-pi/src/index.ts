@@ -1,5 +1,5 @@
-import type { HarnessConfig } from '@ciro/harness-shared';
-import type { AgentRuntime, CreateRuntimeOptions } from '@ciro/harness-core';
+import type { HarnessConfig } from '@ciro-code/harness-shared';
+import type { AgentRuntime, CreateRuntimeOptions } from '@ciro-code/harness-core';
 import { PiAgentRuntime } from './runtime/pi-agent-runtime.js';
 import { MockAgentRuntime } from './runtime/mock-agent-runtime.js';
 

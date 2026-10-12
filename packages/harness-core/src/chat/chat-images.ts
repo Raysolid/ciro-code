@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, normalize, sep } from 'node:path';
-import type { ChatImageAttachmentRef, ChatImageContent } from '@ciro/harness-shared';
+import type { ChatImageAttachmentRef, ChatImageContent } from '@ciro-code/harness-shared';
 
 export const CHAT_IMAGE_MAX_COUNT = 4;
 export const CHAT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;

@@ -1,0 +1,111 @@
+---
+interface Props {
+  label: string;
+  labelLight: string;
+  labelDark: string;
+}
+
+const { label, labelLight, labelDark } = Astro.props;
+---
+
+<button
+  type="button"
+  class="icon-btn theme-toggle"
+  id="theme-toggle"
+  aria-label={label}
+  title={label}
+  data-label-light={labelLight}
+  data-label-dark={labelDark}
+>
+  <svg class="theme-toggle__sun" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.75"></circle>
+    <path
+      d="M12 2.5v2.2M12 19.3v2.2M4.7 4.7l1.6 1.6M17.7 17.7l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.7 19.3l1.6-1.6M17.7 6.3l1.6-1.6"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"></path>
+  </svg>
+  <svg class="theme-toggle__moon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5 7.4 7.4 0 1 0 20.5 14.2Z"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linejoin="round"></path>
+  </svg>
+</button>
+
+<script>
+  const STORAGE_KEY = 'starlight-theme';
+
+  type Theme = 'light' | 'dark';
+
+  const systemTheme = (): Theme =>
+    matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+  /** 无显式偏好时跟随系统；一旦用户切换则只存 light/dark */
+  const loadTheme = (): Theme => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw === 'light' || raw === 'dark') return raw;
+      return systemTheme();
+    } catch {
+      return systemTheme();
+    }
+  };
+
+  const storeTheme = (theme: Theme) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, theme);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const applyTheme = (theme: Theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  };
+
+  const syncButton = (btn: HTMLButtonElement, theme: Theme) => {
+    btn.dataset.theme = theme;
+    const next = theme === 'dark' ? btn.dataset.labelLight : btn.dataset.labelDark;
+    if (next) {
+      btn.setAttribute('aria-label', next);
+      btn.setAttribute('title', next);
+    }
+  };
+
+  const setTheme = (theme: Theme, origin?: DOMRect) => {
+    storeTheme(theme);
+    const run = () => {
+      applyTheme(theme);
+      document.querySelectorAll<HTMLButtonElement>('#theme-toggle').forEach((b) => syncButton(b, theme));
+    };
+
+    if (
+      origin &&
+      !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      'startViewTransition' in document
+    ) {
+      document.documentElement.style.setProperty('--theme-x', `${origin.left + origin.width / 2}px`);
+      document.documentElement.style.setProperty('--theme-y', `${origin.top + origin.height / 2}px`);
+      (document as Document & { startViewTransition: (cb: () => void) => void }).startViewTransition(run);
+      return;
+    }
+    run();
+  };
+
+  const boot = () => {
+    const btn = document.querySelector<HTMLButtonElement>('#theme-toggle');
+    if (!btn) return;
+
+    syncButton(btn, loadTheme());
+
+    btn.addEventListener('click', () => {
+      const next: Theme = loadTheme() === 'dark' ? 'light' : 'dark';
+      setTheme(next, btn.getBoundingClientRect());
+    });
+  };
+
+  boot();
+</script>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { SessionEvent } from '@ciro/harness-shared';
+import type { SessionEvent } from '@ciro-code/harness-shared';
 import { collectFileChanges } from './file-changes.js';
 
 describe('collectFileChanges', () => {

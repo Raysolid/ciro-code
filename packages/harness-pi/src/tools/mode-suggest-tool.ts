@@ -6,8 +6,8 @@ import {
   ModeSuggestBroker,
   policyBlockMessage,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
-import type { HarnessMode } from '@ciro/harness-shared';
+} from '@ciro-code/harness-core';
+import type { HarnessMode } from '@ciro-code/harness-shared';
 
 function fail(text: string) {
   return {

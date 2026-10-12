@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { loadConfig, PackStore, SessionStore } from '@ciro/harness-core';
+import { loadConfig, PackStore, SessionStore } from '@ciro-code/harness-core';
 import { createHarnessApp } from './app.js';
 
 function git(cwd: string, args: string[]) {
@@ -14,12 +14,12 @@ function git(cwd: string, args: string[]) {
 }
 
 function installGitPack(packsRoot: string) {
-  const installPath = join(packsRoot, 'modules', '@ciro', 'ext-git');
+  const installPath = join(packsRoot, 'modules', '@ciro-code', 'ext-git');
   mkdirSync(installPath, { recursive: true });
   writeFileSync(
     join(installPath, 'ciro.pack.json'),
     JSON.stringify({
-      id: '@ciro/ext-git',
+      id: '@ciro-code/ext-git',
       displayName: 'Git',
       version: '0.1.0',
       engines: { ciro: '>=0.1.0' },
@@ -63,7 +63,7 @@ describe('git write routes (G3)', () => {
   });
 
   it('Pack on → branch / tag / cherry-pick confirmation gate', async () => {
-    packStore.setEnabled('@ciro/ext-git', true);
+    packStore.setEnabled('@ciro-code/ext-git', true);
 
     const branchRes = await app.request('/api/v1/git/branch', {
       method: 'POST',

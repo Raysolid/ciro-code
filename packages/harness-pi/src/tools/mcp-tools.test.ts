@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mcpConnectionErrors, registerMissingMcpTools } from './mcp-tools.js';
-import type { McpManager } from '@ciro/harness-core';
+import type { McpManager } from '@ciro-code/harness-core';
 import type { buildMcpTools } from './mcp-tools.js';
 
 describe('registerMissingMcpTools', () => {

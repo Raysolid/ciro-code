@@ -9,8 +9,8 @@ const sidebar = [
     translations: { 'zh-CN': '开始使用' },
     items: [
       { label: 'What is Ciro Code', translations: { 'zh-CN': '产品概览' }, slug: 'getting-started/overview' },
-      { label: 'Quickstart', translations: { 'zh-CN': '快速开始' }, slug: 'getting-started/quickstart' },
       { label: 'Install', translations: { 'zh-CN': '安装' }, slug: 'getting-started/install' },
+      { label: 'Quickstart', translations: { 'zh-CN': '快速开始' }, slug: 'getting-started/quickstart' },
       { label: 'Connect a model', translations: { 'zh-CN': '连接模型' }, slug: 'getting-started/first-provider' },
     ],
   },
@@ -37,9 +37,10 @@ const sidebar = [
     ],
   },
   {
-    label: 'Contribute',
-    translations: { 'zh-CN': '参与贡献' },
+    label: 'Open Core & Contribute',
+    translations: { 'zh-CN': '开源与贡献' },
     items: [
+      { label: 'What is open source', translations: { 'zh-CN': '开源范围与承诺' }, slug: 'open-core/what-is-open' },
       { label: 'Build from source', translations: { 'zh-CN': '从源码构建' }, slug: 'project/contributing' },
     ],
   },

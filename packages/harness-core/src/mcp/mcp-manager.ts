@@ -9,7 +9,7 @@ import type {
   McpServerConfig,
   McpServerListItem,
   McpToolInfo,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   globalMcpConfigPath,
   projectMcpConfigPath,

@@ -1,4 +1,4 @@
-import type { DebugSessionInfo } from '@ciro/harness-shared';
+import type { DebugSessionInfo } from '@ciro-code/harness-shared';
 
 const PLACEHOLDERS = {
   ingestUrl: /\{\{DEBUG_INGEST_URL\}\}/g,

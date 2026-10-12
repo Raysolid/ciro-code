@@ -6,7 +6,7 @@ import {
   policyBlockMessage,
   runSandboxed,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 
 export function createSandboxedBashTool(workspace: string, gate?: ToolPolicyGate) {
   return defineTool({

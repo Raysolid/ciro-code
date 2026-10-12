@@ -25,7 +25,7 @@ import {
   type SkillConfig,
   type SubagentsConfig,
   type UiConfig,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   globalConfigPath,
   legacyGlobalConfigPath,

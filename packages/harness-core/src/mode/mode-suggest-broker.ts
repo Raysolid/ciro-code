@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { MODE_SUGGEST_TIMEOUT_MS, type HarnessMode } from '@ciro/harness-shared';
+import { MODE_SUGGEST_TIMEOUT_MS, type HarnessMode } from '@ciro-code/harness-shared';
 
 export type ModeSuggestDecision = 'switch' | 'skip';
 

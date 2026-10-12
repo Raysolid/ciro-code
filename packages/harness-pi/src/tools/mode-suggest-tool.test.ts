@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ModeSuggestBroker } from '@ciro/harness-core';
+import { ModeSuggestBroker } from '@ciro-code/harness-core';
 import { createSuggestModeTool } from './mode-suggest-tool.js';
 
 describe('createSuggestModeTool', () => {

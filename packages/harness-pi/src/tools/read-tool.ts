@@ -8,7 +8,7 @@ import {
   isPolicyBlocked,
   policyBlockMessage,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 
 /** 误用 workspace 根路径读记忆时，回退到 .ciro/memory（兼容旧 .pi/memory） */
 function resolveMemoryFallback(workspace: string, path: string): string | null {

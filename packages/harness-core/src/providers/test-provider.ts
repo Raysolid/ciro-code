@@ -1,4 +1,4 @@
-import type { ProviderPreset, ProviderTestResult } from '@ciro/harness-shared';
+import type { ProviderPreset, ProviderTestResult } from '@ciro-code/harness-shared';
 import { validateProviderBaseUrl } from './validate-provider-url.js';
 
 /**

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { PolicyEngine, createSessionPolicyGate } from '@ciro/harness-core';
+import { PolicyEngine, createSessionPolicyGate } from '@ciro-code/harness-core';
 import { createSandboxedListFilesTool } from './list-files-tool.js';
 import { createSandboxedGrepTool } from './grep-tool.js';
 import { createSandboxedReadTool } from './read-tool.js';

@@ -5,7 +5,7 @@ import {
   readMemoryEntry,
   resolveEntryId,
   writeMemoryEntry,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import type { AppContext } from '../app-context.js';
 
 export function registerMemoryRoutes(app: Hono, ctx: AppContext): void {

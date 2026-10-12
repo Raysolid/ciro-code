@@ -5,7 +5,7 @@ import {
   policyBlockMessage,
   type ExtensionHost,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import { registerMissingMcpTools } from './mcp-tools.js';
 
 export function buildExtensionTools(host: ExtensionHost | undefined, gate?: ToolPolicyGate) {

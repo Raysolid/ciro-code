@@ -5,7 +5,7 @@ import type {
   ExtensionsListResponse,
   ExtensionUiNotifyLevel,
   HarnessMode,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import type { ExtensionTrustStore } from './extension-trust-store.js';
 
 export type ExtensionToolExecute = (

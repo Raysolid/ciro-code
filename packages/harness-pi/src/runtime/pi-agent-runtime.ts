@@ -30,7 +30,7 @@ import {
   debugHitlUnlockFromUserText,
   formatBackgroundTaskResultUserMessage,
   isBrowserMcpReady,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   AuditLog,
   CompactionOrchestrator,
@@ -70,7 +70,7 @@ import {
   persistChatImages,
   loadChatImagesFromRefs,
   ChatImageValidationError,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import {
   assembleAndPushInjections,
   clearActiveTurnShared,
@@ -1580,7 +1580,7 @@ export class PiAgentRuntime implements AgentRuntime {
 
   async resolvePlanQuestion(
     questionId: string,
-    body: import('@ciro/harness-shared').PlanQuestionResolveBody,
+    body: import('@ciro-code/harness-shared').PlanQuestionResolveBody,
   ): Promise<boolean> {
     return resolvePlanQuestionShared(this.questionsBroker, questionId, body);
   }

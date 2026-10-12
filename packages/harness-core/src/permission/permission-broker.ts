@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { HarnessMode } from '@ciro/harness-shared';
+import type { HarnessMode } from '@ciro-code/harness-shared';
 
 export interface PermissionRequest {
   id: string;

@@ -6,7 +6,7 @@ import {
   policyBlockMessage,
   validateOutboundUrl,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 
 export const WEB_FETCH_TOOL_NAME = 'WebFetch';
 export const WEB_FETCH_TIMEOUT_MS = 30_000;

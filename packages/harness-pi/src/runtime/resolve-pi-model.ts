@@ -1,6 +1,6 @@
 import type { ModelRuntime } from '@earendil-works/pi-coding-agent';
-import type { ModelRef, ProviderModelEntry, ProviderPreset } from '@ciro/harness-shared';
-import type { ProviderStore } from '@ciro/harness-core';
+import type { ModelRef, ProviderModelEntry, ProviderPreset } from '@ciro-code/harness-shared';
+import type { ProviderStore } from '@ciro-code/harness-core';
 
 const ZERO_COST = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
 const DEFAULT_CONTEXT_WINDOW = 128_000;

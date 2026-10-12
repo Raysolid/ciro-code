@@ -2,33 +2,48 @@
 interface Props {
   copyLabel?: string;
   copiedLabel?: string;
-  commentInstall?: string;
-  commentStart?: string;
+  hint?: string;
+  eta?: string;
+  label?: string;
 }
 
 const {
   copyLabel = 'Copy',
   copiedLabel = 'Copied',
-  commentInstall = '# Install CLI',
-  commentStart = '# Start local workbench',
+  hint = 'Requires Node.js 20+. No API key yet? Run ciro web --mock.',
+  eta = '~5 min',
+  label = 'Quickstart',
 } = Astro.props;
-
-const copyText = `npm install -g @ciro-code/code
-ciro web`;
 ---
 
-<div class="install-copy" data-command={copyText} data-copied={copiedLabel}>
-  <button type="button" class="install-copy__btn" data-copy aria-label={copyLabel}>
-    <span data-label>{copyLabel}</span>
-  </button>
-  <code class="install-copy__line install-copy__line--comment">{commentInstall}</code>
-  <code class="install-copy__line">npm install -g @ciro-code/code</code>
-  <code class="install-copy__line install-copy__line--comment">{commentStart}</code>
-  <code class="install-copy__line">ciro web</code>
+<div class="docs-qs">
+  <div class="docs-qs__head">
+    <p class="docs-qs__label">{label}</p>
+    <span class="docs-qs__eta">{eta}</span>
+  </div>
+  <div class="docs-qs__rows">
+    <div class="docs-cmd" data-command="npm install -g @ciro-code/code" data-copied={copiedLabel}>
+      <code
+        ><span class="prompt">$</span> npm install -g @ciro-code/code</code
+      >
+      <button type="button" class="docs-cmd__btn" data-copy aria-label={copyLabel}>
+        <span data-label>{copyLabel}</span>
+      </button>
+    </div>
+    <div class="docs-cmd" data-command="ciro web" data-copied={copiedLabel}>
+      <code
+        ><span class="prompt">$</span> ciro web <span class="cmt"># → http://127.0.0.1:3080</span></code
+      >
+      <button type="button" class="docs-cmd__btn" data-copy aria-label={copyLabel}>
+        <span data-label>{copyLabel}</span>
+      </button>
+    </div>
+  </div>
+  <p class="docs-qs__hint" set:html={hint} />
 </div>
 
 <script>
-  document.querySelectorAll<HTMLElement>('.install-copy').forEach((root) => {
+  document.querySelectorAll<HTMLElement>('.docs-cmd').forEach((root) => {
     const btn = root.querySelector<HTMLButtonElement>('[data-copy]');
     const label = root.querySelector<HTMLElement>('[data-label]');
     const command = root.dataset.command ?? '';
@@ -42,7 +57,7 @@ ciro web`;
         setTimeout(() => {
           label.textContent = idle;
           btn.classList.remove('is-copied');
-        }, 2000);
+        }, 1200);
       } catch {
         /* ignore */
       }

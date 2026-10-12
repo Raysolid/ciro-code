@@ -2,27 +2,24 @@
 interface Props {
   copyLabel: string;
   copiedLabel: string;
-  commentInstall: string;
-  commentStart: string;
 }
 
-const { copyLabel, copiedLabel, commentInstall, commentStart } = Astro.props;
-const copyText = `npm install -g @ciro-code/code
-ciro web`;
+const { copyLabel, copiedLabel } = Astro.props;
+const copyText = 'npm install -g @ciro-code/code && ciro web';
 ---
 
-<div class="install-copy" data-command={copyText} data-copied={copiedLabel}>
-  <button type="button" class="install-copy__btn" data-copy aria-label={copyLabel}>
+<div class="install-bar" data-command={copyText} data-copied={copiedLabel}>
+  <code
+    ><span class="prompt">$</span> npm install -g <span class="pkg">@ciro-code/code</span>
+    <span class="prompt">&amp;&amp;</span> ciro web</code
+  >
+  <button type="button" class="install-bar__btn" data-copy aria-label={copyLabel}>
     <span data-label>{copyLabel}</span>
   </button>
-  <code class="install-copy__line install-copy__line--comment">{commentInstall}</code>
-  <code class="install-copy__line">npm install -g @ciro-code/code</code>
-  <code class="install-copy__line install-copy__line--comment">{commentStart}</code>
-  <code class="install-copy__line">ciro web</code>
 </div>
 
 <script>
-  document.querySelectorAll<HTMLElement>('.install-copy').forEach((root) => {
+  document.querySelectorAll<HTMLElement>('.install-bar').forEach((root) => {
     const btn = root.querySelector<HTMLButtonElement>('[data-copy]');
     const label = root.querySelector<HTMLElement>('[data-label]');
     const command = root.dataset.command ?? '';
@@ -36,7 +33,7 @@ ciro web`;
         setTimeout(() => {
           label.textContent = idle;
           btn.classList.remove('is-copied');
-        }, 2000);
+        }, 1500);
       } catch {
         /* ignore */
       }

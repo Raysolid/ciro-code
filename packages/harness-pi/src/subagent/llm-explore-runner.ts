@@ -11,7 +11,7 @@ import {
   type ModelRef,
   type SubagentSystemKey,
   type SummarySchemaV1,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   createSessionPolicyGate,
   type AuditLog,
@@ -23,7 +23,7 @@ import {
   type ProviderStore,
   type ShellAllowlistStore,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import { defineTool, type ModelRuntime, type ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { createSandboxedBashTool } from '../tools/bash-tool.js';
 import { createSandboxedGrepTool } from '../tools/grep-tool.js';

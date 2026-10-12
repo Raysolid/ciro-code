@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { loadConfig, SessionStore, ProviderStore } from '@ciro/harness-core';
-import { createAgentRuntime } from '@ciro/harness-pi';
+import { loadConfig, SessionStore, ProviderStore } from '@ciro-code/harness-core';
+import { createAgentRuntime } from '@ciro-code/harness-pi';
 import { createHarnessApp } from './app.js';
 
 describe('harness-web Phase3 M0 providers API', () => {

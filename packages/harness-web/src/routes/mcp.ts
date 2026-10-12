@@ -1,5 +1,5 @@
 import type { Hono } from 'hono';
-import type { McpServerConfig } from '@ciro/harness-shared';
+import type { McpServerConfig } from '@ciro-code/harness-shared';
 import type { AppContext } from '../app-context.js';
 
 export function registerMcpRoutes(app: Hono, ctx: AppContext): void {

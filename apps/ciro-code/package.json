@@ -1,0 +1,22 @@
+{
+  "name": "@ciro-code/code",
+  "version": "0.1.5",
+  "description": "Ciro Code — meta package forwarding to @ciro-code/cli",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ciro": "./bin/ciro.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@ciro-code/cli": "workspace:*"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

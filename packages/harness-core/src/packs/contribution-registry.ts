@@ -1,4 +1,4 @@
-import type { PackSidePanelContribution } from '@ciro/harness-shared';
+import type { PackSidePanelContribution } from '@ciro-code/harness-shared';
 
 /** 内存贡献表：仅由 PackStore.reload 写入已启用 Pack */
 export class PackContributionRegistry {

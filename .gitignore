@@ -1,10 +1,9 @@
 node_modules/
 dist/
-_site/
 .turbo/
 .pi/
 .tmp-*/
 *.tsbuildinfo
 .env
 .env.local
-.astro/
+apps/ciro-cli/vendor/

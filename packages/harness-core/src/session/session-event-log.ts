@@ -7,7 +7,7 @@ import type {
   SessionEventType,
   SessionMeta,
   ThinkingLevel,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   legacyPathWarning,
   legacySessionsRoot,

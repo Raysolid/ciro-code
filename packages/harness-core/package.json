@@ -1,7 +1,8 @@
 {
-  "name": "@ciro/harness-core",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@ciro-code/harness-core",
+  "version": "0.1.5",
+  "description": "Ciro Code harness core — config, policy, session, packs",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,6 +12,16 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "!**/*.map",
+    "!**/*.tsbuildinfo",
+    "!**/*.test.js",
+    "!**/*.test.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b --noEmit",
@@ -18,7 +29,7 @@
     "dev": "tsc -b --watch"
   },
   "dependencies": {
-    "@ciro/harness-shared": "workspace:*",
+    "@ciro-code/harness-shared": "workspace:*",
     "@modelcontextprotocol/sdk": "1.30.0",
     "yaml": "^2.8.0"
   },

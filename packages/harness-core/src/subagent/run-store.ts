@@ -12,7 +12,7 @@ import type {
   SubagentRunStatus,
   SummarySchemaV1,
   SubagentStopReason,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 
 export function subagentsDir(parentSessionDir: string): string {
   return join(parentSessionDir, 'subagents');

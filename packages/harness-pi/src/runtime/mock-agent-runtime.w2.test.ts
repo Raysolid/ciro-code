@@ -3,8 +3,8 @@ import { mkdtempSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { MockAgentRuntime } from './mock-agent-runtime.js';
-import { createHarnessConfig } from '@ciro/harness-shared';
-import { AuditLog, PermissionBroker, SessionStore } from '@ciro/harness-core';
+import { createHarnessConfig } from '@ciro-code/harness-shared';
+import { AuditLog, PermissionBroker, SessionStore } from '@ciro-code/harness-core';
 
 async function collect<T>(iter: AsyncIterable<T>): Promise<T[]> {
   const items: T[] = [];

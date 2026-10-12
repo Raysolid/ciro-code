@@ -2,7 +2,7 @@ import { createServer, type Server } from 'node:http';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import type { DebugSessionInfo } from '@ciro/harness-shared';
+import type { DebugSessionInfo } from '@ciro-code/harness-shared';
 import { debugDir } from '../paths/product-paths.js';
 
 export interface DebugIngestHandle {

@@ -5,7 +5,7 @@ import type {
   SessionCreateOptions,
   SessionHandle,
   ThinkingLevel,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   SessionEventLog,
   defaultSessionsRoot,

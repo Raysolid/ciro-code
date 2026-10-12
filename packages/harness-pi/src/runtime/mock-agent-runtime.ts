@@ -27,7 +27,7 @@ import {
   resolveEffectiveContextLimit,
   toMenuThinkingLevel,
   debugHitlUnlockFromUserText,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import {
   AuditLog,
   CompactionOrchestrator,
@@ -67,8 +67,8 @@ import {
   validateChatImages,
   persistChatImages,
   ChatImageValidationError,
-} from '@ciro/harness-core';
-import type { SubagentRunMeta } from '@ciro/harness-shared';
+} from '@ciro-code/harness-core';
+import type { SubagentRunMeta } from '@ciro-code/harness-shared';
 import { createMockExploreRunner } from '../subagent/mock-explore-runner.js';
 import { createWebFetchTool } from '../tools/web-fetch-tool.js';
 import { makeEnvelope } from '../sse/envelope.js';
@@ -771,7 +771,7 @@ export class MockAgentRuntime implements AgentRuntime {
 
   async resolvePlanQuestion(
     _questionId: string,
-    _body: import('@ciro/harness-shared').PlanQuestionResolveBody,
+    _body: import('@ciro-code/harness-shared').PlanQuestionResolveBody,
   ): Promise<boolean> {
     return false;
   }
@@ -1345,7 +1345,7 @@ export class MockAgentRuntime implements AgentRuntime {
               ),
             );
             const { readdirSync } = await import('node:fs');
-            const { assertReadable } = await import('@ciro/harness-core');
+            const { assertReadable } = await import('@ciro-code/harness-core');
             const abs = assertReadable(ctx.workspace, path);
             const entries = existsSync(abs) ? readdirSync(abs).slice(0, 50) : [];
             const preview = entries.join('\n') || '(empty)';
@@ -1432,7 +1432,7 @@ export class MockAgentRuntime implements AgentRuntime {
                 messageId,
               ),
             );
-            const { assertReadable } = await import('@ciro/harness-core');
+            const { assertReadable } = await import('@ciro-code/harness-core');
             const abs = assertReadable(ctx.workspace, path);
             const text = existsSync(abs) ? readFileSync(abs, 'utf-8').slice(0, 500) : 'File not found';
             this.trackToolResult(sessionId, toolCallId, 'read', text);

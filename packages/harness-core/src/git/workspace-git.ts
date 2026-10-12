@@ -12,7 +12,7 @@ import type {
   GitFileStatus,
   GitWorkspaceStatus,
   GitWriteResult,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import { decodeShellBuffer } from '../sandbox/sandboxed-executor.js';
 
 /** 与会话 unified diff 同量级，禁止无限吐盘 */

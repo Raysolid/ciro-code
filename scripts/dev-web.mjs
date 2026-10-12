@@ -30,15 +30,15 @@ const pnpmCmd = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 const isWin = process.platform === 'win32';
 
 const packageFilters = [
-  '--filter=@ciro/harness-shared',
-  '--filter=@ciro/harness-core',
-  '--filter=@ciro/harness-pi',
-  '--filter=@ciro/harness-web',
-  '--filter=@ciro/cli',
+  '--filter=@ciro-code/harness-shared',
+  '--filter=@ciro-code/harness-core',
+  '--filter=@ciro-code/harness-pi',
+  '--filter=@ciro-code/harness-web',
+  '--filter=@ciro-code/cli',
 ];
 
 const watchFilters = [
-  ...packageFilters.filter((f) => f !== '--filter=@ciro/cli'),
+  ...packageFilters.filter((f) => f !== '--filter=@ciro-code/cli'),
 ];
 
 /** @type {import('node:child_process').ChildProcess[]} */
@@ -172,7 +172,7 @@ async function main() {
 
   const apiArgs = [
     '--filter',
-    '@ciro/cli',
+    '@ciro-code/cli',
     'exec',
     '--',
     'tsx',

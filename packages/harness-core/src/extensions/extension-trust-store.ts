@@ -11,7 +11,7 @@ import type {
   ExtensionListItem,
   ExtensionManifest,
   ExtensionsListResponse,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import { extensionsDir, extensionsTrustPath } from '../paths/product-paths.js';
 
 type TrustFile = { trustedIds: string[] };

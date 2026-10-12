@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { PlanStore, PolicyEngine, createSessionPolicyGate } from '@ciro/harness-core';
+import { PlanStore, PolicyEngine, createSessionPolicyGate } from '@ciro-code/harness-core';
 import { createTodoWriteTool } from './todo-write-tool.js';
 
 describe('TodoWrite', () => {

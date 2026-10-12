@@ -9,7 +9,7 @@ import {
   policyBlockMessage,
   clearDebugLog,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 
 export interface DeleteFileToolOptions {
   workspace: string;

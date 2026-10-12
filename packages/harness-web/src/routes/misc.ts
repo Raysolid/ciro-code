@@ -1,11 +1,11 @@
 import type { Hono } from 'hono';
 import { serveStatic } from '@hono/node-server/serve-static';
-import { HARNESS_VERSION, type PlanQuestionAnswer } from '@ciro/harness-shared';
+import { HARNESS_VERSION, type PlanQuestionAnswer } from '@ciro-code/harness-shared';
 import {
   loadEffectiveConfig,
   listMemoryEntries,
   patchProjectExploreModel,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import type { AppContext } from '../app-context.js';
 
 export function registerMiscRoutes(app: Hono, ctx: AppContext): void {

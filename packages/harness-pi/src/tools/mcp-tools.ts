@@ -5,7 +5,7 @@ import {
   policyBlockMessage,
   type McpManager,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 
 /** 将已连接 MCP server 的工具包装为 Pi ToolDefinition（名：mcp:{slug}:{tool}） */
 export function buildMcpTools(

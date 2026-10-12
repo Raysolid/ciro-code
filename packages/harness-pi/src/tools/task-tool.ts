@@ -5,12 +5,12 @@ import {
   policyBlockMessage,
   type SubagentOrchestrator,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import {
   BROWSER_MCP_NOT_READY_MESSAGE,
   isSubagentType,
   type SseEnvelope,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 
 function fail(text: string) {
   return {
@@ -31,12 +31,12 @@ export interface TaskToolContext {
   onResult?: (result: {
     ok: boolean;
     toolResultText: string;
-    summary?: import('@ciro/harness-shared').SummarySchemaV1;
+    summary?: import('@ciro-code/harness-shared').SummarySchemaV1;
   }) => void;
   /** 后台启动：登记本 turn 待收束 taskId */
   onBackgroundStarted?: (taskId: string) => void;
   /** 后台终态：入队同轮续跑 */
-  onBackgroundSettled?: (result: import('@ciro/harness-core').TaskExploreResult) => void;
+  onBackgroundSettled?: (result: import('@ciro-code/harness-core').TaskExploreResult) => void;
   /**
    * 能力闸门：为 true 时 schema 含 browser。
    * 缺省 false（不向模型暴露）。

@@ -1,4 +1,4 @@
-import type { SseEnvelope } from '@ciro/harness-shared';
+import type { SseEnvelope } from '@ciro-code/harness-shared';
 
 export function makeEnvelope<T>(
   type: string,

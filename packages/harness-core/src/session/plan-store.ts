@@ -8,7 +8,7 @@ import {
 } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import type { PlanRecord, PlanSummary, PlanTodoItem } from '@ciro/harness-shared';
+import type { PlanRecord, PlanSummary, PlanTodoItem } from '@ciro-code/harness-shared';
 import { plansDir as workspacePlansDir } from '../paths/product-paths.js';
 
 export interface PlanStoreOptions {

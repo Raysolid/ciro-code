@@ -6,8 +6,8 @@ import {
   type HarnessMode,
   type ModelRef,
   type ThinkingLevel,
-} from '@ciro/harness-shared';
-import { readDebugLogTail, clearDebugLog } from '@ciro/harness-core';
+} from '@ciro-code/harness-shared';
+import { readDebugLogTail, clearDebugLog } from '@ciro-code/harness-core';
 import { toSessionJson, type AppContext } from '../app-context.js';
 
 export function registerSessionRoutes(app: Hono, ctx: AppContext): void {

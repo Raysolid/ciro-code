@@ -20,7 +20,7 @@ import type {
   FileChangeRecord,
   SubagentRunMeta,
   ModeProfileProvider,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import type { SessionStore } from '../session/session-store.js';
 import type { AuditLog } from '../audit/audit-log.js';
 import type { PermissionBroker } from '../permission/permission-broker.js';

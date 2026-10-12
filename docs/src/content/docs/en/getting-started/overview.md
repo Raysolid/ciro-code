@@ -1,31 +1,42 @@
 ---
 title: What is Ciro Code
-description: What Ciro Code is and when to use it.
+description: Design philosophy, architecture, and core capabilities of Ciro Code.
 ---
 
-Ciro Code is a local-first coding agent that works in your project directory.
+Ciro Code is a **local-first** AI coding agent harness that operates directly on your local workspace and filesystem.
 
-You start a local Web workbench with the CLI. The agent runs tools under a policy sandbox you control.
+Unlike cloud-hosted AI coding services that require uploading your repository to remote servers, Ciro Code runs a lightweight execution engine and Web workbench on your own machine. You retain full control over every tool execution, file change, and network connection.
 
-Your config, API keys, and sessions stay on your machine. Ciro Code only calls model providers you enable; tools do not open the network on their own.
+- **Zero Data Egress**: Source code, Git diffs, API credentials, and session state remain strictly on your local disk (`{workspace}/.ciro/` and `~/.ciro/`). Only inference requests are sent directly to your configured LLM providers.
+- **Guardrailed Execution Modes**: `Ask`, `Plan`, `Agent`, and `Debug` enforce clear read-only vs. read-write permissions, eliminating accidental edits.
+- **Open Core Transparency**: The execution kernel and CLI are MIT-licensed and fully open source for auditable local security; the Web workbench ships freely with npm packages. See [What is Open Source](/open-core/what-is-open/).
 
-Ready to try it? Go to [Quickstart](/getting-started/quickstart/). Need the install command first? See [Install](/getting-started/install/).
+We recommend reviewing the [Install guide](/getting-started/install/) first, then following the [Quickstart guide](/getting-started/quickstart/) for your first session.
 
-## When to use each mode
+## Four execution modes
 
-| You want to… | Use |
-|--------------|-----|
-| Ask questions without editing files | **Ask** |
-| Shape a plan before changing code | **Plan** |
-| Let the agent implement changes | **Agent** |
-| Dig into a failure or bug | **Debug** |
+The active mode dictates the agent's permission boundaries and tool capabilities (model providers are configured independently in Settings):
 
-Mode sets the workflow and tool permissions. You pick the model separately in Settings. Details: [Modes](/guides/modes/).
+| Goal & Scenario | Mode | Permission & Behavior |
+|-----------------|------|-----------------------|
+| Understand repo structure, search code, read docs | **Ask** | **Strictly read-only**; only file search and inspection tools are active |
+| Architectural proposals, step-by-step design | **Plan** | **Planning-oriented**; breaks down complex phases before any edit |
+| Implement features, write code, run tests | **Agent** | **Full autonomous execution** within workspace sandbox and approval rules |
+| Reproduce issues, isolate test failures | **Debug** | **Hypothesis-driven diagnosis** with targeted blast-radius containment |
 
-## Extend the workbench
+Learn more in the [Modes guide](/guides/modes/).
 
-Optional Feature Packs add panels and tools (for example Git). Install with the CLI, then enable in Settings — install does not turn a pack on by itself. See [Feature packs](/guides/packs/).
+## Modular Feature Packs
 
-## Privacy in one line
+Ciro Code adheres to the Unix philosophy: keep the Kernel lean, and extend through standard packages:
 
-Everything product-related lives under `{workspace}/.ciro/` and `~/.ciro/`. See [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) if you need paths and egress details.
+- Run `ciro pack add @ciro-code/ext-git` to add a visual Git diff panel to the workbench.
+- Feature Packs install into the user-level directory `~/.ciro/packs/`, never cluttering your project's `package.json`.
+- Newly installed packs require explicit activation in Settings → Feature Packs. See [Feature Packs](/guides/packs/).
+
+## Security & privacy guarantees
+
+Ciro Code is architected with privacy as a non-negotiable principle:
+- All local configuration is stored under `~/.ciro/config.yaml` and `{workspace}/.ciro/`.
+- API keys stay local and are never relayed through intermediate servers.
+- See [What is Open Source](/open-core/what-is-open/) for full license boundaries, and the repository [SECURITY.md](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) for vulnerability disclosure policies.

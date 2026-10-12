@@ -1,4 +1,4 @@
-import type { ChangeDisposition, FileChangeRecord, SessionEvent } from '@ciro/harness-shared';
+import type { ChangeDisposition, FileChangeRecord, SessionEvent } from '@ciro-code/harness-shared';
 
 export type ChangeReviewLookup = Map<
   string,

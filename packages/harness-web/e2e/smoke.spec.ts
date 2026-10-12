@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
  * Primary CI gate is Vitest `app.e2e.test.ts`.
  *
  *   node apps/ciro-cli/dist/cli.js web --mock --no-open
- *   CIRO_E2E_BASE_URL=http://127.0.0.1:3080 pnpm --filter @ciro/harness-web test:e2e
+ *   CIRO_E2E_BASE_URL=http://127.0.0.1:3080 pnpm --filter @ciro-code/harness-web test:e2e
  */
 const baseURL = process.env.CIRO_E2E_BASE_URL;
 

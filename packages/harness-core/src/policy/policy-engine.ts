@@ -10,7 +10,7 @@ import {
   type PolicyContext,
   type PolicyDecision,
   type PolicyResult,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve as resolvePath, normalize } from 'node:path';
 import { isMcpToolName, isMcpWriteClassTool } from '../mcp/mcp-manager.js';

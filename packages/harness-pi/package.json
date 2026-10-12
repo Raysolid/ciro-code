@@ -1,7 +1,8 @@
 {
-  "name": "@ciro/harness-pi",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@ciro-code/harness-pi",
+  "version": "0.1.5",
+  "description": "Ciro Code Pi agent runtime and tools",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,6 +12,16 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "!**/*.map",
+    "!**/*.tsbuildinfo",
+    "!**/*.test.js",
+    "!**/*.test.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b --noEmit",
@@ -18,8 +29,8 @@
     "dev": "tsc -b --watch"
   },
   "dependencies": {
-    "@ciro/harness-core": "workspace:*",
-    "@ciro/harness-shared": "workspace:*",
+    "@ciro-code/harness-core": "workspace:*",
+    "@ciro-code/harness-shared": "workspace:*",
     "@earendil-works/pi-coding-agent": "=0.84.4",
     "typebox": "^1.0.27"
   },

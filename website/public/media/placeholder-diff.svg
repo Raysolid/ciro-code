@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <rect width="1280" height="720" fill="#20211E"/>
+  <rect x="64" y="64" width="1152" height="592" rx="12" fill="#161715" stroke="#2C2D2A"/>
+  <rect x="64" y="64" width="1152" height="48" fill="#1D1E1C" stroke="#2C2D2A"/>
+  <text x="96" y="94" fill="#8A887F" font-family="ui-monospace,monospace" font-size="14">src/app.ts · +12 −7</text>
+  <text x="96" y="180" fill="#C98A7D" font-family="ui-monospace,monospace" font-size="16">- } catch (e) { console.error(e); }</text>
+  <text x="96" y="220" fill="#8FC7B4" font-family="ui-monospace,monospace" font-size="16">+ } catch (err) { throw new AppError("boot", { cause: err }); }</text>
+  <text x="96" y="280" fill="#7A9E8F" font-family="ui-monospace,monospace" font-size="14"># ran pnpm test — 42 passed</text>
+  <text x="640" y="690" text-anchor="middle" fill="#8A887F" font-family="ui-monospace,monospace" font-size="14">Diff preview placeholder · replace with real capture</text>
+</svg>

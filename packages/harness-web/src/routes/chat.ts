@@ -2,12 +2,12 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 import { Readable } from 'node:stream';
 import type { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
-import type { ChatImageContent, HarnessMode, ModelRef } from '@ciro/harness-shared';
-import { resolveChatTurnMode } from '@ciro/harness-shared';
+import type { ChatImageContent, HarnessMode, ModelRef } from '@ciro-code/harness-shared';
+import { resolveChatTurnMode } from '@ciro-code/harness-shared';
 import {
   ChatImageValidationError,
   resolveAttachmentPath,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import type { AppContext } from '../app-context.js';
 
 export function registerChatRoutes(app: Hono, ctx: AppContext): void {

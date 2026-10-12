@@ -1,6 +1,6 @@
 import type { Hono } from 'hono';
-import type { CreateProviderRequest, ModelRef, UpdateProviderRequest } from '@ciro/harness-shared';
-import { testProviderConnectivity } from '@ciro/harness-core';
+import type { CreateProviderRequest, ModelRef, UpdateProviderRequest } from '@ciro-code/harness-shared';
+import { testProviderConnectivity } from '@ciro-code/harness-core';
 import type { AppContext } from '../app-context.js';
 
 export function registerProviderRoutes(app: Hono, ctx: AppContext): void {

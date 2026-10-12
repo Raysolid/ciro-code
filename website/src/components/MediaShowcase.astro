@@ -1,0 +1,48 @@
+---
+import type { Messages } from '../i18n/en';
+
+interface Props {
+  t: Messages;
+  base: string;
+}
+
+const { t, base } = Astro.props;
+const src: Record<string, string> = {
+  workbench: `${base}media/placeholder-workbench.svg`,
+  diff: `${base}media/placeholder-diff.svg`,
+  terminal: `${base}media/placeholder-terminal.svg`,
+};
+---
+
+<section class="showcase section" id="showcase" data-reveal>
+  <div class="wrap">
+    <p class="eyebrow">{t.showcase.eyebrow}</p>
+    <h2>{t.showcase.title}</h2>
+    <div class="showcase__list">
+      {
+        t.showcase.items.map((item, i) => (
+          <article class:list={['showcase__row', i % 2 === 1 && 'showcase__row--flip']} data-reveal>
+            <div class="showcase__copy">
+              <p class="showcase__step">{String(i + 1).padStart(2, '0')}</p>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+            <div class="showcase__media" data-parallax={i % 2 === 0 ? '0.12' : '0.2'}>
+              <figure class="media-frame media-frame--card">
+                <img
+                  src={src[item.media]}
+                  alt={item.alt}
+                  width="1280"
+                  height="720"
+                  loading="lazy"
+                  data-media-scale
+                />
+                <figcaption>{t.stage.mediaNote}</figcaption>
+              </figure>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,4 +1,4 @@
-import type { ProviderStore, SessionStore } from '@ciro/harness-core';
+import type { ProviderStore, SessionStore } from '@ciro-code/harness-core';
 
 /** 从 events 提取首条用户与助手文本 */
 export function extractTitleSource(

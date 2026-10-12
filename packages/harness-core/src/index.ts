@@ -75,6 +75,7 @@ export {
   PackStore,
   isOfficialPackId,
   assertOfficialPackId,
+  parsePackSpec,
   type PackStoreOptions,
 } from './packs/pack-store.js';
 export { PackContributionRegistry } from './packs/contribution-registry.js';

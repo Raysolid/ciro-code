@@ -1,7 +1,8 @@
 {
-  "name": "@ciro/cli",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@ciro-code/cli",
+  "version": "0.1.5",
+  "description": "Ciro Code CLI — local harness server (bin: ciro)",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "ciro": "./dist/cli.js"
@@ -9,6 +10,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b --noEmit",
@@ -17,17 +21,20 @@
     "dev:watch": "tsx watch --exclude \"**/node_modules/**\" --exclude \"**/dist/**\" --exclude \"**/*.tsbuildinfo\" --exclude \"**/harness-ui/dist/**\" src/cli.ts web --no-open",
     "dev:api:watch": "tsx watch --exclude \"**/node_modules/**\" --exclude \"**/dist/**\" --exclude \"**/*.tsbuildinfo\" --exclude \"**/harness-ui/dist/**\" src/cli.ts web --no-open",
     "dev:cli": "tsx src/cli.ts",
-    "pack:smoke": "pnpm run build && npm pack --dry-run"
+    "pack:smoke": "pnpm run build && node ../../scripts/audit-npm-pack.mjs ."
   },
   "dependencies": {
-    "@ciro/harness-core": "workspace:*",
-    "@ciro/harness-shared": "workspace:*",
-    "@ciro/harness-web": "workspace:*",
+    "@ciro-code/harness-core": "workspace:*",
+    "@ciro-code/harness-shared": "workspace:*",
+    "@ciro-code/harness-web": "workspace:*",
     "commander": "^13.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

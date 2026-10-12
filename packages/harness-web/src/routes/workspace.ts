@@ -4,7 +4,7 @@ import {
   pickDirectoryDialog,
   readRecentWorkspaces,
   removeRecentWorkspace,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import { sameWorkspacePath, type AppContext } from '../app-context.js';
 
 export function registerWorkspaceRoutes(app: Hono, ctx: AppContext): void {

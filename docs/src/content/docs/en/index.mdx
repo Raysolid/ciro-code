@@ -1,51 +1,93 @@
 ---
-title: Ciro Code
-description: Local coding agent with a Web workbench.
+title: Documentation
+description: Ciro Code documentation — install, quickstart, modes, packs and reference.
 template: splash
 hero:
-  title: Ciro Code
-  tagline: A local-first coding agent. Open a Web workbench on your machine, work in your project, keep data on disk.
-  actions:
-    - text: Quickstart
-      link: /ciro-code/docs/en/getting-started/quickstart/
-      icon: right-arrow
-      variant: primary
-    - text: GitHub
-      link: https://github.com/Raysolid/ciro-code
-      variant: minimal
-      attrs:
-        rel: me
+  title: Documentation
+  tagline: Ciro Code is a local-first coding agent with a Web workbench on your machine.
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import InstallCopy from '../../../components/InstallCopy.astro';
 
-## Open Core boundary
+<InstallCopy
+  copyLabel="Copy"
+  copiedLabel="Copied"
+  label="Quickstart"
+  eta="~5 min"
+  hint='Requires Node.js 20+. No API key yet? Run <code>ciro web --mock</code>.'
+/>
 
-<div class="home-callout">
+## Start here
 
-**Kernel and CLI are fully open source** — local execution is auditable. **Web UI and official Profiles ship as npm install artifacts** so the project can stay sustainable. **Your config, keys, and sessions stay on your machine** and are never uploaded without your permission.
-
-[Repository](https://github.com/Raysolid/ciro-code) · [Contributing](/ciro-code/docs/en/project/contributing/) · [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) · [llms.txt](/ciro-code/docs/llms.txt)
-
+<div class="home-start-grid">
+  <a class="home-start-card" href="/ciro-code/docs/en/getting-started/quickstart/">
+    <p class="home-start-card__tag">new</p>
+    <h3>I'm new here</h3>
+    <p>Install <code>ciro</code>, connect a provider, and finish a first session. ~5 min.</p>
+    <p class="home-start-card__cta">Quickstart →</p>
+  </a>
+  <a class="home-start-card" href="/ciro-code/docs/en/guides/packs/">
+    <p class="home-start-card__tag">extend</p>
+    <h3>I want to extend it</h3>
+    <p>Feature Packs, manifests, and the CLI / config reference.</p>
+    <p class="home-start-card__cta">Packs → · CLI →</p>
+  </a>
+  <a class="home-start-card" href="/ciro-code/docs/en/open-core/what-is-open/">
+    <p class="home-start-card__tag">source</p>
+    <h3>What is open source?</h3>
+    <p>Kernel architecture, the Open Core boundary, and local data guarantees.</p>
+    <p class="home-start-card__cta">What is open source →</p>
+  </a>
+  <a class="home-start-card" href="/ciro-code/docs/en/guides/troubleshooting/">
+    <p class="home-start-card__tag">help</p>
+    <h3>Something broke</h3>
+    <p>PATH, port 3080, missing <code>ciro</code> — Windows-first fixes.</p>
+    <p class="home-start-card__cta">Troubleshoot →</p>
+  </a>
 </div>
 
-## Next steps
+## Popular pages
 
-<CardGrid>
-  <Card title="I'm new here" icon="rocket">
-    Install `ciro`, connect a provider, and finish a first session.
-    <span class="home-eta">[~5 min →](/ciro-code/docs/en/getting-started/quickstart/)</span>
-  </Card>
-  <Card title="I want to extend it" icon="puzzle">
-    Feature Packs, manifests, and CLI / config reference.
-    <span class="home-eta">[Packs →](/ciro-code/docs/en/guides/packs/) · [CLI →](/ciro-code/docs/en/reference/cli/)</span>
-  </Card>
-  <Card title="What is open source?" icon="open-book">
-    Kernel architecture, Open Core scope, and how to build from source.
-    <span class="home-eta">[Contributing →](/ciro-code/docs/en/project/contributing/)</span>
-  </Card>
-  <Card title="Something broke" icon="information">
-    PATH, port 3080, missing `ciro` — Windows-first fixes.
-    <span class="home-eta">[Troubleshoot →](/ciro-code/docs/en/guides/troubleshooting/)</span>
-  </Card>
-</CardGrid>
+<ul class="home-popular">
+  <li>
+    <a href="/ciro-code/docs/en/guides/modes/">
+      <span>Modes: Ask, Plan, Agent and Debug</span>
+      <span class="slug">guides/modes</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/en/guides/packs/">
+      <span>Feature Packs &amp; manifests</span>
+      <span class="slug">guides/packs</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/en/guides/permissions/">
+      <span>Permissions &amp; policy sandbox</span>
+      <span class="slug">guides/permissions</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/en/reference/cli/">
+      <span>CLI reference</span>
+      <span class="slug">reference/cli</span>
+    </a>
+  </li>
+  <li>
+    <a href="/ciro-code/docs/en/guides/troubleshooting/">
+      <span>Windows install &amp; PATH notes</span>
+      <span class="slug">troubleshooting</span>
+    </a>
+  </li>
+</ul>
+
+<div class="home-help">
+  <div>
+    <p class="home-help__title">Can't find what you need?</p>
+    <p class="home-help__sub">Open an issue or check SECURITY.md for vulnerability reports.</p>
+  </div>
+  <div class="home-help__actions">
+    <a class="ghost" href="https://github.com/Raysolid/ciro-code/issues">GitHub Issues</a>
+    <a class="solid" href="https://github.com/Raysolid/ciro-code">Repository</a>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PolicyEngine, createSessionPolicyGate } from '@ciro/harness-core';
+import { PolicyEngine, createSessionPolicyGate } from '@ciro-code/harness-core';
 import {
   createWebFetchTool,
   extractWebFetchTitle,

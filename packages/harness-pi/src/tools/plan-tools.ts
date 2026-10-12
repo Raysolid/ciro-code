@@ -8,13 +8,13 @@ import {
   type PlanQuestionDecision,
   type PlanStore,
   type ToolPolicyGate,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import type {
   PlanQuestionAnswer,
   PlanQuestionItem,
   PlanTodoItem,
   SseEnvelope,
-} from '@ciro/harness-shared';
+} from '@ciro-code/harness-shared';
 import { makeEnvelope } from '../sse/envelope.js';
 
 function fail(text: string) {

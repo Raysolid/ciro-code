@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import type { SseEnvelope } from '@ciro/harness-shared';
-import { loadConfig, SessionStore, AuditLog, PermissionBroker, SkillRegistry } from '@ciro/harness-core';
-import { createAgentRuntime } from '@ciro/harness-pi';
+import type { SseEnvelope } from '@ciro-code/harness-shared';
+import { loadConfig, SessionStore, AuditLog, PermissionBroker, SkillRegistry } from '@ciro-code/harness-core';
+import { createAgentRuntime } from '@ciro-code/harness-pi';
 import { createHarnessApp } from './app.js';
 
 async function collectSse(res: Response): Promise<SseEnvelope[]> {
@@ -436,13 +436,13 @@ describe('harness-web Phase2 Sprint1 API e2e', () => {
     )) {
       agentEvents.push(e);
     }
-    expect(agentEvents.some((e) => e.type === 'error')).toBe(true);
     expect(
-      agentEvents.some((e) => {
-        if (e.type !== 'error') return false;
-        const p = e.payload as { code?: string; message?: string } | undefined;
-        return p?.code === 'POLICY_DENY' || /WebFetch/i.test(p?.message ?? '');
-      }),
+      agentEvents.some(
+        (e) =>
+          e.type === 'tool_call_result' &&
+          (e.payload as { toolName?: string; isError?: boolean }).toolName === 'bash' &&
+          (e.payload as { isError?: boolean }).isError === true,
+      ),
     ).toBe(true);
   });
 });
@@ -475,7 +475,7 @@ describe('harness-web Plan confirm API', () => {
     const session = (await created.json()) as { id: string; mode: string };
     expect(session.mode).toBe('plan');
 
-    const { PlanStore } = await import('@ciro/harness-core');
+    const { PlanStore } = await import('@ciro-code/harness-core');
     const store = new PlanStore({ sessionsRoot });
     const record = store.create(session.id, {
       title: 'Ship feature',
@@ -776,7 +776,7 @@ describe('harness-web §12 four-mode smoke', () => {
 
   it('Plan confirm → write allow；切回 Ask 仍 deny；mode_change 保留历史', async () => {
     const session = await runtime.createSession({ workspace, mode: 'plan' });
-    const { PlanStore } = await import('@ciro/harness-core');
+    const { PlanStore } = await import('@ciro-code/harness-core');
     const store = new PlanStore({ sessionsRoot });
     const plan = store.create(session.id, {
       title: 'One file',

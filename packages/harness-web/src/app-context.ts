@@ -1,4 +1,4 @@
-import type { HarnessConfig, HarnessMode, ModelRef, ThinkingLevel } from '@ciro/harness-shared';
+import type { HarnessConfig, HarnessMode, ModelRef, ThinkingLevel } from '@ciro-code/harness-shared';
 import {
   MemoryStore,
   RuleRegistry,
@@ -14,7 +14,7 @@ import {
   type ProviderStore,
   type SessionStore,
   type ShellAllowlistStore,
-} from '@ciro/harness-core';
+} from '@ciro-code/harness-core';
 import { basename, resolve } from 'node:path';
 import { existsSync, statSync } from 'node:fs';
 
