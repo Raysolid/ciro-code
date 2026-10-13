@@ -252,21 +252,34 @@ function demoTilt() {
   });
 }
 
-/** 粘性叠切：滚动切换面板，浮现后再播一次场景 */
+/** 桌面：粘性叠切滚动切换；手机：tab 切换。浮现后再播一次场景 */
 function modesStickyFade() {
   const track = document.querySelector<HTMLElement>('[data-modes-track]');
   if (!track) return;
 
   const panels = [...track.querySelectorAll<HTMLElement>('[data-modes-panel]')];
+  const tabs = [...track.querySelectorAll<HTMLButtonElement>('[data-modes-tab]')];
   const count = panels.length;
   if (!count) return;
 
+  const desktopMq = window.matchMedia('(min-width: 54rem)');
   let current = -1;
   let emergeHandler: ((e: AnimationEvent) => void) | null = null;
+  let emergeTimer: number | null = null;
   let playHandler: ((e: AnimationEvent) => void) | null = null;
   let visible = false;
+  let disposeScroll: (() => void) | null = null;
 
   const sceneOf = (panel: HTMLElement) => panel.querySelector<HTMLElement>('[data-mode-scene]');
+
+  const syncTabs = (index: number) => {
+    tabs.forEach((tab, idx) => {
+      const on = idx === index;
+      tab.classList.toggle('is-active', on);
+      tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      tab.tabIndex = on ? 0 : -1;
+    });
+  };
 
   const clearListeners = (panel: HTMLElement) => {
     const copy = panel.querySelector<HTMLElement>('.modes-hl__copy');
@@ -276,6 +289,10 @@ function modesStickyFade() {
       const steps = scene.querySelectorAll('.mode-scene__step');
       const last = steps[steps.length - 1];
       if (last) last.removeEventListener('animationend', playHandler);
+    }
+    if (emergeTimer != null) {
+      window.clearTimeout(emergeTimer);
+      emergeTimer = null;
     }
     emergeHandler = null;
     playHandler = null;
@@ -292,7 +309,7 @@ function modesStickyFade() {
   };
 
   const startPlaying = (panel: HTMLElement) => {
-    if (!visible || panels[current] !== panel) return;
+    if (panels[current] !== panel) return;
     const scene = sceneOf(panel);
     if (!scene) return;
 
@@ -355,26 +372,40 @@ function modesStickyFade() {
     restartEmerge(visual);
     restartEmerge(copy);
 
-    emergeHandler = (e: AnimationEvent) => {
-      if (e.animationName !== 'modes-emerge') return;
-      if (copy && e.target !== copy) return;
-      if (!copy && visual && e.target !== visual) return;
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      if (emergeTimer != null) {
+        window.clearTimeout(emergeTimer);
+        emergeTimer = null;
+      }
       if (emergeHandler) waitEl.removeEventListener('animationend', emergeHandler);
       emergeHandler = null;
       panel.classList.remove('is-emerging');
       startPlaying(panel);
     };
+
+    emergeHandler = (e: AnimationEvent) => {
+      if (e.animationName !== 'modes-emerge') return;
+      if (copy && e.target !== copy) return;
+      if (!copy && visual && e.target !== visual) return;
+      settle();
+    };
     waitEl.addEventListener('animationend', emergeHandler);
+    /* 手机 display:none→block 时 animationend 可能丢失 */
+    if (!desktopMq.matches) emergeTimer = window.setTimeout(settle, 750);
   };
 
   const setIndex = (index: number) => {
     const i = Math.max(0, Math.min(count - 1, index));
     if (i === current) return;
+    if (current >= 0) clearListeners(panels[current]!);
     current = i;
+    syncTabs(i);
 
     panels.forEach((panel, idx) => {
       const on = idx === i;
-      clearListeners(panel);
       panel.classList.remove('is-active', 'is-emerging');
       panel.setAttribute('aria-hidden', on ? 'false' : 'true');
       resetScene(sceneOf(panel));
@@ -385,9 +416,13 @@ function modesStickyFade() {
     });
 
     const active = panels[i];
-    if (!active || !visible) return;
-    startEmerging(active);
+    if (!active) return;
+    if (visible || !desktopMq.matches) startEmerging(active);
   };
+
+  tabs.forEach((tab, idx) => {
+    tab.addEventListener('click', () => setIndex(idx));
+  });
 
   setIndex(0);
 
@@ -419,18 +454,27 @@ function modesStickyFade() {
   );
   io.observe(track);
 
-  if (reduceMotion()) return;
+  const bindDesktopScroll = () => {
+    disposeScroll?.();
+    disposeScroll = null;
+    if (!desktopMq.matches || reduceMotion()) return;
 
-  onScrollProgress({
-    start: () => window.scrollY + track.getBoundingClientRect().top,
-    end: () => {
-      const rect = track.getBoundingClientRect();
-      return window.scrollY + rect.top + rect.height - window.innerHeight;
-    },
-    onUpdate: (t01) => {
-      const idx = Math.min(count - 1, Math.floor(t01 * count + 0.001));
-      setIndex(idx);
-    },
+    disposeScroll = onScrollProgress({
+      start: () => window.scrollY + track.getBoundingClientRect().top,
+      end: () => {
+        const rect = track.getBoundingClientRect();
+        return window.scrollY + rect.top + rect.height - window.innerHeight;
+      },
+      onUpdate: (t01) => {
+        setIndex(Math.min(count - 1, Math.floor(t01 * count + 0.001)));
+      },
+    });
+  };
+
+  bindDesktopScroll();
+  desktopMq.addEventListener('change', () => {
+    bindDesktopScroll();
+    refreshScrollProgress();
   });
 }
 

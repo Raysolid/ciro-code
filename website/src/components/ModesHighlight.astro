@@ -19,6 +19,25 @@ const total = String(items.length).padStart(2, '0');
         <p>{t.modes.lead}</p>
       </header>
 
+      <div class="modes-hl__tabs" role="tablist" aria-label={t.modes.title} data-modes-tabs>
+        {
+          items.map((m, i) => (
+            <button
+              type="button"
+              class:list={['modes-hl__tab', i === 0 && 'is-active']}
+              role="tab"
+              id={`modes-tab-${m.id}`}
+              data-modes-tab={m.id}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              aria-controls={`modes-panel-${m.id}`}
+              tabindex={i === 0 ? 0 : -1}
+            >
+              {m.title}
+            </button>
+          ))
+        }
+      </div>
+
       <div class="modes-hl__frame">
         {
           items.map((m, i) => {
@@ -30,7 +49,10 @@ const total = String(items.length).padStart(2, '0');
                   `modes-hl__panel--${m.id}`,
                   i === 0 && 'is-active',
                 ]}
+                id={`modes-panel-${m.id}`}
+                role="tabpanel"
                 data-modes-panel={m.id}
+                aria-labelledby={`modes-tab-${m.id}`}
                 aria-hidden={i !== 0}
               >
                 <div

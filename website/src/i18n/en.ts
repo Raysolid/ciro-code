@@ -12,6 +12,8 @@ export const en = {
     docs: 'Docs',
     github: 'GitHub',
     langSwitch: 'Switch to 简体中文',
+    menuOpen: 'Open menu',
+    menuClose: 'Close menu',
   },
   theme: {
     label: 'Toggle color theme',
@@ -21,11 +23,11 @@ export const en = {
   hero: {
     title: 'Ciro Code',
     tagline:
-      'A local-first coding agent for developers — clear permissions, verify every edit on your machine.',
+      'The local-first coding agent for developers. Absolute data privacy, granular permissions, and total control on your machine.',
     copyLabel: 'Copy',
     copiedLabel: 'Copied',
-    ctaDocs: 'View docs',
-    ctaGithub: 'GitHub',
+    ctaDocs: 'Quick start',
+    ctaGithub: 'Star on GitHub',
   },
   workbench: {
     brand: 'Ciro',
@@ -56,15 +58,15 @@ export const en = {
   },
   modes: {
     title: 'Trust, matched to the task.',
-    lead: 'From read-only research to controlled execution — you decide how much to delegate.',
+    lead: 'From read-only research to controlled execution — you decide how much autonomy to delegate.',
     items: [
       {
         id: 'ask' as const,
         title: 'Ask',
         slogan: 'Read first. Then answer.',
-        body: 'A read-only subagent retrieves first — answers rest on real code, not guesses.',
+        body: 'A read-only subagent inspects first — answers are grounded in real code, not guesses.',
         meta: [
-          { label: 'Write access', value: 'Fully read-only' },
+          { label: 'Write access', value: 'None (read-only)' },
           { label: 'How it works', value: 'Subagents search the repo in parallel' },
           { label: 'Best for', value: 'New codebases, investigating errors' },
         ],
@@ -92,7 +94,7 @@ export const en = {
         id: 'plan' as const,
         title: 'Plan',
         slogan: 'Plan first. Then build.',
-        body: 'Turn a request into clear steps. Nothing is written until you approve.',
+        body: 'Turn complex requests into explicit steps. Nothing is written until you approve.',
         meta: [
           { label: 'Write access', value: 'After plan approval' },
           { label: 'How it works', value: 'Outputs a step-by-step change plan' },
@@ -126,9 +128,9 @@ export const en = {
         id: 'debug' as const,
         title: 'Debug',
         slogan: 'Diagnose first. Then fix.',
-        body: 'Hypothesize, plant temporary logs, verify — keep the blast radius minimal.',
+        body: 'Hypothesize, inject temporary traces, verify — keep the blast radius minimal.',
         meta: [
-          { label: 'Write access', value: 'Temporary logs only' },
+          { label: 'Write access', value: 'Temporary debug logs only' },
           { label: 'How it works', value: 'Hypothesis → logs → verify' },
           { label: 'Best for', value: 'Tracing failures, flaky bugs' },
         ],
@@ -162,12 +164,12 @@ export const en = {
       {
         id: 'agent' as const,
         title: 'Agent',
-        slogan: 'Review first. Then ship.',
-        body: 'Edit under your policy. Every change shows as a Diff you approve.',
+        slogan: 'Edit under your rules. Ship what you approve.',
+        body: 'Edit within your policy. Every change is presented as a clean diff you approve.',
         meta: [
-          { label: 'Write access', value: 'Policy-bound, Diff confirm' },
+          { label: 'Write access', value: 'Within your policy; you approve every diff' },
           { label: 'How it works', value: 'Edits files and produces Diffs' },
-          { label: 'Best for', value: 'Clear, goal-driven tasks' },
+          { label: 'Best for', value: 'Well-scoped fixes, features, migrations' },
         ],
         scene: {
           variant: 'agent' as const,
@@ -200,8 +202,8 @@ export const en = {
     ],
   },
   cta: {
-    title: 'Read first. Then build.',
-    lead: 'Start read-only in your own codebase.',
+    title: 'Get started with Ciro Code',
+    lead: 'Explore your codebase, build new features, fix bugs, and keep everything under your control.',
     command: 'npm install -g @ciro-code/code && ciro web',
     copyLabel: 'Copy',
     docs: 'View docs',

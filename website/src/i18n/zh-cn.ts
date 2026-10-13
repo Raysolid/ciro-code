@@ -14,6 +14,8 @@ export const zhCn: Messages = {
     docs: '文档',
     github: 'GitHub',
     langSwitch: '切换到 English',
+    menuOpen: '打开菜单',
+    menuClose: '关闭菜单',
   },
   theme: {
     label: '切换亮暗主题',
@@ -22,11 +24,11 @@ export const zhCn: Messages = {
   },
   hero: {
     title: 'Ciro Code',
-    tagline: '面向开发者的本机优先编码 Agent，权限清晰，每一处改动都在你机器上可验证。',
+    tagline: '面向开发者的本地优先 Coding Agent。数据自主掌控，权限颗粒化管理，让每一次代码变更清晰可信。',
     copyLabel: '复制',
     copiedLabel: '已复制',
-    ctaDocs: '查看文档',
-    ctaGithub: 'GitHub',
+    ctaDocs: '快速开始',
+    ctaGithub: '在 GitHub 上 Star',
   },
   workbench: {
     brand: 'Ciro',
@@ -56,16 +58,16 @@ export const zhCn: Messages = {
     },
   },
   modes: {
-    title: '信任等级，随任务切换。',
-    lead: '从只读调研到受控执行，由你决定放权多少。',
+    title: '权限与任务完美匹配',
+    lead: '从只读研究到受控执行——自主决定将多少控制权交予 Agent。',
     items: [
       {
         id: 'ask' as const,
         title: 'Ask',
-        slogan: '先读懂，再回答。',
-        body: '只读子代理先行检索，答案建立在真实代码之上，而非猜测。',
+        slogan: '先阅后答',
+        body: '只读智能体优先检索，立足真实代码，告别主观幻觉。',
         meta: [
-          { label: '写入权限', value: '全程只读' },
+          { label: '写入权限', value: '无（只读）' },
           { label: '工作方式', value: '子代理并行检索代码库' },
           { label: '适合场景', value: '理解陌生代码库、调研报错原因' },
         ],
@@ -92,8 +94,8 @@ export const zhCn: Messages = {
       {
         id: 'plan' as const,
         title: 'Plan',
-        slogan: '先定方案，再动手。',
-        body: '把需求拆成清晰的修改计划，你批准之前，不会写入任何文件。',
+        slogan: '先谋后建',
+        body: '拆解复杂变更，生成清晰步骤；未经授权，绝不改动。',
         meta: [
           { label: '写入权限', value: '批准计划后' },
           { label: '工作方式', value: '输出分步骤的修改计划' },
@@ -126,10 +128,10 @@ export const zhCn: Messages = {
       {
         id: 'debug' as const,
         title: 'Debug',
-        slogan: '先找根因，再修复。',
-        body: '提出假设、插入临时日志、验证结论，改动范围始终保持最小。',
+        slogan: '先诊后修',
+        body: '科学假设、安全埋点、严谨验证，掌控改动边界。',
         meta: [
-          { label: '写入权限', value: '仅限临时日志' },
+          { label: '写入权限', value: '仅限临时调试日志' },
           { label: '工作方式', value: '假设 → 日志 → 验证' },
           { label: '适合场景', value: '排查异常、复现偶发问题' },
         ],
@@ -163,12 +165,12 @@ export const zhCn: Messages = {
       {
         id: 'agent' as const,
         title: 'Agent',
-        slogan: '先审 Diff，再落地。',
-        body: '按你设定的权限策略直接修改文件，所有变更以 Diff 呈现。',
+        slogan: '先审后交',
+        body: '遵循既定规则受控修改，变更清晰呈现，一键审查交付。',
         meta: [
-          { label: '写入权限', value: '按策略执行，经 Diff 确认' },
+          { label: '写入权限', value: '在你的策略内；每个 Diff 由你批准' },
           { label: '工作方式', value: '直接修改并生成 Diff' },
-          { label: '适合场景', value: '目标明确的开发任务' },
+          { label: '适合场景', value: '范围清晰的修复、功能与迁移' },
         ],
         scene: {
           variant: 'agent' as const,
@@ -201,8 +203,8 @@ export const zhCn: Messages = {
     ],
   },
   cta: {
-    title: '先读懂，再动手。',
-    lead: '在你的代码库里，从只读开始。',
+    title: '开始使用 Ciro Code',
+    lead: '探索代码库，构建新功能，修复错误，一切尽在掌控。',
     command: 'npm install -g @ciro-code/code && ciro web',
     copyLabel: '复制',
     docs: '查看文档',

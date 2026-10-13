@@ -10,19 +10,22 @@ interface Props {
 
 const { t, homeHref } = Astro.props;
 const github = 'https://github.com/Raysolid/ciro-code';
+const navItems = [
+  { href: '#hero', label: t.nav.product },
+  { href: '#modes', label: t.nav.modes },
+  { href: '#faq', label: t.nav.faq },
+  { href: t.docsHref, label: t.nav.docs },
+] as const;
 ---
 
-<header class="site-header">
+<header class="site-header" data-site-header>
   <div class="wrap site-header__inner">
     <a class="brand" href={homeHref}>
       <BrandMark size={28} compact />
       <span class="brand__text">Ciro Code</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#demo">{t.nav.product}</a>
-      <a href="#modes">{t.nav.modes}</a>
-      <a href="#faq">{t.nav.faq}</a>
-      <a href={t.docsHref}>{t.nav.docs}</a>
+      {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
     </nav>
     <div class="nav-actions">
       <a
@@ -51,6 +54,77 @@ const github = 'https://github.com/Raysolid/ciro-code';
           ></path></svg
         >
       </a>
+      <button
+        type="button"
+        class="icon-btn nav-toggle"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="site-nav-drawer"
+        aria-label={t.nav.menuOpen}
+        data-label-open={t.nav.menuOpen}
+        data-label-close={t.nav.menuClose}
+      >
+        <svg
+          class="nav-toggle__open"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+        <svg
+          class="nav-toggle__close"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M6 6l12 12M18 6 6 18"></path>
+        </svg>
+      </button>
     </div>
   </div>
+
+  <div class="nav-drawer" id="site-nav-drawer" data-nav-drawer hidden>
+    <nav class="nav-drawer__nav" aria-label="Mobile">
+      {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+  </div>
 </header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const drawer = document.querySelector<HTMLElement>('[data-nav-drawer]');
+  if (header && toggle && drawer) {
+    const labelOpen = toggle.dataset.labelOpen || 'Open menu';
+    const labelClose = toggle.dataset.labelClose || 'Close menu';
+    const mq = window.matchMedia('(min-width: 48rem)');
+
+    const setOpen = (open: boolean) => {
+      header.classList.toggle('is-nav-open', open);
+      document.documentElement.classList.toggle('is-nav-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? labelClose : labelOpen);
+      drawer.hidden = !open;
+    };
+
+    toggle.addEventListener('click', () => setOpen(!header.classList.contains('is-nav-open')));
+    drawer.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+    mq.addEventListener('change', () => {
+      if (mq.matches) setOpen(false);
+    });
+  }
+</script>

@@ -15,10 +15,14 @@ const c = t.cta;
     <p class="final-cta__lead">{c.lead}</p>
 
     <div class="final-cta__cmd" data-command={c.command} data-copied={t.hero.copiedLabel}>
-      <code>
-        <span class="prompt">$</span> npm install -g <span class="pkg">@ciro-code/code</span>
-        <span class="prompt">&amp;&amp;</span> ciro web
-      </code>
+      <div class="final-cta__code">
+        <code class="final-cta__line">
+          <span class="prompt">$</span> npm install -g <span class="pkg">@ciro-code/code</span>
+        </code>
+        <code class="final-cta__line">
+          <span class="prompt">&amp;&amp;</span> ciro web
+        </code>
+      </div>
       <button type="button" class="final-cta__copy" data-copy aria-label={c.copyLabel} title={c.copyLabel}>
         <svg class="cmd-copy__idle" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <rect width="14" height="14" x="8" y="8" rx="2"></rect>
