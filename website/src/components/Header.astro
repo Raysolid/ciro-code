@@ -15,15 +15,13 @@ const github = 'https://github.com/Raysolid/ciro-code';
 <header class="site-header">
   <div class="wrap site-header__inner">
     <a class="brand" href={homeHref}>
-      <BrandMark />
-      Ciro Code
+      <BrandMark size={28} compact />
+      <span class="brand__text">Ciro Code</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#product">{t.nav.product}</a>
+      <a href="#demo">{t.nav.product}</a>
       <a href="#modes">{t.nav.modes}</a>
-      <a href="#features">{t.nav.features}</a>
       <a href="#faq">{t.nav.faq}</a>
-      <a href="#quickstart">{t.nav.quickstart}</a>
       <a href={t.docsHref}>{t.nav.docs}</a>
     </nav>
     <div class="nav-actions">

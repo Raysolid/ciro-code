@@ -1,0 +1,20 @@
+---
+import type { Messages } from '../i18n/en';
+import WorkbenchVisual from './WorkbenchVisual.astro';
+
+interface Props {
+  t: Messages;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="product-demo" id="demo">
+  <div class="wrap product-demo__wrap">
+    <div class="product-demo__stage" data-demo-tilt>
+      <div class="product-demo__frame">
+        <WorkbenchVisual t={t} />
+      </div>
+    </div>
+  </div>
+</section>

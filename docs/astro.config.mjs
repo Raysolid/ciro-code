@@ -77,6 +77,7 @@ export default defineConfig({
       },
       customCss: ['./src/styles/custom.css'],
       components: {
+        Head: './src/components/Head.astro',
         Hero: './src/components/Hero.astro',
         ThemeSelect: './src/components/ThemeSelect.astro',
         LanguageSelect: './src/components/LanguageSelect.astro',

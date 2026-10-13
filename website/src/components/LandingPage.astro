@@ -2,12 +2,10 @@
 import type { Messages } from '../i18n/en';
 import Header from './Header.astro';
 import InstallCopy from './InstallCopy.astro';
-import ProductStage from './ProductStage.astro';
-import MediaShowcase from './MediaShowcase.astro';
-import ModesRail from './ModesRail.astro';
-import StoryHighlights from './StoryHighlights.astro';
-import FaqDialogue from './FaqDialogue.astro';
-import ScrollTimeline from './ScrollTimeline.astro';
+import ProductDemo from './ProductDemo.astro';
+import ModesHighlight from './ModesHighlight.astro';
+import FinalCta from './FinalCta.astro';
+import FaqAccordion from './FaqAccordion.astro';
 import BrandMark from './BrandMark.astro';
 
 interface Props {
@@ -19,97 +17,62 @@ const { t, homeHref } = Astro.props;
 const github = 'https://github.com/Raysolid/ciro-code';
 const security = `${github}/blob/main/SECURITY.md`;
 const agents = `${github}/blob/main/AGENTS.md`;
-const base = import.meta.env.BASE_URL.endsWith('/')
-  ? import.meta.env.BASE_URL
-  : `${import.meta.env.BASE_URL}/`;
+const changelog = `${github}/releases`;
+const npmPkg = 'https://www.npmjs.com/package/@ciro-code/code';
 ---
 
 <Header t={t} homeHref={homeHref} />
-<ScrollTimeline t={t} />
 
 <main>
-  <section class="hero" id="hero" data-reveal data-anchor="hero">
+  <div class="hero-stage" id="hero" data-hero-fx>
     <div class="hero__atmosphere" aria-hidden="true">
-      <div class="hero__orb hero__orb--a" data-parallax="0.14"></div>
-      <div class="hero__orb hero__orb--b" data-parallax="0.24"></div>
+      <canvas class="hero__dots" data-hero-dots></canvas>
     </div>
-    <div class="wrap hero__content">
-      <div class="hero__badge">
-        <span class="hero__badge-dot"></span>
-        {t.hero.badge}
-      </div>
-      <h1 set:html={t.hero.titleHtml} />
-      <p class="hero__tagline">{t.hero.tagline}</p>
-      <InstallCopy copyLabel={t.hero.copyLabel} copiedLabel={t.hero.copiedLabel} />
-      <p class="hero__hint" set:html={t.hero.hintHtml} />
-      <div class="hero__actions">
-        <a class="btn btn--accent" href="#quickstart">{t.nav.getStarted}</a>
-        <a class="btn btn--raised" href={t.docsHref}>{t.hero.ctaDocs}</a>
-        <a class="btn btn--raised" href={github} rel="me" target="_blank">{t.hero.ctaGithub}</a>
-      </div>
-    </div>
-  </section>
-
-  <ProductStage t={t} base={base} />
-  <MediaShowcase t={t} base={base} />
-  <ModesRail t={t} base={base} />
-  <StoryHighlights t={t} />
-
-  <section class="section section--band" id="quickstart" data-reveal data-anchor="quickstart">
-    <div class="wrap qs-layout">
-      <div class="qs-copy">
-        <p class="eyebrow">{t.quickstart.eyebrow}</p>
-        <h2>{t.quickstart.title}</h2>
-        <p class="section__lead">{t.quickstart.lead}</p>
-        <a class="text-link" href={t.docsQuickstartHref}>{t.quickstart.more}</a>
-      </div>
-      <div class="qs-panel">
-        <div class="qs-panel__chrome">
-          <span class="qs-panel__dot" aria-hidden="true"></span>
-          <span class="qs-panel__dot" aria-hidden="true"></span>
-          <span class="qs-panel__dot" aria-hidden="true"></span>
-          <span class="qs-panel__path">{t.quickstart.path}</span>
+    <section class="hero" data-reveal>
+      <div class="wrap hero__content">
+        <h1 class="hero__name">{t.hero.title}</h1>
+        <p class="hero__tagline">{t.hero.tagline}</p>
+        <InstallCopy copyLabel={t.hero.copyLabel} copiedLabel={t.hero.copiedLabel} />
+        <div class="hero__actions">
+          <a class="btn btn--solid" href={t.docsHref}>{t.hero.ctaDocs}</a>
+          <a class="btn btn--outline-fill btn--outline-fill--soft" href={github} rel="me" target="_blank">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+              ></path>
+            </svg>
+            {t.hero.ctaGithub}
+          </a>
         </div>
-        <ol class="qs-steps">
-          {
-            t.quickstart.steps.map((s) => (
-              <li class="qs-step">
-                <div class="qs-step__rail" aria-hidden="true">
-                  <span class="qs-step__n">{s.n}</span>
-                </div>
-                <div class="qs-step__body">
-                  <h3>{s.title}</h3>
-                  <p class="qs-step__hint">{s.hint}</p>
-                  {'codeHtml' in s && s.codeHtml ? (
-                    <pre class="qs-step__code" set:html={s.codeHtml} />
-                  ) : (
-                    <pre class="qs-step__code">{'code' in s ? s.code : ''}</pre>
-                  )}
-                </div>
-              </li>
-            ))
-          }
-        </ol>
       </div>
-    </div>
-  </section>
+    </section>
+    <ProductDemo t={t} />
+  </div>
 
-  <FaqDialogue t={t} />
+  <ModesHighlight t={t} />
+  <FaqAccordion t={t} />
+  <FinalCta t={t} />
 </main>
 
 <footer class="site-footer">
   <div class="wrap site-footer__inner">
     <div class="site-footer__brand">
-      <BrandMark size={18} />
+      <BrandMark size={22} compact />
       <span>{t.footer.license}</span>
     </div>
-    <nav>
-      <a href={t.docsHref}>{t.footer.docs}</a>
-      <a href={github} rel="me" target="_blank">{t.footer.github}</a>
-      <a href={security} target="_blank">{t.footer.security}</a>
-      <a href={agents} target="_blank">{t.footer.agents}</a>
-      <a href={t.llmsHref}>llms.txt</a>
-    </nav>
+    <div class="site-footer__links">
+      <nav class="site-footer__nav" aria-label="Footer">
+        <a href={t.docsHref}>{t.footer.docs}</a>
+        <a href={github} rel="me" target="_blank">{t.footer.github}</a>
+        <a href={npmPkg} target="_blank" rel="noopener noreferrer">{t.footer.npm}</a>
+        <a href={security} target="_blank">{t.footer.security}</a>
+        <a href={changelog} target="_blank">{t.footer.changelog}</a>
+      </nav>
+      <nav class="site-footer__meta" aria-label="Meta">
+        <a href={agents} target="_blank">{t.footer.agents}</a>
+        <a href={t.llmsHref}>llms.txt</a>
+      </nav>
+    </div>
   </div>
 </footer>
 

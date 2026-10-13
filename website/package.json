@@ -9,8 +9,7 @@
     "preview": "astro preview --host 127.0.0.1 --port 4321"
   },
   "dependencies": {
-    "astro": "^5.13.2",
-    "gsap": "^3.15.0"
+    "astro": "^5.13.2"
   },
   "engines": {
     "node": ">=20"

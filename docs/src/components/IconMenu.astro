@@ -9,10 +9,9 @@ interface Props {
   label: string;
   iconPath: string;
   options: Option[];
-  keepNativeSelect?: boolean;
 }
 
-const { label, iconPath, options, keepNativeSelect = false } = Astro.props;
+const { label, iconPath, options } = Astro.props;
 ---
 
 <ciro-icon-menu class="ciro-menu">
@@ -42,15 +41,6 @@ const { label, iconPath, options, keepNativeSelect = false } = Astro.props;
       ))
     }
   </ul>
-  {
-    keepNativeSelect && (
-      <select class="ciro-menu__native" autocomplete="off" tabindex="-1" aria-hidden="true">
-        {options.map((opt) => (
-          <option value={opt.value} selected={opt.selected} set:html={opt.label} />
-        ))}
-      </select>
-    )
-  }
 </ciro-icon-menu>
 
 <script>
@@ -121,15 +111,6 @@ const { label, iconPath, options, keepNativeSelect = false } = Astro.props;
     #close() {
       this.#trigger?.setAttribute('aria-expanded', 'false');
       this.#list?.setAttribute('hidden', '');
-    }
-
-    syncSelected(value: string) {
-      this.#list?.querySelectorAll<HTMLElement>('[role="option"]').forEach((li) => {
-        const v = li.querySelector<HTMLButtonElement>('.ciro-menu__item')?.dataset.value;
-        li.setAttribute('aria-selected', v === value ? 'true' : 'false');
-      });
-      const select = this.querySelector<HTMLSelectElement>('.ciro-menu__native');
-      if (select) select.value = value;
     }
   }
 

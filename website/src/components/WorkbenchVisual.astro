@@ -9,58 +9,217 @@ const { t } = Astro.props;
 const w = t.workbench;
 ---
 
-<div class="wb">
-  <div class="wb__bar">
-    <span class="wb__dot"></span>
-    <span class="wb__dot"></span>
-    <span class="wb__dot"></span>
-    <span class="wb__url">{w.url}</span>
-    <span class="wb__live" aria-hidden="true"><i></i> live</span>
-  </div>
-  <div class="wb__grid">
-    <aside class="wb__side">
-      <p class="wb__side-label">{w.workspace}</p>
-      <ul style="margin:0;padding:0">
-        <li class="wb__file is-active">src/app.ts</li>
-        <li class="wb__file">src/policy.ts</li>
-        <li class="wb__file">ciro.config.json</li>
-        <li class="wb__file">AGENTS.md</li>
-      </ul>
-      <p class="wb__side-label">{w.packs}</p>
-      <ul style="margin:0;padding:0">
-        <li class="wb__file">@ciro-code/ext-git</li>
-      </ul>
-    </aside>
-    <div class="wb__main">
-      <div class="wb__modes">
-        <span class="wb__mode">Ask</span>
-        <span class="wb__mode">Plan</span>
-        <span class="wb__mode is-active">Agent</span>
-        <span class="wb__mode">Debug</span>
+<div class="cw" data-cw aria-hidden="true">
+  <aside class="cw__left">
+    <div class="cw__brand">
+      <span class="cw__brand-mark">C</span>
+      <span>{w.brand}</span>
+    </div>
+    <button type="button" class="cw__new" tabindex="-1">{w.newChat}</button>
+    <p class="cw__section">{w.workspace}</p>
+    <p class="cw__workspace">{w.workspaceName}</p>
+    <ul class="cw__sessions">
+      {
+        w.sessions.map((name, i) => (
+          <li class:list={[i === 0 && 'is-active']}>{name}</li>
+        ))
+      }
+    </ul>
+    <div class="cw__left-foot">{w.settings}</div>
+  </aside>
+
+  <div class="cw__main">
+    <header class="cw__top">
+      <span>{w.headerTitle}</span>
+      <button type="button" class="cw__panel-btn" tabindex="-1" aria-label={w.collapseRight}>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          <path d="M15 3v18"></path>
+        </svg>
+      </button>
+    </header>
+
+    <div class="cw__chat">
+      <div class="cw__user" data-cw-user>
+        <p data-cw-user-text></p>
       </div>
-      <div class="wb__msg">
-        <div class="wb__avatar wb__avatar--you">You</div>
-        <p set:html={w.userMsgHtml} />
-      </div>
-      <div class="wb__msg">
-        <div class="wb__avatar wb__avatar--ai">C</div>
-        <div>
-          <p set:html={w.agentMsgHtml} />
-          <div class="wb__diff wb__diff--in">
-            <div class="wb__diff-head">
-              <span class="font-mono">{w.diffFile}</span>
-              <span class="stat">{w.diffStat}</span>
-            </div>
-            <pre set:html={w.diffPre} />
-          </div>
-          <p class="wb__test" set:html={w.testLineHtml} />
+      <div class="cw__assistant" data-cw-assistant hidden>
+        <div class="cw__think" data-cw-think hidden>
+          <span data-cw-think-label>{w.stream.thinking}</span>
+          <span class="cw__dots" data-cw-think-dots aria-hidden="true"><i></i><i></i><i></i></span>
         </div>
+        <div class="cw__subagent" data-cw-subagent>
+          <i></i>
+          <span>{w.stream.subagent}</span>
+        </div>
+        <div class="cw__reply" data-cw-reply></div>
       </div>
-      <div class="wb__composer">
-        {w.composer}
-        <span class="wb__caret" aria-hidden="true"></span>
-        <kbd>{w.send}</kbd>
+    </div>
+
+    <div class="cw__dock">
+      <div class="cw__composer">
+        <p class="cw__placeholder">{w.composerPlaceholder}</p>
+        <div class="cw__composer-bar">
+          <span class="cw__pill cw__pill--ask">{w.modeAsk}</span>
+          <span class="cw__pill cw__pill--mute">{w.modelLabel}</span>
+          <span class="cw__send" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#171717" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19V5"></path>
+              <path d="m5 12 7-7 7 7"></path>
+            </svg>
+          </span>
+        </div>
       </div>
     </div>
   </div>
+
+  <aside class="cw__right">
+    <div class="cw__right-tabs">
+      <span class="is-active">{w.filesTab}</span>
+      <span>{w.changesTab}</span>
+    </div>
+    <ul class="cw__files">
+      {
+        w.fileTree.map((f, i) => (
+          <li class:list={[i === 0 && 'is-active']}>{f}</li>
+        ))
+      }
+    </ul>
+  </aside>
 </div>
+
+<script define:vars={{ stream: w.stream }}>
+  function prefersReduce() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  async function runLoop(root) {
+    const user = root.querySelector('[data-cw-user]');
+    const userText = root.querySelector('[data-cw-user-text]');
+    const assistant = root.querySelector('[data-cw-assistant]');
+    const think = root.querySelector('[data-cw-think]');
+    const thinkLabel = root.querySelector('[data-cw-think-label]');
+    const thinkDots = root.querySelector('[data-cw-think-dots]');
+    const reply = root.querySelector('[data-cw-reply]');
+    const sub = root.querySelector('[data-cw-subagent]');
+    if (!user || !userText || !assistant || !think || !thinkLabel || !thinkDots || !reply || !sub) return;
+
+    let visible = true;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = Boolean(entry?.isIntersecting);
+      },
+      { threshold: 0.12 },
+    );
+    io.observe(root);
+
+    const waitVisible = () =>
+      new Promise((resolve) => {
+        const check = () => {
+          if (!root.isConnected || visible) {
+            resolve();
+            return;
+          }
+          window.setTimeout(check, 400);
+        };
+        check();
+      });
+
+    const sleep = async (ms) => {
+      await waitVisible();
+      if (!root.isConnected) return;
+      await new Promise((r) => window.setTimeout(r, ms));
+      await waitVisible();
+    };
+
+    const typePlain = (el, plain, speed) =>
+      new Promise(async (resolve) => {
+        let i = 0;
+        el.textContent = '';
+        const tick = async () => {
+          await waitVisible();
+          if (!root.isConnected) {
+            resolve();
+            return;
+          }
+          i += 1;
+          el.textContent = plain.slice(0, i);
+          if (i >= plain.length) {
+            resolve();
+            return;
+          }
+          window.setTimeout(tick, speed);
+        };
+        tick();
+      });
+
+    const streamSegments = async (segments, speed) => {
+      reply.innerHTML = '';
+      for (const html of segments) {
+        const seg = document.createElement('p');
+        seg.className = 'cw__seg';
+        reply.appendChild(seg);
+
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        const plain = tmp.textContent || '';
+
+        if (prefersReduce()) {
+          seg.innerHTML = html;
+        } else {
+          await typePlain(seg, plain, speed);
+          seg.innerHTML = html;
+          await sleep(220);
+        }
+      }
+    };
+
+    const setThinking = () => {
+      think.classList.remove('is-done');
+      thinkLabel.textContent = stream.thinking;
+      thinkDots.classList.remove('is-off');
+    };
+
+    const markThought = () => {
+      thinkLabel.textContent = stream.thought;
+      thinkDots.classList.add('is-off');
+      think.classList.add('is-done');
+    };
+
+    const reset = () => {
+      user.classList.remove('is-in');
+      userText.textContent = '';
+      assistant.hidden = true;
+      think.hidden = true;
+      sub.classList.remove('is-on');
+      setThinking();
+      reply.innerHTML = '';
+    };
+
+    while (root.isConnected) {
+      await waitVisible();
+      if (!root.isConnected) break;
+      reset();
+      await sleep(450);
+      userText.textContent = stream.user;
+      user.classList.add('is-in');
+      await sleep(1100);
+      assistant.hidden = false;
+      think.hidden = false;
+      await sleep(900);
+      sub.classList.add('is-on');
+      await sleep(800);
+      await streamSegments(stream.replySegments, 14);
+      markThought();
+      await sleep(2800);
+    }
+
+    io.disconnect();
+  }
+
+  document.querySelectorAll('[data-cw]').forEach((root) => {
+    if (root.dataset.streamBound === '1') return;
+    root.dataset.streamBound = '1';
+    runLoop(root);
+  });
+</script>

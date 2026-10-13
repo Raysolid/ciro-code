@@ -7,6 +7,8 @@ interface Props {
 
 const { title, description, lang } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const fontsHref =
+  'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap';
 ---
 
 <!doctype html>
@@ -17,12 +19,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light dark" />
     <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href={fontsHref} media="print" onload="this.media='all'" />
+    <noscript>
+      <link rel="stylesheet" href={fontsHref} />
+    </noscript>
     <title>{title}</title>
     <script is:inline>
       (function () {
