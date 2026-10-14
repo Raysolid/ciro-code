@@ -14,8 +14,9 @@ In `{workspace}/.ciro/config.yaml` or through the workbench settings, configure 
 | Preset | Paired Mode | Security Behavior & Scope |
 |--------|-------------|---------------------------|
 | `workspace-readonly` | Default in Ask | Strictly read-only; denies file writes and mutating shell commands |
-| `workspace-balanced` *(Recommended)* | Default in Agent | Edits workspace files and runs allowlisted commands; prompts on sensitive actions |
-| `workspace-unrestricted` | Trusted setups | Streamlined approvals; still confined inside the workspace root boundary |
+| `plan-readonly` | Default in Plan | Read / search tools plus plan tools; no source-file writes |
+| `workspace-write` *(Recommended)* | Default in Agent | Edits workspace files and runs allowlisted commands; prompts on sensitive actions |
+| `debug-instrument` | Default in Debug | Write / edit under Debug policy, including session debug-log cleanup |
 
 ---
 
@@ -28,7 +29,7 @@ Declare permissions and command allowlists explicitly in `.ciro/config.yaml`:
 mode: agent
 
 permissions:
-  preset: workspace-balanced
+  preset: workspace-write
   fs:
     # Allowed write paths relative to workspace root
     allow: ["src/**", "tests/**", "package.json"]

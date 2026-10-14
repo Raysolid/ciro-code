@@ -143,25 +143,50 @@ pre {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: -0.02em;
+  line-height: 0;
   color: var(--ink);
 }
 
-.brand-mark {
-  color: var(--ink);
-  flex-shrink: 0;
+/* Full SVG wordmark — light/dark via data-theme */
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  --brand-logo-h: 1.35rem;
 }
 
-.brand-mark__spark {
-  fill: var(--accent);
+.brand-logo__img {
+  display: block;
+  height: var(--brand-logo-h);
+  width: auto;
 }
 
-.brand__text {
-  line-height: 1;
+.brand-logo__img--dark {
+  display: none;
+}
+
+html[data-theme='dark'] .brand-logo__img--light {
+  display: none;
+}
+
+html[data-theme='dark'] .brand-logo__img--dark {
+  display: block;
+}
+
+.brand-logo--nav {
+  --brand-logo-h: 1.4rem;
+}
+
+.brand-logo--hero {
+  --brand-logo-h: clamp(2.55rem, 5.4vw, 3.65rem);
+}
+
+.brand-logo--footer {
+  --brand-logo-h: 1.25rem;
+}
+
+.site-footer__wordmark {
+  display: block;
 }
 
 .nav-links {
@@ -476,12 +501,10 @@ html[data-theme='dark'] .hero-stage {
 
 .hero__name {
   margin: 0 auto;
-  font-family: var(--font-display);
-  font-size: clamp(2.85rem, 6.2vw, 4.25rem);
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  color: var(--ink);
+  display: flex;
+  justify-content: center;
+  line-height: 0;
+  font-size: 0;
 }
 
 .hero__tagline {
@@ -598,10 +621,6 @@ html[data-theme='dark'] .hero-stage {
   .hero__content {
     width: min(100% - 2rem, 38rem);
     margin-inline: auto;
-  }
-
-  .hero__name {
-    font-size: clamp(2rem, 9vw, 3.5rem);
   }
 
   .hero__tagline {
@@ -732,9 +751,12 @@ html[data-theme='dark'] .hero-stage {
 .site-footer__brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  max-width: 28rem;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.85rem;
+  max-width: 32rem;
   line-height: 1.45;
+  font-size: 13px;
+  color: var(--ink-soft);
 }
 
 .site-footer__links {
@@ -894,24 +916,34 @@ html::-webkit-scrollbar {
 
 .cw__brand {
   display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-weight: 600;
+  align-items: baseline;
+  gap: 0;
+  font-weight: 800;
   font-size: 13px;
   margin-bottom: 0.75rem;
+  color: var(--cw-fg);
+  letter-spacing: -0.05em;
 }
 
 .cw__brand-mark {
-  width: 1.35rem;
-  height: 1.35rem;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--cw-accent);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
+  height: 0.9em;
+  width: auto;
+  aspect-ratio: 388 / 300;
+  display: block;
+  flex-shrink: 0;
+  color: var(--cw-fg);
+  margin-right: -0.1em;
+  position: relative;
+  top: 0.08em;
+}
+
+.cw__brand-spark {
+  fill: var(--cw-accent);
+}
+
+.cw__brand-rest {
+  letter-spacing: -0.065em;
+  line-height: 1;
 }
 
 .cw__new {

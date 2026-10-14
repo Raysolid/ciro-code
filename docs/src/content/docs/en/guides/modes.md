@@ -13,10 +13,10 @@ In Ciro Code:
 
 | Mode | Target Scenario | Active Tools & Permissions | Human Gate |
 |------|-----------------|----------------------------|------------|
-| **Ask** | Explore architecture, understand code, check docs | **Strictly read-only**<br>Only `read_file`, `list_files`, `grep`, and code search | Touches zero files; completely risk-free |
-| **Plan** | Complex refactors, architecture proposals, pre-flight reviews | **Planning-oriented**<br>Inspects codebase and produces step-by-step proposals | You review and approve the proposal before execution |
-| **Agent** | Feature implementation, refactoring, test execution | **Full autonomous execution**<br>Edits files and runs shell test commands within sandbox | Sensitive commands and out-of-bound edits trigger modal approval |
-| **Debug** | Fix crashes, investigate test failures, fix defects | **Hypothesis-driven diagnosis**<br>Reads error traces and generates minimal blast-radius patches | Restores green test suites without sprawling edits |
+| **Ask** | Explore architecture, understand code, check docs | **Strictly read-only** (`workspace-readonly`)<br>Read / search / readonly bash / WebFetch / explore Task | Touches zero project files |
+| **Plan** | Complex refactors, architecture proposals, pre-flight reviews | **Planning-oriented** (`plan-readonly`)<br>Ask tools plus plan tools; no source-file writes | You review the plan, then switch to **Agent** to implement |
+| **Agent** | Feature implementation, refactoring, test execution | **Policy-bounded execution** (`workspace-write`)<br>Edits files and runs allowlisted shell commands | Sensitive commands and out-of-bound edits trigger modal approval |
+| **Debug** | Fix crashes, investigate test failures, fix defects | **Hypothesis-driven** (`debug-instrument`)<br>Write / edit plus session debug-log cleanup | Keep the blast radius small; verify with targeted traces |
 
 ---
 
@@ -31,9 +31,9 @@ For complex feature development or refactoring, follow this multi-phase lifecycl
 1. **Step 1: Ask (Explore first)**  
    Ask Ciro to explain current modules, dependencies, and blast radius in read-only mode to prevent premature edits.
 2. **Step 2: Plan (Architect the steps)**  
-   Direct Ciro to generate a phased execution plan listing target files and proposed diffs.
+   Direct Ciro to generate a phased plan (plan tools only — no source-file writes in Plan mode).
 3. **Step 3: Agent (Execute under policy)**  
-   Switch to Agent mode. Approve the execution and let Ciro implement edits and run test commands. Review live diffs in the Changes tab.
+   Switch to Agent mode. Let Ciro implement edits and run allowlisted commands under `workspace-write`. Review live diffs in the Changes tab.
 4. **Step 4: Debug (Contain the blast radius)**  
    If unexpected test failures arise, switch to Debug mode and provide the stack trace to isolate root causes with a minimal patch.
 

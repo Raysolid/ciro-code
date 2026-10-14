@@ -16,7 +16,7 @@ ciro web
 The terminal prints the server address and automatically opens your default browser:
 
 ```text
-✓ Ciro Kernel initialized (mode: ask, policy: workspace-balanced)
+✓ Ciro Kernel initialized (mode: ask, policy: workspace-readonly)
 ✓ Local Web Workbench running at http://127.0.0.1:3080
 Opening browser...
 ```

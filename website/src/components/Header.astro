@@ -1,6 +1,6 @@
 ---
 import type { Messages } from '../i18n/en';
-import BrandMark from './BrandMark.astro';
+import BrandWordmark from './BrandWordmark.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
@@ -21,8 +21,7 @@ const navItems = [
 <header class="site-header" data-site-header>
   <div class="wrap site-header__inner">
     <a class="brand" href={homeHref}>
-      <BrandMark size={28} compact />
-      <span class="brand__text">Ciro Code</span>
+      <BrandWordmark variant="nav" />
     </a>
     <nav class="nav-links" aria-label="Primary">
       {navItems.map((item) => <a href={item.href}>{item.label}</a>)}

@@ -231,7 +231,7 @@ export const en = {
     ],
   },
   footer: {
-    license: 'Ciro Code © 2026 · Core open-sourced under MIT',
+    license: '© 2026 · Core open-sourced under MIT',
     docs: 'Docs',
     github: 'GitHub',
     npm: 'npm',

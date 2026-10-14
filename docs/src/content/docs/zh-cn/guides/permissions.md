@@ -14,8 +14,9 @@ Ciro Code 将安全性置于首位。Agent 并不是无限制运行的高权限�
 | 预设等级 | 模式匹配 | 适用场景与安全行为 |
 |----------|----------|--------------------|
 | `workspace-readonly` | Ask 模式默认 | 严格只读，禁止写文件或执行带状态变更的命令 |
-| `workspace-balanced` *(推荐默认)* | Agent 模式默认 | 允许修改工作区内文件与执行白名单命令；敏感操作弹出确认 |
-| `workspace-unrestricted` | 高度信任环境 | 放宽内部审批；仍受项目目录边界隔离保护 |
+| `plan-readonly` | Plan 模式默认 | 读 / 搜索 + 计划工具；不写源文件 |
+| `workspace-write` *(推荐默认)* | Agent 模式默认 | 允许修改工作区内文件与执行白名单命令；敏感操作弹出确认 |
+| `debug-instrument` | Debug 模式默认 | 在 Debug 策略下可写 / 改，并清理会话 debug log |
 
 ---
 
@@ -28,7 +29,7 @@ Ciro Code 将安全性置于首位。Agent 并不是无限制运行的高权限�
 mode: agent
 
 permissions:
-  preset: workspace-balanced
+  preset: workspace-write
   fs:
     # 允许修改的路径范围（工作区相对路径）
     allow: ["src/**", "tests/**", "package.json"]

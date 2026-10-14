@@ -232,7 +232,7 @@ export const zhCn: Messages = {
     ],
   },
   footer: {
-    license: 'Ciro Code © 2026 · 核心以 MIT 协议开源',
+    license: '© 2026 · 核心以 MIT 协议开源',
     docs: '文档',
     github: 'GitHub',
     npm: 'npm',

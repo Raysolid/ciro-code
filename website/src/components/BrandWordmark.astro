@@ -1,0 +1,48 @@
+---
+interface Props {
+  /** Visual size slot */
+  variant?: 'nav' | 'hero' | 'footer';
+  /** Accessible name */
+  label?: string;
+  class?: string;
+  /** @deprecated Ignored — lockup is the full SVG wordmark */
+  size?: number;
+  /** @deprecated Ignored */
+  fluid?: boolean;
+  /** @deprecated Ignored */
+  product?: string;
+}
+
+const {
+  variant = 'nav',
+  label = 'Ciro Code',
+  class: className,
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const lightSrc = `${base}brand/ciro-code.svg`;
+const darkSrc = `${base}brand/ciro-code-dark.svg`;
+---
+
+<span
+  class:list={['brand-logo', `brand-logo--${variant}`, className]}
+  role="img"
+  aria-label={label}
+>
+  <img
+    class="brand-logo__img brand-logo__img--light"
+    src={lightSrc}
+    alt=""
+    width="1920"
+    height="512"
+    decoding="async"
+  />
+  <img
+    class="brand-logo__img brand-logo__img--dark"
+    src={darkSrc}
+    alt=""
+    width="1920"
+    height="512"
+    decoding="async"
+  />
+</span>

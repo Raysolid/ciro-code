@@ -126,32 +126,39 @@ header.header {
   color: var(--ink) !important;
 }
 
-.ciro-site-title__text {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  font-size: 15px;
-  line-height: 1;
+.ciro-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  height: 1.35rem;
+}
+
+.ciro-brand-logo__img {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+.ciro-brand-logo__img--dark {
+  display: none;
+}
+
+:root[data-theme='dark'] .ciro-brand-logo__img--light {
+  display: none;
+}
+
+:root[data-theme='dark'] .ciro-brand-logo__img--dark {
+  display: block;
 }
 
 .ciro-site-title__badge {
-  margin-left: 0.15rem;
+  margin-left: 0.2rem;
   padding: 0.1rem 0.4rem;
   border: 1px solid var(--line);
   border-radius: 4px;
   color: var(--ink-mute);
   font-size: 11px;
   font-weight: 500;
-}
-
-.ciro-mark {
-  display: inline-flex;
-  flex-shrink: 0;
-  color: var(--ink);
-}
-
-.ciro-mark__spark {
-  fill: var(--accent);
 }
 
 site-search button {

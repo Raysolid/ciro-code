@@ -6,7 +6,7 @@ import ProductDemo from './ProductDemo.astro';
 import ModesHighlight from './ModesHighlight.astro';
 import FinalCta from './FinalCta.astro';
 import FaqAccordion from './FaqAccordion.astro';
-import BrandMark from './BrandMark.astro';
+import BrandWordmark from './BrandWordmark.astro';
 
 interface Props {
   t: Messages;
@@ -30,7 +30,9 @@ const npmPkg = 'https://www.npmjs.com/package/@ciro-code/code';
     </div>
     <section class="hero" data-reveal>
       <div class="wrap hero__content">
-        <h1 class="hero__name">{t.hero.title}</h1>
+        <h1 class="hero__name">
+          <BrandWordmark variant="hero" label={t.hero.title} />
+        </h1>
         <p class="hero__tagline">{t.hero.tagline}</p>
         <InstallCopy copyLabel={t.hero.copyLabel} copiedLabel={t.hero.copiedLabel} />
         <div class="hero__actions">
@@ -57,7 +59,7 @@ const npmPkg = 'https://www.npmjs.com/package/@ciro-code/code';
 <footer class="site-footer">
   <div class="wrap site-footer__inner">
     <div class="site-footer__brand">
-      <BrandMark size={22} compact />
+      <BrandWordmark variant="footer" class="site-footer__wordmark" />
       <span>{t.footer.license}</span>
     </div>
     <div class="site-footer__links">

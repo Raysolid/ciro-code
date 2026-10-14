@@ -16,7 +16,7 @@ ciro web
 启动后终端将输出服务地址并自动唤起默认浏览器：
 
 ```text
-✓ Ciro Kernel initialized (mode: ask, policy: workspace-balanced)
+✓ Ciro Kernel initialized (mode: ask, policy: workspace-readonly)
 ✓ Local Web Workbench running at http://127.0.0.1:3080
 Opening browser...
 ```

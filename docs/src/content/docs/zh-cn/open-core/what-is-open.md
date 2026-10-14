@@ -7,11 +7,12 @@ Kernel 和 CLI 完全开源，你可以审计所有本地执行逻辑。Web UI �
 
 ## 开源面与交付产物
 
-| 开源部分（MIT） | npm 安装产物 |
+| 开源部分（MIT） | npm 安装产物（源码不开） |
 |----------------|--------------|
 | **Core Kernel** — 策略沙箱、记忆、上下文编排 | **Web 工作台 UI** — 本地可视化操作界面 |
-| **CLI（`ciro`）** — 模式调度、doctor、pack 管理 | **官方 Profiles** — 预置工作流与工程规则 |
-| **扩展规范** — Rules、Skills、MCP 接入 | **官方 Feature Packs** — 如 `@ciro-code/ext-git` |
+| **CLI（`ciro`）** — 模式调度、doctor、pack 管理 | **官方 Profiles** — 预置四模式工作流 |
+| **扩展规范** — Rules、Skills、MCP 接入 | |
+| **官方 Feature Pack** `@ciro-code/ext-git`（亦经 npm 分发；安装 ≠ 启用） | |
 
 以上组件均安装并运行在你的本机。推理直连你配置的模型 Provider——代码与 API Key 不会经过 Ciro 云端代理。
 
