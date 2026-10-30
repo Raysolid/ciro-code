@@ -1,5 +1,13 @@
 # @ciro-code/code
 
+## 0.1.6
+
+### Patch Changes
+
+- Rich composer mention selection/copy/paste, context-panel session MCP toggles, and clearer workspace image `read` guidance.
+- Updated dependencies
+  - @ciro-code/cli@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes

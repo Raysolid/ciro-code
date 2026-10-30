@@ -18,6 +18,10 @@ export { MockAgentRuntime } from './runtime/mock-agent-runtime.js';
 export { createSandboxedReadTool } from './tools/read-tool.js';
 export { createSandboxedListFilesTool } from './tools/list-files-tool.js';
 export { createSandboxedGrepTool } from './tools/grep-tool.js';
+export {
+  createSearchTranscriptTool,
+  createGetToolResultTool,
+} from './tools/transcript-tools.js';
 export { createSandboxedWriteTool, createSandboxedEditTool } from './tools/write-edit-tool.js';
 export { createSandboxedBashTool } from './tools/bash-tool.js';
 export {

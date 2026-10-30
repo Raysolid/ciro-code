@@ -1,5 +1,16 @@
 # @ciro-code/cli
 
+## 0.1.6
+
+### Patch Changes
+
+- Rich composer mention selection/copy/paste, context-panel session MCP toggles, and clearer workspace image `read` guidance.
+- Updated dependencies
+  - @ciro-code/harness-shared@0.1.6
+  - @ciro-code/harness-core@0.1.6
+  - @ciro-code/harness-web@0.1.6
+  - @ciro-code/harness-tui@0.1.1
+
 ## 0.1.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@ciro-code/harness-core",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Ciro Code harness core — config, policy, session, packs",
   "license": "MIT",
   "type": "module",

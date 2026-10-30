@@ -243,7 +243,12 @@ export class SessionEventLog {
   }
 
   /**
-   * C4e：将 src 事件克隆到 dest（含 throughMessageId 对应 message 行，user/assistant 均可）。
+   * C4e：将 src 事件克隆到 dest（含 throughMessageId 所在轮，user/assistant 均可）。
+   *
+   * 助手一轮会多次 flush `message`（工具前分段 + 收尾），且 tool_* 夹在分段之间。
+   * 必须取该 messageId 的**最后**一条 message，并继续包含其后至下一轮 user 之前的
+   * thinking / tool / turn_complete，避免 fork 只剩提问或半截助手。
+   *
    * 覆盖 dest 的 events.jsonl；不修改 src。dest 须已 ensureSession。
    */
   cloneThroughMessage(
@@ -260,8 +265,8 @@ export class SessionEventLog {
       try {
         const event = JSON.parse(lines[i]!) as SessionEvent;
         if (event.type === 'message' && event.messageId === throughMessageId) {
+          // 同 id 多段：保留最后一次，再向下扩展
           cutIndex = i;
-          break;
         }
       } catch {
         // skip corrupt
@@ -269,6 +274,18 @@ export class SessionEventLog {
     }
     if (cutIndex < 0) {
       throw new Error(`Message not found: ${throughMessageId}`);
+    }
+
+    for (let i = cutIndex + 1; i < lines.length; i++) {
+      try {
+        const event = JSON.parse(lines[i]!) as SessionEvent;
+        if (event.type === 'message' && event.role === 'user') {
+          break;
+        }
+        cutIndex = i;
+      } catch {
+        cutIndex = i;
+      }
     }
 
     const clonedLines = lines.slice(0, cutIndex + 1);

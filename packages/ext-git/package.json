@@ -1,6 +1,6 @@
 {
   "name": "@ciro-code/ext-git",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Official Git Feature Pack",
   "license": "MIT",
   "type": "module",

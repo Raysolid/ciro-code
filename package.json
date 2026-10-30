@@ -8,6 +8,8 @@
     "dev": "turbo run dev",
     "dev:web": "pnpm run build && pnpm --filter @ciro-code/cli exec node dist/cli.js web --no-open",
     "dev:web:mock": "pnpm run build && pnpm --filter @ciro-code/cli exec node dist/cli.js web --mock --no-open",
+    "dev:tui": "node ./scripts/dev-tui.mjs",
+    "dev:tui:mock": "node ./scripts/dev-tui.mjs --mock",
     "dev:api:watch": "pnpm --filter @ciro-code/cli run dev:api:watch",
     "test": "turbo run test",
     "test:e2e": "pnpm --filter @ciro-code/harness-web test:e2e",

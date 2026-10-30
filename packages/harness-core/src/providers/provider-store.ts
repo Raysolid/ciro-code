@@ -1,18 +1,19 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import type {
-  AvailableModelGroup,
-  AvailableModelsResponse,
-  CreateProviderRequest,
-  FetchModelsResult,
-  ModelRef,
-  ProviderModelEntry,
-  ProviderPreset,
-  ProviderPresetMasked,
-  ProvidersFile,
-  ProvidersListResponse,
-  UpdateProviderRequest,
+import {
+  FAMILY_CONTEXT_LIMIT_256K,
+  type AvailableModelGroup,
+  type AvailableModelsResponse,
+  type CreateProviderRequest,
+  type FetchModelsResult,
+  type ModelRef,
+  type ProviderModelEntry,
+  type ProviderPreset,
+  type ProviderPresetMasked,
+  type ProvidersFile,
+  type ProvidersListResponse,
+  type UpdateProviderRequest,
 } from '@ciro-code/harness-shared';
 import { hasApiKey } from '../config/load-config.js';
 import {
@@ -92,7 +93,8 @@ function templateDefaults(
             id: 'deepseek-chat',
             label: 'DeepSeek Chat',
             enabled: false,
-            contextLimit: 128000,
+            // 与 DeepSeek Harness pi-ai DEFAULT_CONTEXT_WINDOW 对齐；满窗走 Max+apiMaxContext
+            contextLimit: FAMILY_CONTEXT_LIMIT_256K,
           },
         ],
       };
@@ -404,7 +406,7 @@ export class ProviderStore {
             id: 'deepseek-chat',
             label: 'DeepSeek Chat',
             enabled: true,
-            contextLimit: 128000,
+            contextLimit: FAMILY_CONTEXT_LIMIT_256K,
           },
         ],
       });

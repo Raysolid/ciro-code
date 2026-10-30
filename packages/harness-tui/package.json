@@ -1,0 +1,40 @@
+{
+  "name": "@ciro-code/harness-tui",
+  "version": "0.1.1",
+  "private": true,
+  "description": "Ciro Code fullscreen terminal REPL (Grok-style alternate screen)",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.map",
+    "!**/*.tsbuildinfo",
+    "!**/*.test.js",
+    "!**/*.test.d.ts"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "dev": "tsc -b --watch"
+  },
+  "dependencies": {
+    "@ciro-code/harness-core": "workspace:*",
+    "@ciro-code/harness-pi": "workspace:*",
+    "@ciro-code/harness-shared": "workspace:*",
+    "@ciro-code/harness-timeline": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

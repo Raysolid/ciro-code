@@ -1,6 +1,6 @@
 {
   "name": "@ciro-code/cli",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Ciro Code CLI — local harness server (bin: ciro)",
   "license": "MIT",
   "type": "module",
@@ -21,11 +21,14 @@
     "dev:watch": "tsx watch --exclude \"**/node_modules/**\" --exclude \"**/dist/**\" --exclude \"**/*.tsbuildinfo\" --exclude \"**/harness-ui/dist/**\" src/cli.ts web --no-open",
     "dev:api:watch": "tsx watch --exclude \"**/node_modules/**\" --exclude \"**/dist/**\" --exclude \"**/*.tsbuildinfo\" --exclude \"**/harness-ui/dist/**\" src/cli.ts web --no-open",
     "dev:cli": "tsx src/cli.ts",
+    "dev:tui": "tsx src/cli.ts tui",
+    "dev:tui:mock": "tsx src/cli.ts tui --mock",
     "pack:smoke": "pnpm run build && node ../../scripts/audit-npm-pack.mjs ."
   },
   "dependencies": {
     "@ciro-code/harness-core": "workspace:*",
     "@ciro-code/harness-shared": "workspace:*",
+    "@ciro-code/harness-tui": "workspace:*",
     "@ciro-code/harness-web": "workspace:*",
     "commander": "^13.1.0"
   },

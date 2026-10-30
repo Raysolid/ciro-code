@@ -180,6 +180,84 @@ describe('PiAgentRuntime smoke', () => {
     await runtime.deleteSession(session.id);
   });
 
+  it('rewindSession rebuilds accounting like resume (keeps summarized + remaining tools)', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'pi-rewind-acct-'));
+    const store = new SessionStore({ sessionsRoot: root });
+    const runtime = new PiAgentRuntime(config, { sessionStore: store });
+    const session = await runtime.createSession({ workspace, mode: 'ask' });
+    store.appendEvent(session.id, {
+      type: 'message',
+      role: 'user',
+      content: 'before',
+      messageId: 'u0',
+    });
+    store.appendEvent(session.id, {
+      type: 'message',
+      role: 'assistant',
+      content: 'early',
+      messageId: 'a0',
+    });
+    store.appendEvent(session.id, {
+      type: 'compaction',
+      method: 'session-memory',
+      summarized: '# Compaction summary\n\nKept intent and files.',
+      conversation: '\nUser: recent-tail\nAssistant: ok-tail',
+      tokensSaved: 500,
+    });
+    store.appendEvent(session.id, {
+      type: 'message',
+      role: 'user',
+      content: 'after-compact',
+      messageId: 'u1',
+    });
+    store.appendEvent(session.id, {
+      type: 'tool_result',
+      toolCallId: 't-keep',
+      toolName: 'read',
+      content: 'x'.repeat(400),
+    });
+    store.appendEvent(session.id, {
+      type: 'message',
+      role: 'assistant',
+      content: 'used-tool',
+      messageId: 'a1',
+    });
+    store.appendEvent(session.id, {
+      type: 'message',
+      role: 'user',
+      content: 'drop-me',
+      messageId: 'u2',
+    });
+    store.appendEvent(session.id, {
+      type: 'tool_result',
+      toolCallId: 't-drop',
+      toolName: 'read',
+      content: 'y'.repeat(800),
+    });
+    store.appendEvent(session.id, {
+      type: 'message',
+      role: 'assistant',
+      content: 'later',
+      messageId: 'a2',
+    });
+
+    await runtime.rewindSession(session.id, 'u2');
+
+    const usage = runtime.getContextUsage(session.id);
+    expect(usage).toBeTruthy();
+    const summarized = usage!.buckets.find((b) => b.id === 'summarized');
+    expect(summarized?.tokens ?? 0).toBeGreaterThan(0);
+    // 截断后仍保留压缩边界与 u1 轮 tool；用量应低于含 t-drop 的状态，且 conversation 含 recent-tail
+    expect(usage!.totalTokens).toBeGreaterThan(0);
+
+    const resumed = await runtime.resumeSession(session.id);
+    const resumeUsage = resumed.contextUsage ?? runtime.getContextUsage(session.id);
+    expect(resumeUsage?.buckets.find((b) => b.id === 'summarized')?.tokens ?? 0).toBeGreaterThan(0);
+    expect(resumeUsage?.totalTokens).toBe(usage!.totalTokens);
+
+    await runtime.deleteSession(session.id);
+  });
+
   it('prepareFork truncates then allows clean history', async () => {
     const root = mkdtempSync(join(tmpdir(), 'pi-fork-'));
     const store = new SessionStore({ sessionsRoot: root });
@@ -262,6 +340,52 @@ describe('PiAgentRuntime smoke', () => {
       runtime as unknown as { busySessions: Set<string> }
     ).busySessions.add(session.id);
     await expect(runtime.rewindSession(session.id, 'u1')).rejects.toThrow(/SESSION_BUSY/);
+    await runtime.deleteSession(session.id);
+  });
+
+  it('compactSession throws SESSION_BUSY while streaming without allowBusy', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'pi-compact-busy-'));
+    const runtime = new PiAgentRuntime(config, {
+      sessionStore: new SessionStore({ sessionsRoot: root }),
+    });
+    const session = await runtime.createSession({ workspace, mode: 'ask' });
+    (
+      runtime as unknown as { busySessions: Set<string> }
+    ).busySessions.add(session.id);
+    await expect(runtime.compactSession(session.id, { method: 'micro' })).rejects.toThrow(
+      /SESSION_BUSY/,
+    );
+    await runtime.deleteSession(session.id);
+  });
+
+  it('compact rebuild rebinds confirmed plan markdown', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'pi-compact-plan-'));
+    const runtime = new PiAgentRuntime(config, {
+      sessionStore: new SessionStore({ sessionsRoot: root }),
+    });
+    const session = await runtime.createSession({ workspace, mode: 'plan' });
+    const { PlanStore } = await import('@ciro-code/harness-core');
+    const plan = new PlanStore({ sessionsRoot: root }).create(session.id, {
+      title: 'Keep me',
+      markdown: '## Steps\n- do thing\n',
+      planId: 'abcd1234',
+    });
+    await runtime.confirmPlan(session.id, plan.planId);
+    type Entry = {
+      confirmedPlanMarkdown?: string;
+      confirmedPlanId?: string;
+    };
+    const sessions = (runtime as unknown as { sessions: Map<string, Entry> }).sessions;
+    const before = sessions.get(session.id);
+    expect(before?.confirmedPlanMarkdown).toBeTruthy();
+    if (before) {
+      before.confirmedPlanMarkdown = undefined;
+      before.confirmedPlanId = undefined;
+    }
+    await runtime.compactSession(session.id, { method: 'micro' });
+    const after = sessions.get(session.id);
+    expect(after?.confirmedPlanId).toBe('abcd1234');
+    expect(after?.confirmedPlanMarkdown).toMatch(/Keep me|Steps|do thing/);
     await runtime.deleteSession(session.id);
   });
 });

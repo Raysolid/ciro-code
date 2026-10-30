@@ -236,14 +236,15 @@ function mergeCompaction(project: RawConfig, global: RawConfig): {
   const mode = parseCompactionMode(value.mode as string | undefined) ?? DEFAULT_COMPACTION_CONFIG.mode;
   return {
     compaction: {
-      ...DEFAULT_COMPACTION_CONFIG,
-      ...value,
       mode,
       thresholds: {
         ...DEFAULT_COMPACTION_CONFIG.thresholds,
         ...value.thresholds,
       },
-      strategies: value.strategies ?? DEFAULT_COMPACTION_CONFIG.strategies,
+      maxConsecutiveFailures:
+        typeof value.maxConsecutiveFailures === 'number'
+          ? value.maxConsecutiveFailures
+          : DEFAULT_COMPACTION_CONFIG.maxConsecutiveFailures,
     },
     source,
   };

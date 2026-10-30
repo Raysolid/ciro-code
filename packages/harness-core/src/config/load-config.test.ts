@@ -99,4 +99,26 @@ ui:
     expect(effective.sources.memory).toBe('project');
     expect(effective.sources.compaction).toBe('project');
   });
+
+  it('ignores removed compaction keys enablePrediction/strategies', () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'harness-cfg-dead-'));
+    mkdirSync(join(workspace, '.ciro'), { recursive: true });
+    writeFileSync(
+      join(workspace, '.ciro', 'config.yaml'),
+      `
+compaction:
+  mode: ask
+  enablePrediction: true
+  strategies:
+    - micro
+    - full
+  maxConsecutiveFailures: 5
+`.trim(),
+    );
+    const effective = loadEffectiveConfig({ workspace });
+    expect(effective.config.compaction.mode).toBe('ask');
+    expect(effective.config.compaction.maxConsecutiveFailures).toBe(5);
+    expect(effective.config.compaction).not.toHaveProperty('enablePrediction');
+    expect(effective.config.compaction).not.toHaveProperty('strategies');
+  });
 });

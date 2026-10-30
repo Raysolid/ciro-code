@@ -28,9 +28,7 @@ export interface CompactionConfig {
     suggest: number;
     required: number;
   };
-  enablePrediction: boolean;
   maxConsecutiveFailures: number;
-  strategies: Array<'micro' | 'session-memory' | 'full'>;
 }
 
 export interface SessionPersistConfig {
@@ -92,16 +90,15 @@ export const DEFAULT_MEMORY_CONFIG: MemoryConfig = {
   maxMemoryFiles: 50,
 };
 
+/** 轻量优先、逐步升级：micro 早触发；full 提前到 85% 给摘要留生成余量 */
 export const DEFAULT_COMPACTION_CONFIG: CompactionConfig = {
   mode: 'auto',
   thresholds: {
-    background: 0.7,
-    suggest: 0.85,
-    required: 0.95,
+    background: 0.65,
+    suggest: 0.8,
+    required: 0.85,
   },
-  enablePrediction: true,
   maxConsecutiveFailures: 3,
-  strategies: ['micro', 'session-memory', 'full'],
 };
 
 export const DEFAULT_SESSION_CONFIG: SessionPersistConfig = {
@@ -156,7 +153,6 @@ function cloneCompaction(base: CompactionConfig): CompactionConfig {
   return {
     ...base,
     thresholds: { ...base.thresholds },
-    strategies: [...base.strategies],
   };
 }
 
@@ -187,7 +183,9 @@ export function createHarnessConfig(
         ...DEFAULT_COMPACTION_CONFIG.thresholds,
         ...partial.compaction?.thresholds,
       },
-      strategies: partial.compaction?.strategies ?? [...DEFAULT_COMPACTION_CONFIG.strategies],
+      maxConsecutiveFailures:
+        partial.compaction?.maxConsecutiveFailures ??
+        DEFAULT_COMPACTION_CONFIG.maxConsecutiveFailures,
     },
     session: { ...DEFAULT_SESSION_CONFIG, ...partial.session },
     skill: { ...DEFAULT_SKILL_CONFIG, ...partial.skill },

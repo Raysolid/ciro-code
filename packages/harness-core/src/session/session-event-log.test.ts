@@ -89,6 +89,66 @@ describe('SessionEventLog.cloneThroughMessage', () => {
     log.ensureSession('dest', '/ws', 'ask', Date.now());
     expect(() => log.cloneThroughMessage('src', 'dest', 'nope')).toThrow(/not found/);
   });
+
+  it('clones full assistant turn across segmented messages and tools', () => {
+    const root = mkdtempSync(join(tmpdir(), 'evt-clone-seg-'));
+    const log = new SessionEventLog({ sessionsRoot: root, snapshotInterval: 100 });
+    const src = 'src';
+    const dest = 'dest';
+    log.ensureSession(src, '/ws', 'ask', Date.now());
+    log.append(src, { type: 'message', role: 'user', content: 'q1', messageId: 'u1' });
+    log.append(src, { type: 'message', role: 'assistant', content: 'a1', messageId: 'a1' });
+    log.append(src, { type: 'message', role: 'user', content: 'q2', messageId: 'u2' });
+    log.append(src, {
+      type: 'thinking',
+      messageId: 'a2',
+      content: 'plan',
+      durationSec: 1,
+    });
+    // 工具前 flush 的首段（旧逻辑会在此截断）
+    log.append(src, {
+      type: 'message',
+      role: 'assistant',
+      content: 'let me look',
+      messageId: 'a2',
+    });
+    log.append(src, {
+      type: 'tool_call',
+      toolCallId: 't1',
+      toolName: 'find',
+      toolInput: { pattern: 'memory' },
+    });
+    log.append(src, {
+      type: 'tool_result',
+      toolCallId: 't1',
+      toolName: 'find',
+      content: 'hits',
+    });
+    log.append(src, {
+      type: 'message',
+      role: 'assistant',
+      content: ' final answer',
+      messageId: 'a2',
+    });
+    log.append(src, { type: 'turn_complete', messageId: 'a2', workedMs: 50000 });
+    log.append(src, { type: 'message', role: 'user', content: 'q3', messageId: 'u3' });
+
+    log.ensureSession(dest, '/ws', 'ask', Date.now());
+    log.cloneThroughMessage(src, dest, 'a2');
+
+    const destEvents = log.readEvents(dest);
+    expect(destEvents.some((e) => e.type === 'tool_call' && e.toolCallId === 't1')).toBe(true);
+    expect(destEvents.some((e) => e.type === 'turn_complete' && e.messageId === 'a2')).toBe(true);
+    expect(destEvents.some((e) => e.type === 'message' && e.messageId === 'u3')).toBe(false);
+
+    const msgs = uiMessagesFromEvents(destEvents);
+    const last = msgs[msgs.length - 1];
+    expect(last?.role).toBe('assistant');
+    expect(last?.id).toBe('a2');
+    expect(last?.content).toContain('let me look');
+    expect(last?.content).toContain('final answer');
+    expect(last?.timeline?.some((i) => i.kind === 'tool' && i.id === 't1')).toBe(true);
+  });
 });
 
 describe('SessionEventLog debug pointer', () => {

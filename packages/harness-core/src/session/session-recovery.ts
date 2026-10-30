@@ -28,9 +28,15 @@ export interface RecoveredSessionState {
   messages: RecoveredChatMessage[];
 }
 
+export interface RecoveredCompactionMeta {
+  method?: string;
+  tokensSaved?: number;
+  narrative?: string;
+}
+
 export interface RecoveredChatMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'compaction';
   content: string;
   /** tool / diff / text / thought 时间线（resume） */
   timeline?: RecoveredTimelineItem[];
@@ -38,6 +44,8 @@ export interface RecoveredChatMessage {
   workedMs?: number;
   /** 用户消息图片附件（相对 sessionDir） */
   images?: Array<{ path: string; mimeType: string }>;
+  /** role=compaction */
+  compaction?: RecoveredCompactionMeta;
 }
 
 export type RecoveredTimelineItem =
@@ -173,6 +181,27 @@ export function uiMessagesFromEvents(events: SessionEvent[]): RecoveredChatMessa
   };
 
   for (const event of events) {
+    if (event.type === 'compaction') {
+      flushPendingToLastAssistant();
+      const method = typeof event.method === 'string' ? event.method : undefined;
+      // micro 过密，时间线不落分隔条（与 live shouldPersistCompactionMarker 对齐）
+      if (method === 'micro') continue;
+      const tokensSaved =
+        typeof event.tokensSaved === 'number' && event.tokensSaved > 0
+          ? event.tokensSaved
+          : undefined;
+      const narrative =
+        typeof event.narrative === 'string' && event.narrative.trim()
+          ? event.narrative.trim()
+          : undefined;
+      out.push({
+        id: `compaction-${event.ts}-${out.length}`,
+        role: 'compaction',
+        content: narrative ?? '',
+        compaction: { method, tokensSaved, narrative },
+      });
+      continue;
+    }
     if (event.type === 'thinking') {
       const content = typeof event.content === 'string' ? event.content : '';
       if (!content) continue;
@@ -393,6 +422,75 @@ export function parseEventLine(line: string): ParsedEventLine {
   return { event };
 }
 
+/** disk 条目 → 会计用 content：pointer 仅预览，避免 resume 把外置全文再计入 conversation 桶 */
+function accountingContentFromStored(entry: {
+  content: string;
+  retention?: string;
+  preview?: string;
+}): string {
+  if (entry.retention === 'pointer') return entry.preview ?? '';
+  return entry.content || '';
+}
+
+/**
+ * 重建「仍计入模型上下文」的 tool payload。
+ * SM/full 压缩后旧 tool 已不在上下文（可经 get_tool_result 回查磁盘），会计 Map 应清空后只累加压缩之后的结果。
+ * micro 将结果降为 preview/pointer，按磁盘 retention 估数。
+ */
+export function rebuildAccountingToolResults(
+  events: SessionEvent[],
+  sessionDir: string,
+): ToolResultRecord[] {
+  const store = existsSync(join(sessionDir, 'tool-results'))
+    ? new ToolResultStore(sessionDir)
+    : null;
+  const byId = new Map<string, ToolResultRecord>();
+
+  const upsert = (toolCallId: string, toolName: string, content: string) => {
+    byId.set(toolCallId, { toolCallId, toolName, content });
+  };
+
+  for (const event of events) {
+    if (event.type === 'compaction') {
+      const method = typeof event.method === 'string' ? event.method : '';
+      if (method === 'micro') {
+        // 外置为 pointer/preview，按磁盘 retention 收缩
+        for (const [id, rec] of [...byId.entries()]) {
+          const disk = store?.read(id);
+          if (disk) {
+            upsert(id, rec.toolName, accountingContentFromStored(disk));
+          }
+        }
+      } else {
+        // session-memory / full / 旧事件无 method：旧 tool 已不在模型上下文
+        byId.clear();
+      }
+      continue;
+    }
+    if (event.type !== 'tool_result') continue;
+    const id = String(event.toolCallId);
+    const name = String(event.toolName);
+    const disk = store?.read(id);
+    if (disk) {
+      upsert(id, name, accountingContentFromStored(disk));
+    } else {
+      upsert(id, name, typeof event.content === 'string' ? event.content : '');
+    }
+  }
+
+  return [...byId.values()];
+}
+
+/** UI 时间线预览：可含压缩前工具（get_tool_result 同源磁盘） */
+export function loadAllToolResultsForUi(sessionDir: string): ToolResultRecord[] {
+  if (!existsSync(join(sessionDir, 'tool-results'))) return [];
+  return new ToolResultStore(sessionDir).list().map((e) => ({
+    toolCallId: e.toolCallId,
+    toolName: e.toolName,
+    content: accountingContentFromStored(e),
+  }));
+}
+
 export function replayEvents(events: SessionEvent[]): {
   mode: HarnessMode;
   workspace: string;
@@ -526,28 +624,22 @@ export class SessionRecoveryManager {
       maxMode: meta?.currentState.maxMode,
     };
 
-    let toolResults: ToolResultRecord[] = [];
     const sessionDir = this.eventLog.sessionDir(sessionId);
-    if (existsSync(join(sessionDir, 'tool-results'))) {
-      toolResults = new ToolResultStore(sessionDir).list().map((e) => ({
-        toolCallId: e.toolCallId,
-        toolName: e.toolName,
-        content: e.retention === 'pointer' ? e.preview ?? '' : e.content,
-      }));
-    }
-
+    const toolResults = rebuildAccountingToolResults(events, sessionDir);
+    const uiTools = loadAllToolResultsForUi(sessionDir);
+    // 事件里有、磁盘没有的补进 UI 预览
     for (const event of events) {
       if (event.type !== 'tool_result') continue;
       const id = String(event.toolCallId);
-      if (toolResults.some((t) => t.toolCallId === id)) continue;
-      toolResults.push({
+      if (uiTools.some((t) => t.toolCallId === id)) continue;
+      uiTools.push({
         toolCallId: id,
         toolName: String(event.toolName),
         content: typeof event.content === 'string' ? event.content : '',
       });
     }
 
-    const messages = enrichTimelinePreviews(uiMessagesFromEvents(events), toolResults);
+    const messages = enrichTimelinePreviews(uiMessagesFromEvents(events), uiTools);
 
     return {
       handle,

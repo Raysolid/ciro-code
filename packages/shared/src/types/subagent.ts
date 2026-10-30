@@ -27,6 +27,8 @@ export const EXPLORE_DISALLOWED_TOOLS = [
   'delete_file',
   'TodoWrite',
   'WebFetch',
+  'search_transcript',
+  'get_tool_result',
 ] as const;
 
 /**

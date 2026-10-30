@@ -34,6 +34,11 @@ import type { ExtensionHost } from '../extensions/extension-host.js';
 
 export interface CompactSessionOptions {
   method?: CompactionMethod;
+  /**
+   * 回合末 auto-compact 在 clearActiveTurn 之前调用，需放行 busy。
+   * 手动 compact（HTTP/UI）勿传；busy 时与 rewind 一样拒绝。
+   */
+  allowBusy?: boolean;
 }
 
 export interface SubagentRunView {
@@ -75,7 +80,7 @@ export interface AgentRuntime {
     beforeMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }>;
   /** 截断到 fromMessageId 之前并重建 Pi；调用方再 sendMessage */
   prepareFork(
@@ -83,7 +88,7 @@ export interface AgentRuntime {
     fromMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }>;
   /**
    * C4e：新建会话并克隆源至 throughMessageId（含）；原会话不动。
@@ -94,7 +99,7 @@ export interface AgentRuntime {
     throughMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }>;
   setSessionTitle(
     sessionId: string,
@@ -134,7 +139,7 @@ export interface AgentRuntime {
     eventsReplayed: number;
     stoppedAtBoundary: boolean;
     contextUsage?: ContextUsageSnapshot;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
     /** 该 session 最近已确认计划；供 resume 时间线标 confirmed */
     confirmedPlanId?: string;
   }>;

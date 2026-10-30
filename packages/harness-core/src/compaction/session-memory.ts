@@ -7,6 +7,7 @@ import {
   memoryDir,
   resolveReadable,
 } from '../paths/product-paths.js';
+import { sliceRecentConversation } from './slice-recent.js';
 
 const SESSION_MEMORY_REL = 'session-memory.md';
 
@@ -67,11 +68,9 @@ export function runSessionMemoryCompact(
   const sm = readSessionMemory(input.workspace).trim();
   const originalTokens = roughTokenEstimate(input.conversationText);
 
-  // 保留尾部：按字符粗切
   const keepChars = keepRecent * 4;
   const conv = input.conversationText;
-  const recent =
-    conv.length <= keepChars ? conv : conv.slice(conv.length - keepChars);
+  const recent = sliceRecentConversation(conv, keepChars);
   const removedEstimate = Math.max(0, conv.length - recent.length);
 
   const summarizedBlock = sm

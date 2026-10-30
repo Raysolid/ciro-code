@@ -160,10 +160,7 @@ function patchCliForStub(dest) {
     `import { HARNESS_VERSION, createMinimalModeProfiles } from '@ciro-code/harness-shared';`,
   );
   cli = cli.replace(/\r?\nimport \{ loadModeProfiles \} from '\.\/load-mode-profiles\.js';/, '');
-  cli = cli.replace(
-    /\r?\n\s*uiDistPath:\s*resolveBundledUiDist\(\),/,
-    '',
-  );
+  cli = cli.replace(/\r?\n\s*uiDistPath:\s*resolveBundledUiDist\(\),/g, '');
   cli = cli.replace(
     /\/\*\* npm 包内预打入的 UI dist[\s\S]*?function resolveBundledUiDist\(\): string \| undefined \{[\s\S]*?\}\r?\n\r?\n/,
     '',
@@ -172,8 +169,9 @@ function patchCliForStub(dest) {
     /import \{ existsSync \} from 'node:fs';\r?\nimport \{ dirname, join, resolve \} from 'node:path';\r?\nimport \{ fileURLToPath \} from 'node:url';\r?\n/,
     `import { resolve } from 'node:path';\n`,
   );
+  // TUI + web 各有一处 modeProfiles
   cli = cli.replace(
-    /modeProfiles:\s*await loadModeProfiles\(\),/,
+    /modeProfiles:\s*await loadModeProfiles\(\),/g,
     'modeProfiles: createMinimalModeProfiles(),',
   );
   if (

@@ -70,6 +70,9 @@ import {
   persistChatImages,
   loadChatImagesFromRefs,
   ChatImageValidationError,
+  sumToolPayloadTokens,
+  createLiveContextUsageEmitter,
+  type LiveContextUsageEmitter,
 } from '@ciro-code/harness-core';
 import {
   assembleAndPushInjections,
@@ -79,6 +82,7 @@ import {
   installPermissionPushRouter,
   type SsePush,
   availableToolsShared,
+  buildResumeSeedMessagesShared,
   compactSessionShared,
   confirmPlanShared,
   createSessionActivityHub,
@@ -109,6 +113,10 @@ import {
 import { createSandboxedReadTool } from '../tools/read-tool.js';
 import { createSandboxedListFilesTool } from '../tools/list-files-tool.js';
 import { createSandboxedGrepTool } from '../tools/grep-tool.js';
+import {
+  createGetToolResultTool,
+  createSearchTranscriptTool,
+} from '../tools/transcript-tools.js';
 import { createSandboxedWriteTool, createSandboxedEditTool, type OnFileEdit } from '../tools/write-edit-tool.js';
 import { createSandboxedBashTool } from '../tools/bash-tool.js';
 import { createWebFetchTool } from '../tools/web-fetch-tool.js';
@@ -134,6 +142,7 @@ import { buildExtensionTools, registerMissingExtTools } from '../tools/extension
 import { makeEnvelope } from '../sse/envelope.js';
 import { resolvePiModel, type PiResolvedModel } from './resolve-pi-model.js';
 import { injectDebugReminder } from './debug-reminder.js';
+import { createPiFullCompactSummarizer } from './compaction-summarizer.js';
 import {
   createSessionPromptRefs,
   createToolRegisterHolder,
@@ -143,6 +152,54 @@ import {
   type ToolRegisterHolder,
 } from './pi-session-factory.js';
 import { clipToolPreview, previewFromToolResult, toolResultIsError } from './tool-error.js';
+
+/** UI 历史 → Pi 种子：跳过 compaction 时间线标记 */
+function toPiSeedHistory(
+  messages: Array<{
+    role: 'user' | 'assistant' | 'compaction';
+    content: string;
+    images?: Array<{ path: string; mimeType: string }>;
+  }>,
+  sessionDir: string,
+): SeedChatMessage[] {
+  const out: SeedChatMessage[] = [];
+  for (const m of messages) {
+    if (m.role !== 'user' && m.role !== 'assistant') continue;
+    out.push({
+      role: m.role,
+      content: m.content,
+      images:
+        m.role === 'user' ? loadChatImagesFromRefs(sessionDir, m.images) : undefined,
+    });
+  }
+  return out;
+}
+
+/** rewind / fork 后 Pi 种子：有会计摘要时与 resume 同路径 */
+function piHistoryAfterAccountingRebuild(
+  runtime: {
+    store: SessionStore;
+    context: ContextAccountant;
+    sessionDir: (sessionId: string) => string;
+  },
+  sessionId: string,
+  messages: Array<{
+    role: 'user' | 'assistant' | 'compaction';
+    content: string;
+    images?: Array<{ path: string; mimeType: string }>;
+  }>,
+): SeedChatMessage[] {
+  const summarized = runtime.context.getSummarized(sessionId).trim();
+  if (summarized.length > 0) {
+    return buildResumeSeedMessagesShared({
+      store: runtime.store,
+      context: runtime.context,
+      sessionId,
+      uiMessages: messages,
+    }).map((m) => ({ role: m.role, content: m.content }));
+  }
+  return toPiSeedHistory(messages, runtime.sessionDir(sessionId));
+}
 
 function emitFileChange(
   sessionId: string,
@@ -190,6 +247,8 @@ interface BuildToolsOptions {
   workspace: string;
   gate: ToolPolicyGate;
   sessionId: string;
+  /** ~/.ciro/sessions/{id} — transcript / tool-results 回查 */
+  sessionDir: string;
   planStore: PlanStore;
   modeSuggests: ModeSuggestBroker;
   questionsBroker: PlanQuestionBroker;
@@ -218,6 +277,8 @@ interface BuildToolsOptions {
   /** Task schema 是否含 browser（能力闸门） */
   includeBrowser?: boolean;
   isBrowserAvailable?: () => boolean;
+  /** read 工具投图前检查当前会话模型 Vision */
+  getSupportsVision?: () => boolean;
 }
 
 /** 注册全部已实现工具；Mode 白名单由 setActiveToolsByName 控制 */
@@ -226,6 +287,7 @@ function buildAllTools(opts: BuildToolsOptions) {
     workspace,
     gate,
     sessionId,
+    sessionDir,
     planStore,
     modeSuggests,
     questionsBroker,
@@ -245,11 +307,14 @@ function buildAllTools(opts: BuildToolsOptions) {
     onBackgroundSettled,
     includeBrowser,
     isBrowserAvailable,
+    getSupportsVision,
   } = opts;
   const tools = [
-    createSandboxedReadTool(workspace, gate),
+    createSandboxedReadTool(workspace, gate, { getSupportsVision }),
     createSandboxedListFilesTool(workspace, gate),
     createSandboxedGrepTool(workspace, gate),
+    createSearchTranscriptTool(sessionDir, gate),
+    createGetToolResultTool(sessionDir, gate),
     createSandboxedWriteTool(workspace, gate, onFileEdit),
     createSandboxedEditTool(workspace, gate, onFileEdit),
     createSandboxedBashTool(workspace, gate),
@@ -434,6 +499,21 @@ export class PiAgentRuntime implements AgentRuntime {
     this.compaction = new CompactionOrchestrator(
       config.compaction,
       this.context,
+      createPiFullCompactSummarizer({
+        getModelRuntime: () => this.getModelRuntime(),
+        providerStore: this.providerStore,
+        getPreferredModelRef: (sessionId) => {
+          if (!sessionId) return this.providerStore?.resolveEffectiveModelRef(null) ?? null;
+          const entry = this.sessions.get(sessionId);
+          const handle = this.store.get(sessionId) ?? entry?.handle;
+          return (
+            entry?.appliedModelRef ??
+            handle?.modelRef ??
+            this.providerStore?.resolveEffectiveModelRef(null) ??
+            null
+          );
+        },
+      }),
     );
     installPermissionPushRouter(this.permissions, (sessionId) => {
       const push = this.activePushes.get(sessionId);
@@ -603,7 +683,11 @@ export class PiAgentRuntime implements AgentRuntime {
     sessionId: string,
     opts?: CompactSessionOptions,
   ): Promise<{ result: CompactionResult; contextUsage?: ContextUsageSnapshot }> {
-    return compactSessionShared({
+    if (this.busySessions.has(sessionId) && !opts?.allowBusy) {
+      throw new Error('SESSION_BUSY: Session is streaming');
+    }
+
+    const shared = await compactSessionShared({
       store: this.store,
       context: this.context,
       compaction: this.compaction,
@@ -613,6 +697,56 @@ export class PiAgentRuntime implements AgentRuntime {
       modeProfiles: this.modeProfiles,
       compactOpts: opts,
     });
+
+    await this.rebuildPiFromSeed(sessionId, shared.seedMessages);
+
+    const handle = this.store.get(sessionId) ?? this.sessions.get(sessionId)?.handle;
+    const seedConversation = shared.seedMessages
+      .map((m) => (m.role === 'user' ? `\nUser: ${m.content}` : `\nAssistant: ${m.content}`))
+      .join('');
+    if (handle) {
+      const contextUsage = this.context.refresh(sessionId, {
+        system: this.modeProfiles.systemPromptForMode(handle.mode),
+        tools: [...this.modeProfiles.toolsForMode(handle.mode)].join('\n'),
+        conversation: seedConversation,
+        summarized: '',
+        toolPayloadTokens: sumToolPayloadTokens(this.toolResults.get(sessionId) ?? []),
+      });
+      return { result: shared.result, contextUsage };
+    }
+    return { result: shared.result, contextUsage: shared.contextUsage };
+  }
+
+  /** dispose 当前 Pi 并用压缩种子重建（UI events 不截断） */
+  private async rebuildPiFromSeed(
+    sessionId: string,
+    seedMessages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  ): Promise<void> {
+    const existing = this.sessions.get(sessionId);
+    const handle = this.store.get(sessionId) ?? existing?.handle;
+    if (!handle) return;
+
+    if (existing) {
+      await existing.piSession.abort?.();
+      disposePiSession(existing.piSession);
+      this.sessions.delete(sessionId);
+    }
+
+    const history: SeedChatMessage[] = seedMessages.map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+    const piOpened = await this.openPiSession(handle, history);
+    this.sessions.set(sessionId, {
+      handle,
+      piSession: piOpened.session,
+      refs: piOpened.refs,
+      appliedModelRef: piOpened.appliedModelRef,
+      mcpActiveNames: piOpened.mcpActiveNames,
+      toolRegister: piOpened.toolRegister,
+      browserTaskExposed: this.isBrowserMcpReadyForSession(sessionId),
+    });
+    this.bindLatestConfirmedPlan(sessionId);
   }
 
   async resumeSession(sessionId: string): Promise<{
@@ -621,7 +755,7 @@ export class PiAgentRuntime implements AgentRuntime {
     eventsReplayed: number;
     stoppedAtBoundary: boolean;
     contextUsage?: ContextUsageSnapshot;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
     confirmedPlanId?: string;
   }> {
     const state = recoverSessionShared(
@@ -638,14 +772,18 @@ export class PiAgentRuntime implements AgentRuntime {
       disposePiSession(existing.piSession);
       this.sessions.delete(sessionId);
     }
-    const history: SeedChatMessage[] = state.messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-      images:
-        m.role === 'user'
-          ? loadChatImagesFromRefs(this.sessionDir(sessionId), m.images)
-          : undefined,
-    }));
+
+    const hasSummary = state.summarizedText.trim().length > 0;
+    const seed = buildResumeSeedMessagesShared({
+      store: this.store,
+      context: this.context,
+      sessionId,
+      uiMessages: state.messages,
+    });
+    const history: SeedChatMessage[] = hasSummary
+      ? seed.map((m) => ({ role: m.role, content: m.content }))
+      : toPiSeedHistory(state.messages, this.sessionDir(sessionId));
+
     const piOpened = await this.openPiSession(state.handle, history);
     this.sessions.set(sessionId, {
       handle: state.handle,
@@ -665,13 +803,15 @@ export class PiAgentRuntime implements AgentRuntime {
     if (state.handle.mode === 'debug') {
       await this.startDebugSession(state.handle);
     }
+    // openPiSession → syncSessionContextLimit 会再 refresh；返回会计终态，避免与 GET /context 不一致
+    const contextUsage = this.context.get(sessionId) ?? state.contextUsage;
     const confirmedPlanId = latestConfirmedPlan(this.planStore, sessionId)?.planId;
     return {
       session: state.handle,
       messageCount: state.messageCount,
       eventsReplayed: state.eventsReplayed,
       stoppedAtBoundary: state.stoppedAtBoundary,
-      contextUsage: state.contextUsage,
+      contextUsage,
       messages: state.messages,
       ...(confirmedPlanId ? { confirmedPlanId } : {}),
     };
@@ -783,6 +923,7 @@ export class PiAgentRuntime implements AgentRuntime {
       workspace: handle.workspace,
       gate,
       sessionId: handle.id,
+      sessionDir: resolveSessionDir(this.store, handle.workspace, handle.id),
       planStore: this.planStore,
       modeSuggests: this.modeSuggests,
       questionsBroker: this.questionsBroker,
@@ -840,6 +981,20 @@ export class PiAgentRuntime implements AgentRuntime {
       extTools,
       includeBrowser: this.isBrowserMcpReadyForSession(handle.id),
       isBrowserAvailable: () => this.isBrowserMcpReadyForSession(handle.id),
+      getSupportsVision: () => {
+        const preferred =
+          this.sessions.get(handle.id)?.appliedModelRef ??
+          this.store.get(handle.id)?.modelRef ??
+          handle.modelRef ??
+          null;
+        const effective =
+          this.providerStore?.resolveEffectiveModelRef(preferred) ?? preferred;
+        const creds =
+          effective && this.providerStore
+            ? this.providerStore.resolveCredentials(effective)
+            : null;
+        return Boolean(creds?.model.supportsVision);
+      },
     });
 
     let model: PiResolvedModel | undefined;
@@ -1083,6 +1238,7 @@ export class PiAgentRuntime implements AgentRuntime {
           tools: names.join('\n'),
           conversation: this.context.getConversation(sessionId),
           summarized: this.context.getSummarized(sessionId),
+          toolPayloadTokens: sumToolPayloadTokens(this.toolResults.get(sessionId) ?? []),
         });
       }
     } else if (updated && mode === 'debug' && prev?.mode !== 'debug') {
@@ -1349,6 +1505,7 @@ export class PiAgentRuntime implements AgentRuntime {
       maxMode: handle.maxMode,
       apiMaxContext: creds?.model.apiMaxContext,
       contextLimit: creds?.model.contextLimit,
+      modelId: handle.modelRef?.modelId ?? creds?.model.id,
       fallbackLimit: this.config.modelContextLimit,
     });
   }
@@ -1356,6 +1513,8 @@ export class PiAgentRuntime implements AgentRuntime {
   private syncSessionContextLimit(handle: SessionHandle): void {
     const limit = this.effectiveContextFor(handle);
     this.context.setSessionLimit(handle.id, limit);
+    // 必须带上 toolPayloadTokens，否则会把 resume/换模后的 conversation 桶侧车清成 0，
+    // 出现「角标仍是压缩前比例、打开面板又变成很低」的不一致。
     this.context.refresh(handle.id, {
       system: this.modeProfiles.systemPromptForMode(handle.mode),
       tools: this.toolNamesFor(
@@ -1364,6 +1523,7 @@ export class PiAgentRuntime implements AgentRuntime {
       ).join('\n'),
       conversation: this.context.getConversation(handle.id),
       summarized: this.context.getSummarized(handle.id),
+      toolPayloadTokens: sumToolPayloadTokens(this.toolResults.get(handle.id) ?? []),
     });
   }
 
@@ -1448,7 +1608,7 @@ export class PiAgentRuntime implements AgentRuntime {
     beforeMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }> {
     return this.truncateAndRebuildPi(sessionId, beforeMessageId, 'rewind');
   }
@@ -1458,7 +1618,7 @@ export class PiAgentRuntime implements AgentRuntime {
     fromMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }> {
     return this.truncateAndRebuildPi(sessionId, fromMessageId, 'fork');
   }
@@ -1468,7 +1628,7 @@ export class PiAgentRuntime implements AgentRuntime {
     throughMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }> {
     const { session: handle, messages } = await forkChatSessionShared({
       store: this.store,
@@ -1489,14 +1649,15 @@ export class PiAgentRuntime implements AgentRuntime {
       this.sessions.delete(handle.id);
     }
 
-    const history: SeedChatMessage[] = messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-      images:
-        m.role === 'user'
-          ? loadChatImagesFromRefs(this.sessionDir(handle.id), m.images)
-          : undefined,
-    }));
+    const history = piHistoryAfterAccountingRebuild(
+      {
+        store: this.store,
+        context: this.context,
+        sessionDir: (id) => this.sessionDir(id),
+      },
+      handle.id,
+      messages,
+    );
     const piOpened = await this.openPiSession(handle, history);
     this.sessions.set(handle.id, {
       handle,
@@ -1517,7 +1678,7 @@ export class PiAgentRuntime implements AgentRuntime {
     kind: 'rewind' | 'fork',
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }> {
     const { session: handle, messages } = truncateSessionHistoryShared({
       store: this.store,
@@ -1538,14 +1699,15 @@ export class PiAgentRuntime implements AgentRuntime {
       this.sessions.delete(sessionId);
     }
 
-    const history: SeedChatMessage[] = messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-      images:
-        m.role === 'user'
-          ? loadChatImagesFromRefs(this.sessionDir(sessionId), m.images)
-          : undefined,
-    }));
+    const history = piHistoryAfterAccountingRebuild(
+      {
+        store: this.store,
+        context: this.context,
+        sessionDir: (id) => this.sessionDir(id),
+      },
+      sessionId,
+      messages,
+    );
     const piOpened = await this.openPiSession(handle, history);
     this.sessions.set(sessionId, {
       handle,
@@ -1726,7 +1888,7 @@ export class PiAgentRuntime implements AgentRuntime {
     void (async () => {
       let turnMode = ctx.mode;
 
-      const currentEntry = this.sessions.get(sessionId);
+      let currentEntry = this.sessions.get(sessionId);
       if (!currentEntry || done) {
         if (!done) {
           done = true;
@@ -1740,6 +1902,7 @@ export class PiAgentRuntime implements AgentRuntime {
       let assistantFlushedLen = 0;
       let thinkingText = '';
       let thinkingStartedAt: number | null = null;
+      let liveUsage: LiveContextUsageEmitter | null = null;
       const turnStartedAt = Date.now();
       const flushThinkingSegment = () => {
         if (!thinkingText) return;
@@ -1788,6 +1951,7 @@ export class PiAgentRuntime implements AgentRuntime {
                   messageId,
                 ),
               );
+              liveUsage?.schedule();
             } else if (event.assistantMessageEvent.type === 'thinking_delta') {
               if (thinkingStartedAt == null) thinkingStartedAt = Date.now();
               thinkingText += event.assistantMessageEvent.delta;
@@ -1823,6 +1987,7 @@ export class PiAgentRuntime implements AgentRuntime {
                 messageId,
               ),
             );
+            liveUsage?.schedule();
             break;
           }
           case 'tool_execution_end': {
@@ -1855,6 +2020,8 @@ export class PiAgentRuntime implements AgentRuntime {
                 messageId,
               ),
             );
+            // 工具结果主导上下文增长；立即刷新（对齐 Cursor 上下文环）
+            liveUsage?.flush();
             break;
           }
           case 'agent_settled':
@@ -1940,7 +2107,7 @@ export class PiAgentRuntime implements AgentRuntime {
       const systemWithExtras = extras ? `${modeSystem}\n\n${extras}` : modeSystem;
 
       this.context.appendConversation(sessionId, `\nUser: ${message.message}`);
-      const snapshot = this.context.refresh(sessionId, {
+      const staticParts = () => ({
         system: systemWithExtras,
         tools: activeNames.join('\n'),
         memory: mem.injection,
@@ -1949,13 +2116,25 @@ export class PiAgentRuntime implements AgentRuntime {
         mcp: mcpText,
         subagents: this.context.getSubagents(sessionId),
         summarized: this.context.getSummarized(sessionId),
+        toolPayloadTokens: sumToolPayloadTokens(this.toolResults.get(sessionId) ?? []),
       });
+      const snapshot = this.context.refresh(sessionId, staticParts());
       this.store.appendEvent(sessionId, {
         type: 'message',
         role: 'system',
         tokenEstimate: snapshot.totalTokens,
       });
       push(makeEnvelope('context_usage', snapshot, sessionId, messageId));
+
+      liveUsage = createLiveContextUsageEmitter({
+        context: this.context,
+        sessionId,
+        getStaticParts: staticParts,
+        getInFlightAssistantText: () => assistantText,
+        onSnapshot: (snap) => {
+          push(makeEnvelope('context_usage', snap, sessionId, messageId));
+        },
+      });
 
       try {
         await currentEntry.piSession.prompt(message.message, {
@@ -1968,16 +2147,7 @@ export class PiAgentRuntime implements AgentRuntime {
           toolNames: (this.toolResults.get(sessionId) ?? []).slice(-8).map((t) => t.toolName),
         });
 
-        await emitAutoCompaction({
-          push,
-          compaction: this.compaction,
-          context: this.context,
-          sessionId,
-          messageId,
-          fallbackSnapshot: snapshot,
-          compactSession: (id, o) => this.compactSession(id, o),
-        });
-
+        // 先落盘本轮助手文本/事件，再 compact，避免重建 Pi 时丢掉刚完成的回合
         flushThinkingSegment();
         flushAssistantSegment();
         this.store.appendEvent(sessionId, {
@@ -1985,9 +2155,29 @@ export class PiAgentRuntime implements AgentRuntime {
           messageId: assistantMessageId,
           workedMs: Math.max(0, Date.now() - turnStartedAt),
         });
+        liveUsage?.dispose();
+        liveUsage = null;
         if (assistantText) {
           this.context.appendConversation(sessionId, `\nAssistant: ${assistantText}`);
         }
+
+        // 回合内 tool payload 已写入 Map；刷新后再决定 auto-compact
+        const postTurnSnap = this.context.refresh(sessionId, staticParts());
+        push(makeEnvelope('context_usage', postTurnSnap, sessionId, messageId));
+
+        await emitAutoCompaction({
+          push,
+          compaction: this.compaction,
+          context: this.context,
+          sessionId,
+          messageId,
+          fallbackSnapshot: postTurnSnap,
+          compactionBias: this.modeProfiles.getModeProfile(ctx.mode).compactionBias,
+          compactSession: (id, o) => this.compactSession(id, o),
+        });
+        const rebuilt = this.sessions.get(sessionId);
+        if (rebuilt) currentEntry = rebuilt;
+
         markComplete();
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
@@ -2002,9 +2192,16 @@ export class PiAgentRuntime implements AgentRuntime {
         done = true;
         hub.finish();
       } finally {
-        currentEntry.refs.turnExtras.current = '';
-        currentEntry.refs.debugInfo.current = null;
-        unsubscribe();
+        liveUsage?.dispose();
+        liveUsage = null;
+        try {
+          unsubscribe();
+        } catch {
+          /* Pi 可能已在 compact rebuild 中 dispose */
+        }
+        const live = this.sessions.get(sessionId) ?? currentEntry;
+        live.refs.turnExtras.current = '';
+        live.refs.debugInfo.current = null;
         const dbg = this.debugSessions.get(sessionId);
         if (dbg) {
           dbg.analyzeUnlocked = false;

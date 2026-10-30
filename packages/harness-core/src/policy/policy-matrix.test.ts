@@ -27,7 +27,7 @@ describe('§12 Policy matrix — Ask', () => {
     );
   });
 
-  it('git push → deny；git log → allow（只读白名单）', () => {
+  it('git push → deny；git log / echo → allow；未知命令 → ask', () => {
     expect(
       engine.evaluate({
         mode: 'ask',
@@ -44,6 +44,22 @@ describe('§12 Policy matrix — Ask', () => {
         workspace: ws,
       }).decision,
     ).toBe('allow');
+    expect(
+      engine.evaluate({
+        mode: 'ask',
+        toolName: 'bash',
+        toolInput: { command: 'echo hello' },
+        workspace: ws,
+      }).decision,
+    ).toBe('allow');
+    expect(
+      engine.evaluate({
+        mode: 'ask',
+        toolName: 'bash',
+        toolInput: { command: 'pnpm test' },
+        workspace: ws,
+      }).decision,
+    ).toBe('ask');
   });
 });
 

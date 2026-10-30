@@ -1,5 +1,6 @@
 import { join, relative } from 'node:path';
 import {
+  type CompactionBias,
   type CompactionResult,
   type ContextUsageSnapshot,
   type HarnessConfig,
@@ -17,10 +18,12 @@ import {
   assembleMemoryInjection,
   assembleRulesInjection,
   assembleSkillInjection,
+  buildCompactedSeedMessages,
   ChangeReviewStore,
   collectFileChanges,
   CompactionOrchestrator,
   ContextAccountant,
+  sumToolPayloadTokens,
   MemoryStore,
   PermissionBroker,
   ModeSuggestBroker,
@@ -34,6 +37,7 @@ import {
   uiMessagesFromEvents,
   workspaceSessionsDir,
   type AuditLog,
+  type CompactedSeedMessage,
   type CompactSessionOptions,
   type RecoveredChatMessage,
   type RecoveredSessionState,
@@ -78,14 +82,22 @@ export async function compactSessionShared(opts: {
   sessionId: string;
   modeProfiles: ModeProfileProvider;
   compactOpts?: CompactSessionOptions;
-}): Promise<{ result: CompactionResult; contextUsage?: ContextUsageSnapshot }> {
+}): Promise<{
+  result: CompactionResult;
+  contextUsage?: ContextUsageSnapshot;
+  conversationText: string;
+  summarizedText: string;
+  seedMessages: CompactedSeedMessage[];
+}> {
   const { store, context, compaction, toolResults, sessionDir, sessionId, compactOpts } = opts;
   const session = store.get(sessionId);
   if (!session) throw new Error('Session not found');
+  const compactionBias = opts.modeProfiles.getModeProfile(session.mode).compactionBias;
   const outcome = await compaction.compact({
     sessionId,
     workspace: session.workspace,
     mode: session.mode,
+    compactionBias,
     method: compactOpts?.method,
     conversationText: context.getConversation(sessionId),
     summarizedText: context.getSummarized(sessionId),
@@ -95,11 +107,30 @@ export async function compactSessionShared(opts: {
   toolResults.set(sessionId, outcome.toolResults);
   context.setConversation(sessionId, outcome.conversationText);
   context.setSummarized(sessionId, outcome.summarizedText);
+
+  const uiMessages = uiMessagesFromEvents(store.eventLog?.readEvents(sessionId) ?? []);
+  const seedMessages = buildCompactedSeedMessages({
+    method: outcome.result.metadata.method,
+    summarizedText: outcome.summarizedText,
+    conversationText: outcome.conversationText,
+    uiMessages,
+  });
+
+  // 会计贴近模型将看到的文本：micro 用 seed（无 tool）；SM/full 保持分桶
+  const method = outcome.result.metadata.method;
+  const seedConversation = seedMessages
+    .map((m) => (m.role === 'user' ? `\nUser: ${m.content}` : `\nAssistant: ${m.content}`))
+    .join('');
+  const refreshConversation =
+    method === 'micro' ? seedConversation : outcome.conversationText;
+  const refreshSummarized = method === 'micro' ? '' : outcome.summarizedText;
+
   const contextUsage = context.refresh(sessionId, {
     system: opts.modeProfiles.systemPromptForMode(session.mode),
     tools: toolsForMode(opts.modeProfiles, session.mode).join('\n'),
-    conversation: outcome.conversationText,
-    summarized: outcome.summarizedText,
+    conversation: refreshConversation,
+    summarized: refreshSummarized,
+    toolPayloadTokens: sumToolPayloadTokens(outcome.toolResults),
   });
   store.appendEvent(sessionId, {
     type: 'compaction',
@@ -109,7 +140,27 @@ export async function compactSessionShared(opts: {
     conversation: outcome.conversationText,
     summarized: outcome.summarizedText,
   });
-  return { result: outcome.result, contextUsage };
+  return {
+    result: outcome.result,
+    contextUsage,
+    conversationText: outcome.conversationText,
+    summarizedText: outcome.summarizedText,
+    seedMessages,
+  };
+}
+
+/** resume / 冷启动：按会计摘要构建 Pi 种子（无摘要则全量 UI 文本） */
+export function buildResumeSeedMessagesShared(opts: {
+  store: SessionStore;
+  context: ContextAccountant;
+  sessionId: string;
+  uiMessages: Array<{ role: 'user' | 'assistant' | 'compaction'; content: string }>;
+}): CompactedSeedMessage[] {
+  return buildCompactedSeedMessages({
+    summarizedText: opts.context.getSummarized(opts.sessionId),
+    conversationText: opts.context.getConversation(opts.sessionId),
+    uiMessages: opts.uiMessages,
+  });
 }
 
 export function recoverSessionShared(
@@ -144,6 +195,7 @@ export function recoverSessionShared(
     tools: toolsForMode(modeProfiles, state.handle.mode).join('\n'),
     conversation: state.conversationText,
     summarized: state.summarizedText,
+    toolPayloadTokens: sumToolPayloadTokens(state.toolResults),
   });
   return {
     handle: state.handle,
@@ -295,24 +347,56 @@ export function rebindWorkspaceShared(
 
 export type SessionHistoryMessages = RecoveredChatMessage[];
 
-export function refreshConversationFromUiMessagesShared(opts: {
+/**
+ * 截断 / fork 克隆后：与 resume 同路径重建会计（conversation / summarized / toolPayload）。
+ * 禁止仅用 UI 文本拼 conversation 并清空 summarized / toolResults。
+ */
+export function refreshAccountingFromDiskShared(opts: {
+  store: SessionStore;
   context: ContextAccountant;
   toolResults: Map<string, ToolResultRecord[]>;
   sessionId: string;
   handle: SessionHandle;
-  messages: SessionHistoryMessages;
   modeProfiles: ModeProfileProvider;
-}): void {
-  const conversation = opts.messages
-    .map((m) => (m.role === 'user' ? `\nUser: ${m.content}` : `\nAssistant: ${m.content}`))
-    .join('');
+}): {
+  messages: SessionHistoryMessages;
+  conversationText: string;
+  summarizedText: string;
+} {
+  const clearAccounting = () => {
+    opts.toolResults.set(opts.sessionId, []);
+    opts.context.setConversation(opts.sessionId, '');
+    opts.context.setSummarized(opts.sessionId, '');
+    opts.context.refresh(opts.sessionId, {
+      system: opts.modeProfiles.systemPromptForMode(opts.handle.mode),
+      tools: toolsForMode(opts.modeProfiles, opts.handle.mode).join('\n'),
+      conversation: '',
+      summarized: '',
+      toolPayloadTokens: 0,
+    });
+    return { messages: [] as SessionHistoryMessages, conversationText: '', summarizedText: '' };
+  };
+
+  if (!opts.store.eventLog) return clearAccounting();
+
+  const state = new SessionRecoveryManager(opts.store.eventLog).recover(opts.sessionId);
+  if (!state) return clearAccounting();
+
+  opts.toolResults.set(opts.sessionId, state.toolResults);
+  opts.context.setConversation(opts.sessionId, state.conversationText);
+  opts.context.setSummarized(opts.sessionId, state.summarizedText);
   opts.context.refresh(opts.sessionId, {
-    system: opts.modeProfiles.systemPromptForMode(opts.handle.mode),
-    tools: toolsForMode(opts.modeProfiles, opts.handle.mode).join('\n'),
-    conversation,
-    summarized: '',
+    system: opts.modeProfiles.systemPromptForMode(state.handle.mode),
+    tools: toolsForMode(opts.modeProfiles, state.handle.mode).join('\n'),
+    conversation: state.conversationText,
+    summarized: state.summarizedText,
+    toolPayloadTokens: sumToolPayloadTokens(state.toolResults),
   });
-  opts.toolResults.set(opts.sessionId, []);
+  return {
+    messages: state.messages,
+    conversationText: state.conversationText,
+    summarizedText: state.summarizedText,
+  };
 }
 
 export function resolveSessionHandleFromDiskShared(
@@ -372,14 +456,13 @@ export function truncateSessionHistoryShared(opts: {
     fromMessageId: kind === 'fork' ? messageId : undefined,
   });
 
-  const messages = uiMessagesFromEvents(store.eventLog?.readEvents(sessionId) ?? []);
   handle = store.get(sessionId) ?? handle;
-  refreshConversationFromUiMessagesShared({
+  const { messages } = refreshAccountingFromDiskShared({
+    store,
     context: opts.context,
     toolResults: opts.toolResults,
     sessionId,
     handle,
-    messages,
     modeProfiles: opts.modeProfiles,
   });
   return { session: handle, messages };
@@ -420,13 +503,12 @@ export async function forkChatSessionShared(opts: {
   const titled = await opts.setSessionTitle(dest.id, forkTitle);
   const handle = titled ?? opts.store.get(dest.id) ?? dest;
 
-  const messages = uiMessagesFromEvents(opts.store.eventLog?.readEvents(dest.id) ?? []);
-  refreshConversationFromUiMessagesShared({
+  const { messages } = refreshAccountingFromDiskShared({
+    store: opts.store,
     context: opts.context,
     toolResults: opts.toolResults,
     sessionId: dest.id,
     handle,
-    messages,
     modeProfiles: opts.modeProfiles,
   });
   return { session: handle, messages };
@@ -828,12 +910,17 @@ export async function emitAutoCompaction(opts: {
   sessionId: string;
   messageId: string;
   fallbackSnapshot: ContextUsageSnapshot;
+  /** ModeProfile.compactionBias；缺省 normal */
+  compactionBias?: CompactionBias;
   compactSession: (
     sessionId: string,
     compactOpts?: CompactSessionOptions,
   ) => Promise<{ result: CompactionResult; contextUsage?: ContextUsageSnapshot }>;
 }): Promise<void> {
-  const decision = opts.compaction.decideAutoAction(opts.sessionId);
+  const decision = opts.compaction.decideAutoAction(
+    opts.sessionId,
+    opts.compactionBias ?? 'normal',
+  );
   if (decision.action === 'suggest') {
     const snap = opts.context.get(opts.sessionId) ?? opts.fallbackSnapshot;
     opts.push(
@@ -868,6 +955,7 @@ export async function emitAutoCompaction(opts: {
     );
     const { result, contextUsage } = await opts.compactSession(opts.sessionId, {
       method: decision.action,
+      allowBusy: true,
     });
     opts.push(
       makeEnvelope(

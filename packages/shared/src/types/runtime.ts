@@ -284,7 +284,8 @@ export interface SessionRecoveredPayload {
   recoveredAt: number;
 }
 
-export type CompactionMethod = 'micro' | 'session-memory' | 'full' | 'auto';
+/** auto=回合内分层；manual=用户点「压缩」（SM/full，不走 micro） */
+export type CompactionMethod = 'micro' | 'session-memory' | 'full' | 'auto' | 'manual';
 
 export interface CompactionResult {
   metadata: {

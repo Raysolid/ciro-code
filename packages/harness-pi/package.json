@@ -1,6 +1,6 @@
 {
   "name": "@ciro-code/harness-pi",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Ciro Code Pi agent runtime and tools",
   "license": "MIT",
   "type": "module",

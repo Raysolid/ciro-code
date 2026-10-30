@@ -3,12 +3,14 @@ import {
   DEFAULT_COMPACTION_CONFIG,
   DEFAULT_MODEL_CONTEXT_LIMIT,
   DEFAULT_RESERVED_OUTPUT_TOKENS,
+  type CompactionBias,
   type CompactionConfig,
   type ContextBucket,
   type ContextBucketId,
   type ContextUrgency,
   type ContextUsageSnapshot,
 } from '@ciro-code/harness-shared';
+import { effectiveCompactionThresholds } from '../compaction/bias-effects.js';
 import { roughTokenEstimate } from './token-estimate.js';
 
 export interface ContextAccountantOptions {
@@ -28,6 +30,8 @@ export interface ContextParts {
   summarized?: string;
   /** Phase 4.3：Task 定义 + 返回的 summary_schema 文本 */
   subagents?: string;
+  /** 侧车 tool payload 估数；并入 conversation 桶，不新增 ContextBucketId */
+  toolPayloadTokens?: number;
 }
 
 /** 始终输出的桶（空桶 tokens=0） */
@@ -135,6 +139,7 @@ export class ContextAccountant {
     const subagents =
       parts.subagents ?? this.subagentsText.get(sessionId) ?? '';
 
+    const toolPayload = Math.max(0, Math.floor(parts.toolPayloadTokens ?? 0));
     const counts: Record<ContextBucketId, number> = {
       system: roughTokenEstimate(parts.system ?? ''),
       tools: roughTokenEstimate(parts.tools ?? ''),
@@ -142,7 +147,7 @@ export class ContextAccountant {
       rules: roughTokenEstimate(parts.rules ?? ''),
       skills: roughTokenEstimate(parts.skills ?? ''),
       mcp: roughTokenEstimate(parts.mcp ?? ''),
-      conversation: roughTokenEstimate(conversation),
+      conversation: roughTokenEstimate(conversation) + toolPayload,
       summarized: roughTokenEstimate(summarized),
       subagents: roughTokenEstimate(subagents),
     };
@@ -177,10 +182,14 @@ export class ContextAccountant {
     return this.snapshots.get(sessionId);
   }
 
-  /** compact urgency 唯一入口：读同一 snapshot.usageRatio */
-  getCompactUrgency(sessionId: string): ContextUrgency {
+  /**
+   * compact urgency 唯一入口：读同一 snapshot.usageRatio。
+   * bias 仅偏移 background/suggest 阈值，不改 usageRatio。
+   */
+  getCompactUrgency(sessionId: string, bias: CompactionBias = 'normal'): ContextUrgency {
     const snap = this.snapshots.get(sessionId);
     if (!snap) return 'none';
-    return urgencyFromRatio(snap.usageRatio, this.compaction.thresholds);
+    const thresholds = effectiveCompactionThresholds(this.compaction.thresholds, bias);
+    return urgencyFromRatio(snap.usageRatio, thresholds);
   }
 }

@@ -256,7 +256,33 @@ describe('SessionRecoveryManager boundary', () => {
     expect(r.summarizedText).toBe('note');
   });
 
-  it('recovers tool-results from disk', () => {
+  it('uiMessagesFromEvents inserts SM/full compaction markers but skips micro', () => {
+    const msgs = uiMessagesFromEvents([
+      { type: 'message', ts: 1, role: 'user', content: 'a', messageId: 'u1' },
+      { type: 'message', ts: 2, role: 'assistant', content: 'b', messageId: 'a1' },
+      {
+        type: 'compaction',
+        ts: 3,
+        method: 'micro',
+        tokensSaved: 10,
+      },
+      {
+        type: 'compaction',
+        ts: 4,
+        method: 'session-memory',
+        tokensSaved: 100,
+        narrative: 'kept recent',
+      },
+      { type: 'message', ts: 5, role: 'user', content: 'c', messageId: 'u2' },
+    ]);
+    const markers = msgs.filter((m) => m.role === 'compaction');
+    expect(markers).toHaveLength(1);
+    expect(markers[0]?.compaction?.method).toBe('session-memory');
+    expect(markers[0]?.compaction?.tokensSaved).toBe(100);
+    expect(msgs.map((m) => m.role)).toEqual(['user', 'assistant', 'compaction', 'user']);
+  });
+
+  it('recovers tool-results from disk when tool_result event exists', () => {
     const root = mkdtempSync(join(tmpdir(), 'recover-tr-'));
     const store = new SessionStore({ sessionsRoot: root });
     const handle = store.create({ workspace: '/ws' });
@@ -274,8 +300,56 @@ describe('SessionRecoveryManager boundary', () => {
       }),
       'utf-8',
     );
+    store.appendEvent(handle.id, {
+      type: 'tool_result',
+      toolCallId: 't1',
+      toolName: 'read',
+    });
     const state = new SessionRecoveryManager(store.eventLog!).recover(handle.id)!;
     expect(state.toolResults.some((t) => t.toolCallId === 't1')).toBe(true);
+    expect(state.toolResults.find((t) => t.toolCallId === 't1')?.content).toBe('file body');
+  });
+
+  it('clears accounting toolResults after session-memory / full compaction', () => {
+    const root = mkdtempSync(join(tmpdir(), 'recover-tr-clear-'));
+    const store = new SessionStore({ sessionsRoot: root });
+    const handle = store.create({ workspace: '/ws' });
+    const trDir = join(root, handle.id, 'tool-results');
+    mkdirSync(trDir, { recursive: true });
+    writeFileSync(
+      join(trDir, 'old.json'),
+      JSON.stringify({
+        toolCallId: 'old',
+        toolName: 'read',
+        content: 'x'.repeat(40_000),
+        storedAt: new Date().toISOString(),
+        tokenCount: 10_000,
+        retention: 'inline',
+      }),
+      'utf-8',
+    );
+    store.appendEvent(handle.id, {
+      type: 'tool_result',
+      toolCallId: 'old',
+      toolName: 'read',
+    });
+    store.appendEvent(handle.id, {
+      type: 'compaction',
+      method: 'session-memory',
+      conversation: '\nUser: kept',
+      summarized: 'summary',
+    });
+    store.appendEvent(handle.id, {
+      type: 'tool_result',
+      toolCallId: 'new',
+      toolName: 'grep',
+      content: 'hit',
+    });
+    const state = new SessionRecoveryManager(store.eventLog!).recover(handle.id)!;
+    expect(state.toolResults.some((t) => t.toolCallId === 'old')).toBe(false);
+    expect(state.toolResults.some((t) => t.toolCallId === 'new')).toBe(true);
+    expect(state.conversationText).toBe('\nUser: kept');
+    expect(state.summarizedText).toBe('summary');
   });
 
   it('purgeEmpty removes zero-message sessions only', () => {

@@ -2,7 +2,17 @@ import { serve } from '@hono/node-server';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadConfig, ExtensionHost, ExtensionTrustStore, McpManager, ProviderStore, SessionStore, SkillRegistry } from '@ciro-code/harness-core';
+import {
+  acquireWorkspaceLock,
+  loadConfig,
+  ExtensionHost,
+  ExtensionTrustStore,
+  McpManager,
+  ProviderStore,
+  releaseWorkspaceLock,
+  SessionStore,
+  SkillRegistry,
+} from '@ciro-code/harness-core';
 import type { HarnessMode, ModeProfileProvider } from '@ciro-code/harness-shared';
 import { createMinimalModeProfiles } from '@ciro-code/harness-shared';
 import { createAgentRuntime } from '@ciro-code/harness-pi';
@@ -28,6 +38,8 @@ export interface StartServerOptions {
   workspacePinned?: boolean;
   /** 四模式 Profile；缺省 minimal stub（产品路径由 CLI 注入） */
   modeProfiles?: ModeProfileProvider;
+  /** 与 TUI 工作区互斥；默认 true */
+  workspaceLock?: boolean;
 }
 
 export async function startHarnessServer(options: StartServerOptions = {}) {
@@ -39,6 +51,28 @@ export async function startHarnessServer(options: StartServerOptions = {}) {
     agentBackend: options.agentBackend,
     profile: options.profile,
   });
+
+  if (options.workspaceLock !== false) {
+    const lock = acquireWorkspaceLock(config.workspace, 'web');
+    if (!lock.ok) {
+      const e = lock.existing;
+      throw new Error(
+        e.kind === 'tui'
+          ? `TUI 运行中（pid ${e.pid}）。请先退出，或对 TUI 使用 --allow-concurrent`
+          : `另一 Web daemon 运行中（pid ${e.pid}）`,
+      );
+    }
+    const release = () => releaseWorkspaceLock(config.workspace);
+    process.on('exit', release);
+    process.on('SIGINT', () => {
+      release();
+      process.exit(0);
+    });
+    process.on('SIGTERM', () => {
+      release();
+      process.exit(0);
+    });
+  }
 
   const uiDistPath = options.uiDistPath ?? resolveDefaultUiDist();
 

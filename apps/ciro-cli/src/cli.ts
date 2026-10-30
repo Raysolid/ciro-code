@@ -16,13 +16,91 @@ import {
   validateConfig,
   SkillRegistry,
 } from '@ciro-code/harness-core';
+import type { HarnessMode } from '@ciro-code/harness-shared';
 import { HARNESS_VERSION, createMinimalModeProfiles } from '@ciro-code/harness-shared';
+import { startTui } from '@ciro-code/harness-tui';
 import { startHarnessServer } from '@ciro-code/harness-web';
 import { openBrowser, printCiroBanner, printWebReady } from './banner.js';
 
+function parseMode(mode?: string): HarnessMode | undefined {
+  if (mode === 'ask' || mode === 'agent' || mode === 'plan' || mode === 'debug') return mode;
+  return undefined;
+}
+
+interface TuiCliOpts {
+  workspace?: string;
+  mode?: string;
+  mock?: boolean;
+  continue?: boolean;
+  resume?: string;
+  allowConcurrent?: boolean;
+  profile?: string;
+}
+
+async function runTuiAction(opts: TuiCliOpts): Promise<void> {
+  const mode = parseMode(opts.mode);
+  const workspace = resolve(opts.workspace ?? process.cwd());
+  const useMock = Boolean(opts.mock) || process.env.CIRO_AGENT_BACKEND === 'mock';
+
+  if (!useMock && !hasApiKey()) {
+    // 非 TTY 提示到 stderr；进入全屏前打出
+    console.warn(
+      'Warning: No API key found. Set DEEPSEEK_API_KEY / OPENAI_API_KEY, or use --mock / CIRO_AGENT_BACKEND=mock.',
+    );
+  }
+
+  try {
+    await startTui({
+      workspace,
+      mode,
+      mock: useMock,
+      continue: Boolean(opts.continue),
+      resume: opts.resume,
+      allowConcurrent: Boolean(opts.allowConcurrent),
+      profile: opts.profile,
+      modeProfiles: createMinimalModeProfiles(),
+    });
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exitCode = 1;
+  }
+}
+
+const tuiFlags = (cmd: Command) =>
+  cmd
+    .option('-w, --workspace <path>', 'Workspace root (default: cwd)')
+    .option('--mode <mode>', 'Initial mode: ask | plan | agent | debug')
+    .option('--mock', 'Use mock agent runtime (no API key needed)')
+    .option('--continue', 'Resume the most recent session')
+    .option('--resume <id>', 'Resume a specific session id')
+    .option('--allow-concurrent', 'Allow alongside Web/TUI (session ids prefixed .tui-)')
+    .option('--profile <id>', 'Profile overlay (e.g. developer)');
+
 const program = new Command();
 
-program.name('ciro').description('Ciro Code Harness CLI').version(HARNESS_VERSION);
+program
+  .name('ciro')
+  .description('Ciro Code Harness CLI — default: fullscreen TUI (also: ciro tui)')
+  .version(HARNESS_VERSION)
+  .addHelpText(
+    'after',
+    `
+Examples:
+  ciro                         Start TUI in the current workspace
+  ciro --mode=agent --mock     TUI with mock backend
+  ciro tui -w ./my-app         Explicit TUI alias
+  ciro web --mock              Start Web workbench daemon
+`,
+  );
+
+// 裸 ciro → TUI（D8）：isDefault，避免根级 --mode 抢走 config/web 子命令选项
+tuiFlags(
+  program
+    .command('tui', { isDefault: true, hidden: false })
+    .description('Start fullscreen TUI REPL (default when no subcommand)'),
+).action(async (opts: TuiCliOpts) => {
+  await runTuiAction(opts);
+});
 
 program
   .command('web')
@@ -50,13 +128,7 @@ program
         );
       }
 
-      const mode =
-        opts.mode === 'agent' ||
-        opts.mode === 'ask' ||
-        opts.mode === 'plan' ||
-        opts.mode === 'debug'
-          ? opts.mode
-          : undefined;
+      const mode = parseMode(opts.mode);
       const workspacePinned = Boolean(opts.workspace);
       const workspace = resolve(opts.workspace ?? process.cwd());
       const port = parseInt(opts.port, 10);
@@ -115,7 +187,9 @@ program
           2,
         ),
       );
-      console.log(`[ciro init] copied ${result.files.length} file(s). Try: ciro web --mock -w ${result.destDir}`);
+      console.log(
+        `[ciro init] copied ${result.files.length} file(s). Try: ciro --mock -w ${result.destDir}`,
+      );
     } catch (err) {
       console.error(err instanceof Error ? err.message : String(err));
       process.exitCode = 1;
@@ -128,10 +202,10 @@ configCmd
   .command('show')
   .description('Show effective config with source tree')
   .option('-w, --workspace <path>', 'Workspace root', process.cwd())
-  .option('--mode <mode>', 'CLI mode override')
+  .option('--mode <mode>', 'CLI mode override: ask | plan | agent | debug')
   .option('--profile <id>', 'Profile overlay')
   .action((opts: { workspace: string; mode?: string; profile?: string }) => {
-    const mode = opts.mode === 'agent' || opts.mode === 'ask' ? opts.mode : undefined;
+    const mode = parseMode(opts.mode);
     try {
       const effective = loadEffectiveConfig({
         workspace: resolve(opts.workspace),
@@ -161,10 +235,10 @@ configCmd
   .command('effective')
   .description('Print effective config as JSON')
   .option('-w, --workspace <path>', 'Workspace root', process.cwd())
-  .option('--mode <mode>', 'CLI mode override')
+  .option('--mode <mode>', 'CLI mode override: ask | plan | agent | debug')
   .option('--profile <id>', 'Profile overlay')
   .action((opts: { workspace: string; mode?: string; profile?: string }) => {
-    const mode = opts.mode === 'agent' || opts.mode === 'ask' ? opts.mode : undefined;
+    const mode = parseMode(opts.mode);
     try {
       const effective = loadEffectiveConfig({
         workspace: resolve(opts.workspace),

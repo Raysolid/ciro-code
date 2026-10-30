@@ -402,7 +402,11 @@ export function createLlmExploreRunner(deps: LlmExploreRunnerDeps): ExploreRunne
       activeToolNames = customTools.map((t) => t.name);
     } else {
       customTools = [
-        createSandboxedReadTool(workspace, gate),
+        createSandboxedReadTool(workspace, gate, {
+          getSupportsVision: () =>
+            Array.isArray(resolved.model.input) &&
+            resolved.model.input.includes('image'),
+        }),
         createSandboxedListFilesTool(workspace, gate),
         createSandboxedGrepTool(workspace, gate),
         createSandboxedBashTool(workspace, gate),

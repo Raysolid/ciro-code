@@ -1,6 +1,6 @@
 {
   "name": "@ciro-code/harness-web",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Ciro Code local HTTP/SSE API server",
   "license": "MIT",
   "type": "module",

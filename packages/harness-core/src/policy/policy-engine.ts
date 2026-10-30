@@ -4,7 +4,7 @@ import {
   MODE_TOOL_WHITELIST,
   PRESET_TOOL_WHITELIST,
   defaultPresetForMode,
-  isReadonlyBashCommand,
+  classifyBashForReadonlyMode,
   type HarnessMode,
   type PermissionPreset,
   type PolicyContext,
@@ -256,7 +256,7 @@ const readonlyModeWriteDenyRule: PolicyRule = (ctx) => {
 };
 
 /**
- * Ask / Plan：bash 仅允许只读白名单命令。
+ * Ask / Plan：bash 只读白名单自动放行；明确写类硬 deny；其余 ask（权限卡片 / allowlist）。
  * shell 与 bash 同级处理。
  */
 const readonlyModeBashRule: PolicyRule = (ctx) => {
@@ -269,10 +269,17 @@ const readonlyModeBashRule: PolicyRule = (ctx) => {
       reason: `Empty bash command is not allowed in ${ctx.mode} mode`,
     };
   }
-  if (isReadonlyBashCommand(cmd)) return null;
+  const kind = classifyBashForReadonlyMode(cmd);
+  if (kind === 'readonly') return null;
+  if (kind === 'mutating') {
+    return {
+      decision: 'deny' as PolicyDecision,
+      reason: `Mutating bash is not allowed in ${ctx.mode} mode`,
+    };
+  }
   return {
-    decision: 'deny' as PolicyDecision,
-    reason: `Only readonly bash is allowed in ${ctx.mode} mode`,
+    decision: 'ask' as PolicyDecision,
+    reason: `Command is outside the readonly bash allowlist in ${ctx.mode} mode`,
   };
 };
 

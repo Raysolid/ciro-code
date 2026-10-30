@@ -53,9 +53,7 @@ describe('ContextAccountant', () => {
       compaction: {
         mode: 'auto',
         thresholds: { background: 0.5, suggest: 0.7, required: 0.9 },
-        enablePrediction: true,
         maxConsecutiveFailures: 3,
-        strategies: ['micro', 'session-memory', 'full'],
       },
     });
     acct.refresh('s', {
@@ -75,5 +73,22 @@ describe('ContextAccountant', () => {
       conversation: '',
     });
     expect(acct.getCompactUrgency('s')).toBe('required');
+  });
+
+  it('folds toolPayloadTokens into conversation bucket', () => {
+    const acct = new ContextAccountant({
+      modelContextLimit: 100,
+      reservedOutputTokens: 0,
+    });
+    const base = acct.refresh('s', { conversation: 'x'.repeat(40) }); // ~10 tokens
+    const withTools = acct.refresh('s', {
+      conversation: 'x'.repeat(40),
+      toolPayloadTokens: 40,
+    });
+    expect(withTools.totalTokens).toBe(base.totalTokens + 40);
+    expect(
+      withTools.buckets.find((b) => b.id === 'conversation')?.tokens,
+    ).toBe((base.buckets.find((b) => b.id === 'conversation')?.tokens ?? 0) + 40);
+    expect(withTools.usageRatio).toBeGreaterThan(base.usageRatio);
   });
 });

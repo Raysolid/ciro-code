@@ -47,6 +47,7 @@ function paintSolidRow(row: string, face: string): string {
 /** Print brand splash (stdout). No ANSI when not a TTY / NO_COLOR. */
 export function printCiroBanner(version: string): void {
   const lines = WORDMARK.map((row, i) => paintSolidRow(row, FACE_GRADIENT[i]!));
+  lines.unshift('\n');
   lines.push('');
   lines.push(`  ${paint('Ciro Code', BOLD)}  ${paint(`v${version}`, DIM)}`);
   lines.push('');

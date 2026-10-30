@@ -1,6 +1,6 @@
 {
   "name": "@ciro-code/harness-shared",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Ciro Code harness shared types and constants",
   "license": "MIT",
   "type": "module",

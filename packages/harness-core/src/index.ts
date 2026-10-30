@@ -217,6 +217,14 @@ export {
 } from './workspace/open-path.js';
 export { SessionStore, type SessionStoreOptions } from './session/session-store.js';
 export { defaultSessionsRoot } from './session/session-event-log.js';
+export {
+  searchTranscriptEvents,
+  searchTranscriptSessionDir,
+  capToolResultContent,
+  TOOL_RESULT_CONTENT_CAP,
+  type TranscriptHit,
+  type SearchTranscriptOptions,
+} from './session/transcript-search.js';
 export { PlanStore, type PlanStoreOptions } from './session/plan-store.js';
 export {
   startDebugIngestServer,
@@ -230,6 +238,8 @@ export {
 export {
   SessionRecoveryManager,
   uiMessagesFromEvents,
+  rebuildAccountingToolResults,
+  loadAllToolResultsForUi,
   type RecoveredSessionState,
   type RecoveredChatMessage,
   type RecoveredTimelineItem,
@@ -262,6 +272,21 @@ export {
   type ContextParts,
 } from './context/context-accountant.js';
 export {
+  CONTEXT_USAGE_LIVE_MIN_INTERVAL_MS,
+  createLiveContextUsageEmitter,
+  type LiveContextUsageEmitter,
+} from './context/live-context-usage.js';
+export {
+  roughTokenEstimate,
+  sumToolPayloadTokens,
+} from './context/token-estimate.js';
+export { sliceRecentConversation } from './compaction/slice-recent.js';
+export {
+  resolveCompactionBiasEffects,
+  effectiveCompactionThresholds,
+  type CompactionBiasEffects,
+} from './compaction/bias-effects.js';
+export {
   SubagentOrchestrator,
   type ExploreRunner,
   type ExploreRunInput,
@@ -290,6 +315,21 @@ export {
   type CompactRequest,
   type CompactOutcome,
 } from './compaction/orchestrator.js';
+export {
+  createStubFullCompactSummarizer,
+  type FullCompactSummarizer,
+  type FullCompactSummarizerInput,
+} from './compaction/full-compact-summarizer.js';
+export {
+  runFullCompact,
+  normalizeCompactionSummaryMarkdown,
+} from './compaction/full-compact.js';
+export {
+  buildCompactedSeedMessages,
+  parseConversationText,
+  type CompactedSeedMessage,
+  type BuildCompactedSeedInput,
+} from './compaction/build-compacted-seed.js';
 export {
   type AgentRuntime,
   type CreateRuntimeOptions,
@@ -329,3 +369,11 @@ export {
   removeChangeReviews,
   type ChangeReviewMeta,
 } from './session/change-review-store.js';
+export {
+  acquireWorkspaceLock,
+  releaseWorkspaceLock,
+  readWorkspaceLock,
+  workspaceLockPath,
+  type LockKind,
+  type WorkspaceLockInfo,
+} from './lock/workspace-lock.js';

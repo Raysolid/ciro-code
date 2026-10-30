@@ -1,9 +1,14 @@
 import type { ModelRuntime } from '@earendil-works/pi-coding-agent';
-import type { ModelRef, ProviderModelEntry, ProviderPreset } from '@ciro-code/harness-shared';
+import {
+  DEFAULT_MODEL_CONTEXT_LIMIT,
+  inferFamilyContextLimit,
+  type ModelRef,
+  type ProviderModelEntry,
+  type ProviderPreset,
+} from '@ciro-code/harness-shared';
 import type { ProviderStore } from '@ciro-code/harness-core';
 
 const ZERO_COST = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
-const DEFAULT_CONTEXT_WINDOW = 128_000;
 /** 思考流计入输出额度；8192 会被 medium 思考打满后静默 complete */
 const MIN_OUTPUT_TOKENS = 32_768;
 const MAX_OUTPUT_TOKENS = 65_536;
@@ -23,7 +28,9 @@ function toProviderModels(
     const contextWindow =
       override && m.id === override.modelId
         ? override.contextWindow
-        : (m.contextLimit ?? DEFAULT_CONTEXT_WINDOW);
+        : (m.contextLimit ??
+          inferFamilyContextLimit(m.id) ??
+          DEFAULT_MODEL_CONTEXT_LIMIT);
     return {
       id: m.id,
       name: m.label || m.id,

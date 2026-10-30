@@ -16,13 +16,19 @@ describe('PolicyEngine', () => {
     expect(result.decision).toBe('allow');
   });
 
-  it('allows list_files and grep in ask mode', () => {
+  it('allows list_files, grep, and transcript tools in ask mode', () => {
     expect(
       engine.evaluate({ mode: 'ask', toolName: 'list_files', workspace: '/tmp' }).decision,
     ).toBe('allow');
     expect(engine.evaluate({ mode: 'ask', toolName: 'grep', workspace: '/tmp' }).decision).toBe(
       'allow',
     );
+    expect(
+      engine.evaluate({ mode: 'ask', toolName: 'search_transcript', workspace: '/tmp' }).decision,
+    ).toBe('allow');
+    expect(
+      engine.evaluate({ mode: 'ask', toolName: 'get_tool_result', workspace: '/tmp' }).decision,
+    ).toBe('allow');
   });
 
   it('denies memory_* tools (removed) in ask mode', () => {
@@ -79,7 +85,7 @@ describe('PolicyEngine', () => {
     ).toBe('allow');
   });
 
-  it('denies non-readonly bash in ask mode', () => {
+  it('denies mutating bash in ask mode', () => {
     const result = engine.evaluate({
       mode: 'ask',
       toolName: 'bash',
@@ -87,7 +93,27 @@ describe('PolicyEngine', () => {
       workspace: '/tmp',
     });
     expect(result.decision).toBe('deny');
-    expect(result.reason).toMatch(/readonly bash/i);
+    expect(result.reason).toMatch(/mutating bash/i);
+  });
+
+  it('allows echo; asks for non-readonly non-mutating bash in ask mode', () => {
+    expect(
+      engine.evaluate({
+        mode: 'ask',
+        toolName: 'bash',
+        toolInput: { command: 'echo hello' },
+        workspace: '/tmp',
+      }).decision,
+    ).toBe('allow');
+
+    expect(
+      engine.evaluate({
+        mode: 'plan',
+        toolName: 'bash',
+        toolInput: { command: 'if exist game (dir game)' },
+        workspace: '/tmp',
+      }).decision,
+    ).toBe('ask');
   });
 
   it('allows AskQuestion in plan mode whitelist', () => {
@@ -257,7 +283,7 @@ describe('PolicyEngine', () => {
     ).toBe('deny');
   });
 
-  it('explore subagent (ask+depth): allows readonly bash; denies pnpm test', () => {
+  it('explore subagent (ask+depth): allows readonly bash; asks pnpm test; denies npm install', () => {
     expect(
       engine.evaluate({
         mode: 'ask',
@@ -273,6 +299,16 @@ describe('PolicyEngine', () => {
         mode: 'ask',
         toolName: 'bash',
         toolInput: { command: 'pnpm test' },
+        workspace: '/tmp',
+        subagentDepth: 1,
+        preset: 'workspace-readonly',
+      }).decision,
+    ).toBe('ask');
+    expect(
+      engine.evaluate({
+        mode: 'ask',
+        toolName: 'bash',
+        toolInput: { command: 'npm install' },
         workspace: '/tmp',
         subagentDepth: 1,
         preset: 'workspace-readonly',

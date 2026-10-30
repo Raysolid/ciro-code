@@ -1,6 +1,6 @@
 {
   "name": "@ciro-code/code",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Ciro Code — meta package forwarding to @ciro-code/cli",
   "license": "MIT",
   "type": "module",

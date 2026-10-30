@@ -12,6 +12,9 @@
       "path": "../../packages/harness-core"
     },
     {
+      "path": "../../packages/harness-tui"
+    },
+    {
       "path": "../../packages/harness-web"
     }
   ]

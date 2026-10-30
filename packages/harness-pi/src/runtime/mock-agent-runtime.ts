@@ -67,6 +67,8 @@ import {
   validateChatImages,
   persistChatImages,
   ChatImageValidationError,
+  createStubFullCompactSummarizer,
+  sumToolPayloadTokens,
 } from '@ciro-code/harness-core';
 import type { SubagentRunMeta } from '@ciro-code/harness-shared';
 import { createMockExploreRunner } from '../subagent/mock-explore-runner.js';
@@ -201,7 +203,11 @@ export class MockAgentRuntime implements AgentRuntime {
         reservedOutputTokens: config.reservedOutputTokens,
         compaction: config.compaction,
       });
-    this.compaction = new CompactionOrchestrator(config.compaction, this.context);
+    this.compaction = new CompactionOrchestrator(
+      config.compaction,
+      this.context,
+      createStubFullCompactSummarizer(),
+    );
     this.providerStore = options.providerStore;
     installPermissionPushRouter(this.permissions, (sessionId) => {
       const push = this.activePushes.get(sessionId);
@@ -368,7 +374,10 @@ export class MockAgentRuntime implements AgentRuntime {
     sessionId: string,
     opts?: CompactSessionOptions,
   ): Promise<{ result: CompactionResult; contextUsage?: ContextUsageSnapshot }> {
-    return compactSessionShared({
+    if (this.busySessions.has(sessionId) && !opts?.allowBusy) {
+      throw new Error('SESSION_BUSY: Session is streaming');
+    }
+    const shared = await compactSessionShared({
       store: this.store,
       context: this.context,
       compaction: this.compaction,
@@ -378,6 +387,19 @@ export class MockAgentRuntime implements AgentRuntime {
       modeProfiles: this.modeProfiles,
       compactOpts: opts,
     });
+    const handle = this.store.get(sessionId);
+    if (!handle) return { result: shared.result, contextUsage: shared.contextUsage };
+    const seedConversation = shared.seedMessages
+      .map((m) => (m.role === 'user' ? `\nUser: ${m.content}` : `\nAssistant: ${m.content}`))
+      .join('');
+    const contextUsage = this.context.refresh(sessionId, {
+      system: this.modeProfiles.systemPromptForMode(handle.mode),
+      tools: toolsForMode(this.modeProfiles, handle.mode).join('\n'),
+      conversation: seedConversation,
+      summarized: '',
+      toolPayloadTokens: sumToolPayloadTokens(this.toolResults.get(sessionId) ?? []),
+    });
+    return { result: shared.result, contextUsage };
   }
 
   async resumeSession(sessionId: string): Promise<{
@@ -386,7 +408,7 @@ export class MockAgentRuntime implements AgentRuntime {
     eventsReplayed: number;
     stoppedAtBoundary: boolean;
     contextUsage?: ContextUsageSnapshot;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
     confirmedPlanId?: string;
   }> {
     const state = recoverSessionShared(
@@ -477,12 +499,14 @@ export class MockAgentRuntime implements AgentRuntime {
       maxMode: handle.maxMode,
       apiMaxContext: creds?.model.apiMaxContext,
       contextLimit: creds?.model.contextLimit,
+      modelId: handle.modelRef?.modelId ?? creds?.model.id,
       fallbackLimit: this.config.modelContextLimit,
     });
     this.context.setSessionLimit(handle.id, limit);
     this.context.refresh(handle.id, {
       conversation: this.context.getConversation(handle.id),
       summarized: this.context.getSummarized(handle.id),
+      toolPayloadTokens: sumToolPayloadTokens(this.toolResults.get(handle.id) ?? []),
     });
   }
 
@@ -699,7 +723,7 @@ export class MockAgentRuntime implements AgentRuntime {
     beforeMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }> {
     return truncateSessionHistoryShared({
       store: this.store,
@@ -718,7 +742,7 @@ export class MockAgentRuntime implements AgentRuntime {
     fromMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }> {
     return truncateSessionHistoryShared({
       store: this.store,
@@ -737,7 +761,7 @@ export class MockAgentRuntime implements AgentRuntime {
     throughMessageId: string,
   ): Promise<{
     session: SessionHandle;
-    messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>;
+    messages: Array<{ id: string; role: 'user' | 'assistant' | 'compaction'; content: string }>;
   }> {
     return forkChatSessionShared({
       store: this.store,
@@ -1482,21 +1506,12 @@ export class MockAgentRuntime implements AgentRuntime {
         skills: skillAdv.injection,
         subagents: this.context.getSubagents(sessionId),
         summarized: this.context.getSummarized(sessionId),
+        toolPayloadTokens: sumToolPayloadTokens(this.toolResults.get(sessionId) ?? []),
       });
       this.compaction.noteTurn(ctx.workspace, {
         userMessage: message.message,
         assistantPreview,
         toolNames: (this.toolResults.get(sessionId) ?? []).slice(-5).map((t) => t.toolName),
-      });
-
-      await emitAutoCompaction({
-        push,
-        compaction: this.compaction,
-        context: this.context,
-        sessionId,
-        messageId,
-        fallbackSnapshot: snap,
-        compactSession: (id, o) => this.compactSession(id, o),
       });
 
       flushThinkingSegment();
@@ -1515,6 +1530,18 @@ export class MockAgentRuntime implements AgentRuntime {
         messageId: assistantMessageId,
         workedMs: Math.max(0, Date.now() - turnStartedAt),
       });
+
+      await emitAutoCompaction({
+        push,
+        compaction: this.compaction,
+        context: this.context,
+        sessionId,
+        messageId,
+        fallbackSnapshot: snap,
+        compactionBias: this.modeProfiles.getModeProfile(ctx.mode).compactionBias,
+        compactSession: (id, o) => this.compactSession(id, o),
+      });
+
       push(makeEnvelope('complete', { messageId }, sessionId, messageId));
       push(
         makeEnvelope(

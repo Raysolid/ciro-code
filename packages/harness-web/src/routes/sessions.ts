@@ -102,8 +102,10 @@ export function registerSessionRoutes(app: Hono, ctx: AppContext): void {
       return c.json({ error: 'Session not found' }, 404);
     }
     const body = (await c.req
-      .json<{ method?: 'micro' | 'session-memory' | 'full' | 'auto' }>()
-      .catch(() => ({}))) as { method?: 'micro' | 'session-memory' | 'full' | 'auto' };
+      .json<{ method?: 'micro' | 'session-memory' | 'full' | 'auto' | 'manual' }>()
+      .catch(() => ({}))) as {
+      method?: 'micro' | 'session-memory' | 'full' | 'auto' | 'manual';
+    };
     try {
       const out = await runtime.compactSession(sessionId, { method: body.method ?? 'auto' });
       return c.json(out);
