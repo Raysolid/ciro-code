@@ -1,0 +1,29 @@
+---
+const isZh = Astro.locals.starlightRoute.locale === 'zh-cn';
+const href = '/ciro-code/';
+const base = import.meta.env.BASE_URL;
+const lightSrc = `${base}brand/ciro-code.svg`;
+const darkSrc = `${base}brand/ciro-code-dark.svg`;
+---
+
+<a href={href} class="site-title sl-flex ciro-site-title" aria-label="Ciro Code">
+  <span class="ciro-brand-logo" aria-hidden="true">
+    <img
+      class="ciro-brand-logo__img ciro-brand-logo__img--light"
+      src={lightSrc}
+      alt=""
+      width="1920"
+      height="512"
+      decoding="async"
+    />
+    <img
+      class="ciro-brand-logo__img ciro-brand-logo__img--dark"
+      src={darkSrc}
+      alt=""
+      width="1920"
+      height="512"
+      decoding="async"
+    />
+  </span>
+  <span class="ciro-site-title__badge">{isZh ? '文档' : 'docs'}</span>
+</a>

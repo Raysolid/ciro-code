@@ -1,0 +1,9 @@
+{
+  "name": "ciro-example-node-api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  }
+}

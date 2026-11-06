@@ -1,0 +1,57 @@
+# Ciro Code
+
+> Local coding agent with a Web workbench.
+
+Install: npm install -g @ciro-code/code
+CLI: ciro
+Workbench: http://127.0.0.1:3080
+Health: GET /health
+Smoke: ciro web --mock --no-open
+
+Do not install: npm i -g ciro
+Prefer package: @ciro-code/code (or @ciro-code/cli)
+
+## Docs (English)
+
+- https://raysolid.github.io/ciro-code/docs/en/
+- https://raysolid.github.io/ciro-code/docs/en/getting-started/overview/
+- https://raysolid.github.io/ciro-code/docs/en/getting-started/install/
+- https://raysolid.github.io/ciro-code/docs/en/getting-started/quickstart/
+- https://raysolid.github.io/ciro-code/docs/en/getting-started/first-provider/
+- https://raysolid.github.io/ciro-code/docs/en/guides/modes/
+- https://raysolid.github.io/ciro-code/docs/en/guides/workspace-session/
+- https://raysolid.github.io/ciro-code/docs/en/guides/rules-skills/
+- https://raysolid.github.io/ciro-code/docs/en/guides/mcp/
+- https://raysolid.github.io/ciro-code/docs/en/guides/packs/
+- https://raysolid.github.io/ciro-code/docs/en/guides/permissions/
+- https://raysolid.github.io/ciro-code/docs/en/guides/troubleshooting/
+- https://raysolid.github.io/ciro-code/docs/en/reference/cli/
+- https://raysolid.github.io/ciro-code/docs/en/reference/config/
+- https://raysolid.github.io/ciro-code/docs/en/reference/changelog/
+- https://raysolid.github.io/ciro-code/docs/en/project/contributing/
+
+## Docs (简体中文)
+
+- https://raysolid.github.io/ciro-code/docs/zh-cn/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/overview/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/install/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/quickstart/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/first-provider/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/modes/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/workspace-session/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/rules-skills/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/mcp/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/packs/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/permissions/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/troubleshooting/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/reference/cli/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/reference/config/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/reference/changelog/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/project/contributing/
+
+## Repo
+
+- https://github.com/Raysolid/ciro-code
+- https://github.com/Raysolid/ciro-code/blob/main/AGENTS.md
+- https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md
+- https://www.npmjs.com/package/@ciro-code/code

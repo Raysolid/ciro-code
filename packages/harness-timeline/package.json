@@ -1,0 +1,38 @@
+{
+  "name": "@ciro-code/harness-timeline",
+  "version": "0.2.0",
+  "description": "UI-agnostic chat timeline reduce layer (Web/TUI shared)",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.map",
+    "!**/*.tsbuildinfo",
+    "!**/*.test.js",
+    "!**/*.test.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "dev": "tsc -b --watch"
+  },
+  "dependencies": {
+    "@ciro-code/harness-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

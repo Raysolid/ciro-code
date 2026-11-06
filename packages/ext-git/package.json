@@ -1,0 +1,14 @@
+{
+  "name": "@ciro-code/ext-git",
+  "version": "0.2.0",
+  "description": "Official Git Feature Pack",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "ciro.pack.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

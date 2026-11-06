@@ -1,0 +1,51 @@
+---
+interface Props {
+  copyLabel: string;
+  copiedLabel: string;
+}
+
+const { copyLabel, copiedLabel } = Astro.props;
+const copyText = 'npm install -g @ciro-code/code && ciro web';
+---
+
+<div class="install-bar" data-command={copyText} data-copied={copiedLabel}>
+  <div class="install-bar__code">
+    <code class="install-bar__line">
+      <span class="prompt">$</span> npm install -g <span class="pkg">@ciro-code/code</span>
+    </code>
+    <code class="install-bar__line">
+      <span class="prompt">&amp;&amp;</span> ciro web
+    </code>
+  </div>
+  <button type="button" class="cmd-copy" data-copy aria-label={copyLabel} title={copyLabel}>
+    <svg class="cmd-copy__idle" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="14" height="14" x="8" y="8" rx="2"></rect>
+      <path d="M4 16V4a2 2 0 0 1 2-2h12"></path>
+    </svg>
+    <svg class="cmd-copy__done" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 6 9 17l-5-5"></path>
+    </svg>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.install-bar').forEach((root) => {
+    const btn = root.querySelector<HTMLButtonElement>('[data-copy]');
+    const command = root.dataset.command ?? '';
+    if (!btn) return;
+    const idleLabel = btn.getAttribute('aria-label') || 'Copy';
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(command);
+        btn.classList.add('is-copied');
+        btn.setAttribute('aria-label', root.dataset.copied || 'Copied');
+        setTimeout(() => {
+          btn.classList.remove('is-copied');
+          btn.setAttribute('aria-label', idleLabel);
+        }, 1500);
+      } catch {
+        /* ignore */
+      }
+    });
+  });
+</script>

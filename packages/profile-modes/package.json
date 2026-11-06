@@ -1,0 +1,30 @@
+{
+  "name": "@ciro-code/profile-modes",
+  "version": "0.1.4",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "embed": "node ./scripts/embed-prompts.mjs",
+    "prebuild": "pnpm embed",
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
+    "test": "node ./scripts/embed-prompts.mjs --check && vitest run",
+    "dev": "tsc -b --watch"
+  },
+  "dependencies": {
+    "@ciro-code/harness-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

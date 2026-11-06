@@ -1,0 +1,10 @@
+mode: ask
+tools:
+  - read
+  - list_files
+  - grep
+  - bash
+  - SuggestMode
+  - WebFetch
+permissions:
+  preset: workspace-readonly

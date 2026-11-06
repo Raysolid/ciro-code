@@ -1,0 +1,252 @@
+import type {
+  CompactionBias,
+  CompactionConfig,
+  CompactionMethod,
+  CompactionResult,
+  ContextUrgency,
+  HarnessMode,
+} from '@ciro-code/harness-shared';
+import type { ContextAccountant } from '../context/context-accountant.js';
+import {
+  roughTokenEstimate,
+  sumToolPayloadTokens,
+} from '../context/token-estimate.js';
+import { resolveCompactionBiasEffects } from './bias-effects.js';
+import { runMicroCompact, type ToolResultRecord } from './micro-compact.js';
+import { ToolResultStore } from './tool-result-store.js';
+import {
+  appendSessionNote,
+  runSessionMemoryCompact,
+} from './session-memory.js';
+import { runFullCompact } from './full-compact.js';
+import type { FullCompactSummarizer } from './full-compact-summarizer.js';
+
+export interface CompactRequest {
+  sessionId: string;
+  workspace: string;
+  mode: HarnessMode;
+  /** ModeProfile.compactionBias；缺省 normal */
+  compactionBias?: CompactionBias;
+  method?: CompactionMethod;
+  conversationText: string;
+  summarizedText?: string;
+  toolResults: ToolResultRecord[];
+  sessionDir: string;
+}
+
+export interface CompactOutcome {
+  result: CompactionResult;
+  conversationText: string;
+  summarizedText: string;
+  toolResults: ToolResultRecord[];
+  suggested?: boolean;
+}
+
+/**
+ * 分层 compact 编排：micro → session-memory → full
+ * urgency 只读 ContextAccountant；尊重 compaction.mode 与熔断。
+ */
+export class CompactionOrchestrator {
+  private consecutiveFailures = new Map<string, number>();
+
+  constructor(
+    private readonly config: CompactionConfig,
+    private readonly context: ContextAccountant,
+    private readonly summarizer?: FullCompactSummarizer,
+  ) {}
+
+  /** 根据当前 snapshot 决定是否自动跑 / 仅建议 */
+  decideAutoAction(
+    sessionId: string,
+    bias: CompactionBias = 'normal',
+  ): {
+    urgency: ContextUrgency;
+    action: 'none' | 'micro' | 'session-memory' | 'full' | 'suggest';
+  } {
+    const urgency = this.context.getCompactUrgency(sessionId, bias);
+    if (urgency === 'none') return { urgency, action: 'none' };
+
+    if (this.isFused(sessionId)) {
+      return { urgency, action: 'none' };
+    }
+
+    if (this.config.mode === 'manual') {
+      return { urgency, action: 'suggest' };
+    }
+
+    if (this.config.mode === 'ask') {
+      if (urgency === 'background') return { urgency, action: 'micro' };
+      return { urgency, action: 'suggest' };
+    }
+
+    // auto
+    if (urgency === 'background') return { urgency, action: 'micro' };
+    if (urgency === 'suggest') return { urgency, action: 'session-memory' };
+    return { urgency, action: 'full' };
+  }
+
+  async compact(req: CompactRequest): Promise<CompactOutcome> {
+    const method = this.resolveMethod(req);
+
+    try {
+      const outcome = await this.runMethod(method, req);
+      this.consecutiveFailures.set(req.sessionId, 0);
+      return outcome;
+    } catch (err) {
+      const n = (this.consecutiveFailures.get(req.sessionId) ?? 0) + 1;
+      this.consecutiveFailures.set(req.sessionId, n);
+      throw err;
+    }
+  }
+
+  /** 暴露给测试：当前连续失败次数 */
+  consecutiveFailureCount(sessionId: string): number {
+    return this.consecutiveFailures.get(sessionId) ?? 0;
+  }
+
+  /** 每轮结束后追加 session 笔记（不阻断） */
+  noteTurn(
+    workspace: string,
+    turn: { userMessage: string; assistantPreview?: string; toolNames?: string[] },
+  ): void {
+    appendSessionNote(workspace, {
+      role: 'user',
+      summary: turn.userMessage.slice(0, 200),
+    });
+    if (turn.toolNames?.length) {
+      appendSessionNote(workspace, {
+        role: 'tool',
+        summary: `tools: ${turn.toolNames.join(', ')}`,
+      });
+    }
+    if (turn.assistantPreview) {
+      appendSessionNote(workspace, {
+        role: 'assistant',
+        summary: turn.assistantPreview.slice(0, 200),
+      });
+    }
+  }
+
+  private isFused(sessionId: string): boolean {
+    const n = this.consecutiveFailures.get(sessionId) ?? 0;
+    return n >= this.config.maxConsecutiveFailures;
+  }
+
+  private resolveMethod(req: CompactRequest): 'micro' | 'session-memory' | 'full' {
+    const bias = req.compactionBias ?? 'normal';
+
+    // 用户显式压缩：真缩短对话；高占用上 LLM。micro 仅留给自动卫生。
+    if (req.method === 'manual') {
+      return this.resolveManualMethod(req.sessionId, bias);
+    }
+
+    if (req.method && req.method !== 'auto') {
+      return req.method;
+    }
+    const { action } = this.decideAutoAction(req.sessionId, bias);
+    if (action === 'micro') return 'micro';
+    if (action === 'session-memory') return 'session-memory';
+    if (action === 'full') return 'full';
+    return 'micro';
+  }
+
+  /** suggest/required → full；其余 → session-memory（对齐成熟产品「手动=摘要」） */
+  private resolveManualMethod(
+    sessionId: string,
+    bias: CompactionBias,
+  ): 'session-memory' | 'full' {
+    const urgency = this.context.getCompactUrgency(sessionId, bias);
+    if (urgency === 'suggest' || urgency === 'required') return 'full';
+    return 'session-memory';
+  }
+
+  private async runMethod(
+    method: 'micro' | 'session-memory' | 'full',
+    req: CompactRequest,
+  ): Promise<CompactOutcome> {
+    if (method === 'micro') {
+      const effects = resolveCompactionBiasEffects(req.compactionBias ?? 'normal');
+      const store = new ToolResultStore(req.sessionDir);
+      const out = runMicroCompact({
+        sessionId: req.sessionId,
+        mode: req.mode,
+        toolResults: req.toolResults,
+        store,
+        keepRecentInline: effects.keepRecentInline,
+        minTokensToExternalize: effects.minTokensToExternalize,
+      });
+      return {
+        result: out.result,
+        conversationText: req.conversationText,
+        summarizedText: req.summarizedText ?? '',
+        toolResults: out.toolResults,
+      };
+    }
+
+    if (method === 'full') {
+      if (!this.summarizer) {
+        throw new Error(
+          'FULL_COMPACT_NO_SUMMARIZER: FullCompactSummarizer not wired; refuse heuristic fallback',
+        );
+      }
+      const full = await runFullCompact({
+        workspace: req.workspace,
+        mode: req.mode,
+        conversationText: req.conversationText,
+        summarizedText: req.summarizedText,
+        sessionId: req.sessionId,
+        summarizer: this.summarizer,
+      });
+      // 与 resume 会计一致：SM/full 后旧 tool 已不在模型上下文
+      return withClearedToolPayloadSavings(req, {
+        result: full.result,
+        conversationText: full.conversationText,
+        summarizedText: full.summarizedText,
+        toolResults: [],
+      });
+    }
+
+    const sm = runSessionMemoryCompact({
+      workspace: req.workspace,
+      mode: req.mode,
+      conversationText: req.conversationText,
+    });
+    return withClearedToolPayloadSavings(req, {
+      result: sm.result,
+      conversationText: sm.conversationText,
+      summarizedText: sm.summarizedText,
+      toolResults: [],
+    });
+  }
+}
+
+/**
+ * conversation 桶 = 对话文本 + toolPayload。SM/full 只按文本算 tokensSaved 会严重偏低
+ *（例如 132K→3K 却显示节省 521）。清空 tool 会计后，把 payload 降幅并入 tokensSaved。
+ */
+function withClearedToolPayloadSavings(
+  req: CompactRequest,
+  outcome: CompactOutcome,
+): CompactOutcome {
+  const before =
+    roughTokenEstimate(req.conversationText) +
+    roughTokenEstimate(req.summarizedText ?? '') +
+    sumToolPayloadTokens(req.toolResults);
+  const after =
+    roughTokenEstimate(outcome.conversationText) +
+    roughTokenEstimate(outcome.summarizedText) +
+    sumToolPayloadTokens(outcome.toolResults);
+  const tokensSaved = Math.max(0, before - after);
+  const method = outcome.result.metadata.method;
+  return {
+    ...outcome,
+    result: {
+      ...outcome.result,
+      metadata: { ...outcome.result.metadata, tokensSaved },
+      narrative:
+        method === 'full'
+          ? `Full LLM compact replaced early transcript; saved ~${tokensSaved} tokens.`
+          : `Session-memory compact replaced early transcript with notes; saved ~${tokensSaved} tokens.`,
+    },
+  };
+}

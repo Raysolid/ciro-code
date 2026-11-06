@@ -1,0 +1,40 @@
+{
+  "name": "@ciro-code/harness-shared",
+  "version": "0.2.0",
+  "description": "Ciro Code harness shared types and constants",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package-version": {
+      "types": "./dist/package-version.d.ts",
+      "import": "./dist/package-version.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.map",
+    "!**/*.tsbuildinfo",
+    "!**/*.test.js",
+    "!**/*.test.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "dev": "tsc -b --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

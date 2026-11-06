@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*", "generated/mode-prompts.ts"],
+  "exclude": ["src/**/*.test.ts"],
+  "references": [{ "path": "../shared" }]
+}

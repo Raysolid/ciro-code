@@ -1,0 +1,54 @@
+---
+import type { Messages } from '../i18n/en';
+
+interface Props {
+  t: Messages;
+}
+
+const { t } = Astro.props;
+const items = t.faq.items;
+---
+
+<section class="section faq-acc" id="faq" data-reveal>
+  <div class="wrap faq-acc__inner">
+    <header class="faq-acc__head">
+      <h2 class="faq-acc__title">{t.faq.title}</h2>
+      <p class="faq-acc__eyebrow">{t.faq.eyebrow}</p>
+    </header>
+
+    <div class="faq-acc__list">
+      {
+        items.map((item, i) => (
+          <div class:list={['faq-acc__item', i === 0 && 'is-open']} data-faq-item>
+            <button
+              type="button"
+              class="faq-acc__trigger"
+              aria-expanded={i === 0 ? 'true' : 'false'}
+              data-faq-trigger
+            >
+              <span class="faq-acc__q">{item.q}</span>
+              <span class="faq-acc__icon" aria-hidden="true"></span>
+            </button>
+            <div class="faq-acc__panel" data-faq-panel>
+              <div class="faq-acc__panel-inner">
+                <p class="faq-acc__a" set:html={item.a} />
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-faq-item]').forEach((item) => {
+    const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
+    if (!trigger) return;
+
+    trigger.addEventListener('click', () => {
+      const open = item.classList.toggle('is-open');
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+</script>

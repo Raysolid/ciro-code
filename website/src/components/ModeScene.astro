@@ -1,0 +1,213 @@
+---
+import type { ModeSceneData } from './mode-scene-types';
+
+interface Props {
+  scene: ModeSceneData;
+}
+
+const { scene } = Astro.props;
+const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+let step = 0;
+const nextStep = () => {
+  step += 1;
+  return `is-${step}`;
+};
+---
+
+<div class:list={['mode-scene', `mode-scene--${scene.variant}`]} data-mode-scene={scene.variant}>
+  <div class="mode-scene__live">
+    {
+      scene.variant === 'ask' && (
+        <>
+          <div class:list={['mode-scene__step', 'mode-scene__think', nextStep()]}>{scene.thought}</div>
+          <div class:list={['mode-scene__step', 'ms-tools', nextStep()]}>
+            {scene.tools.map((tool) => (
+              <div class="ms-tool">
+                <span class="ms-tool__verb">{tool.verb}</span>
+                <span class="ms-tool__target">{tool.target}</span>
+                {tool.meta ? <span class="ms-tool__meta">{tool.meta}</span> : null}
+              </div>
+            ))}
+          </div>
+          <div class:list={['mode-scene__step', 'ms-snip', nextStep()]}>
+            <div class="ms-snip__path">{scene.snippet.path}</div>
+            <div class="ms-snip__code">
+              {scene.snippet.lines.map((line) => (
+                <code>{line}</code>
+              ))}
+            </div>
+          </div>
+          <div class="mode-scene__reply">
+            {scene.segments.map((html) => (
+              <p class:list={['mode-scene__step', 'mode-scene__seg', nextStep()]} set:html={html} />
+            ))}
+          </div>
+        </>
+      )
+    }
+
+    {
+      scene.variant === 'plan' && (
+        <>
+          <div class:list={['mode-scene__step', 'mode-scene__think', nextStep()]}>{scene.thought}</div>
+          <div class:list={['mode-scene__step', 'ms-q', nextStep()]}>
+            <div class="ms-q__pending">
+              <div class="ms-q__head">
+                <span class="ms-q__icon" aria-hidden="true">?</span>
+                <span class="ms-q__title">{scene.question.title}</span>
+              </div>
+              <div class="ms-q__prompt">1. {scene.question.prompt}</div>
+              <div class="ms-q__opts">
+                {scene.question.options.map((opt, i) => (
+                  <div
+                    class:list={[
+                      'ms-q__opt',
+                      i === scene.question.selectedIndex && 'is-pick',
+                    ]}
+                  >
+                    <span class="ms-q__letter">{letters[i]}</span>
+                    <span class="ms-q__label">{opt}</span>
+                  </div>
+                ))}
+              </div>
+              <div class="ms-q__foot">
+                <span class="ms-q__skip">{scene.question.skipLabel}</span>
+                <span class="ms-q__go">
+                  {scene.question.continueLabel}
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="9 10 4 15 9 20"></polyline>
+                    <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
+                  </svg>
+                </span>
+              </div>
+            </div>
+            <div class="ms-q__done">
+              <div class="ms-q__done-prompt">{scene.question.prompt}</div>
+              <div class="ms-q__done-answer">
+                {scene.question.options[scene.question.selectedIndex]}
+              </div>
+            </div>
+          </div>
+          <div class:list={['mode-scene__step', 'ms-plan', nextStep()]}>
+            <div class="ms-plan__label">{scene.plan.label}</div>
+            <div class="ms-plan__title">{scene.plan.title}</div>
+            <p class="ms-plan__overview">{scene.plan.overview}</p>
+            <div class="ms-plan__actions">
+              <span class="ms-plan__view">{scene.plan.viewLabel}</span>
+              <span class="ms-plan__build">
+                {scene.plan.buildLabel}
+                <kbd>{scene.plan.shortcut}</kbd>
+              </span>
+            </div>
+          </div>
+        </>
+      )
+    }
+
+    {
+      scene.variant === 'debug' && (
+        <>
+          <div class:list={['mode-scene__step', 'mode-scene__think', nextStep()]}>{scene.thought}</div>
+          <div class:list={['mode-scene__step', 'ms-hypo', nextStep()]}>
+            <p class="ms-hypo__intro">{scene.intro}</p>
+            <table class="ms-hypo__table">
+              <tbody>
+                {scene.hypotheses.map((h) => (
+                  <tr>
+                    <th>{h.id}</th>
+                    <td>{h.text}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div class:list={['mode-scene__step', 'ms-logs', nextStep()]}>
+            <div class="ms-logs__head">
+              <span class="ms-logs__title">{scene.logs.title}</span>
+              <span class="ms-logs__meta">{scene.logs.count}</span>
+              <span class="ms-logs__meta">{scene.logs.status}</span>
+            </div>
+            <div class="ms-logs__path">{scene.logs.path}</div>
+            <div class="ms-logs__filters">
+              <span class="ms-logs__filter-label">{scene.logs.filterLabel}</span>
+              <span class="ms-logs__chip is-on">{scene.logs.filterAll}</span>
+              {scene.hypotheses.map((h) => (
+                <span class="ms-logs__chip">{h.id}</span>
+              ))}
+            </div>
+            <ul class="ms-logs__list">
+              {scene.logs.lines.map((line) => (
+                <li>
+                  <span class="ms-logs__time">{line.time}</span>
+                  <span class="ms-logs__text">
+                    {line.text}
+                    {line.tag ? <em>{line.tag}</em> : null}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )
+    }
+
+    {
+      scene.variant === 'agent' && (
+        <>
+          <div class:list={['mode-scene__step', 'mode-scene__think', nextStep()]}>{scene.thought}</div>
+          <div class:list={['mode-scene__step', 'ms-sub', nextStep()]}>
+            <span class="ms-sub__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"></path>
+              </svg>
+            </span>
+            <div class="ms-sub__body">
+              <div class="ms-sub__row">
+                <span class="ms-sub__title">{scene.subagent.title}</span>
+                <span class="ms-sub__type">{scene.subagent.type}</span>
+              </div>
+              <div class="ms-sub__status">{scene.subagent.status}</div>
+            </div>
+          </div>
+          <div class="mode-scene__reply">
+            {scene.segments.map((html) => (
+              <p class:list={['mode-scene__step', 'mode-scene__seg', nextStep()]} set:html={html} />
+            ))}
+          </div>
+          <div class:list={['mode-scene__step', 'ms-diff', nextStep()]}>
+            <div class="ms-diff__head">
+              <span class="ms-diff__badge">{scene.diff.badge}</span>
+              <span class="ms-diff__name">{scene.diff.fileName}</span>
+              <span class="ms-diff__dir">{scene.diff.dir}</span>
+              <span class="ms-diff__stats">
+                <em class="is-add">+{scene.diff.additions}</em>
+                <em class="is-del">-{scene.diff.deletions}</em>
+              </span>
+            </div>
+            <div class="ms-diff__body">
+              {scene.diff.lines.map((line) => (
+                <div class:list={['ms-diff__line', `is-${line.kind}`]}>{line.text}</div>
+              ))}
+            </div>
+          </div>
+        </>
+      )
+    }
+  </div>
+
+  <div class="mode-scene__composer">
+    <p class="mode-scene__placeholder">{scene.placeholder}</p>
+    <div class="mode-scene__bar">
+      <span class:list={['mode-scene__pill', `mode-scene__pill--${scene.variant}`]}>{scene.modeLabel}</span>
+      <span class="mode-scene__pill mode-scene__pill--mute">{scene.modelLabel}</span>
+      <span class="mode-scene__send" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 19V5"></path>
+          <path d="m5 12 7-7 7 7"></path>
+        </svg>
+      </span>
+    </div>
+  </div>
+</div>

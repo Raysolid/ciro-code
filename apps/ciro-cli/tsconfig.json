@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../../packages/harness-core" },
+    { "path": "../../packages/harness-tui" },
+    { "path": "../../packages/harness-web" },
+    { "path": "../../packages/profile-modes" }
+  ]
+}

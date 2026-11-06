@@ -1,0 +1,13 @@
+mode: agent
+tools:
+  - read
+  - list_files
+  - grep
+  - write
+  - edit
+  - bash
+  - SuggestMode
+  - Task
+  - WebFetch
+permissions:
+  preset: workspace-write
