@@ -17,7 +17,7 @@ ciro web
 
 ```text
 ✓ Ciro Kernel initialized (mode: ask, policy: workspace-readonly)
-✓ Local Web Workbench running at http://127.0.0.1:3080
+✓ Local Web Workbench running at http://127.0.0.1:5280
 Opening browser...
 ```
 
@@ -27,7 +27,7 @@ Opening browser...
 ciro web --mock
 ```
 
-浏览器将打开 [http://127.0.0.1:3080](http://127.0.0.1:3080)。如果不希望自动打开浏览器，可追加 `--no-open` 参数。
+浏览器将打开 [http://127.0.0.1:5280](http://127.0.0.1:5280)。如果不希望自动打开浏览器，可追加 `--no-open` 参数。
 
 ## 2. 选定项目工作区
 
@@ -80,8 +80,18 @@ Ciro 会在发送第一条消息时自动创建会话，扫描相关文件并在
 1. 点击 **Changes** 标签页，以直观的 Side-by-Side 或 Inline Diff 形式核对代码改动。
 2. 确认改动符合预期且测试通过后，即可在终端使用常规 Git 流程进行提交。
 
+## 成功时你应看到
+
+- 浏览器打开 `http://127.0.0.1:5280`（或你指定的端口）
+- 已选定工作区后，底部输入框可发送消息
+- **Ask** 任务：右侧出现检索 / 阅读过程，且项目文件无改动
+- **Agent** 任务：Changes 中出现 Diff；若跑了测试，输出可在界面中查看
+
+可选：需要先对齐方案时，切到 **Plan**，让 Ciro 产出步骤后再切 **Agent** 落地。详见 [工作模式](/guides/modes/)。
+
 ## 接下来
 
-- 深入理解四档权限边界：[工作模式](/guides/modes/)
-- 通过 npm 扩展工作台能力：[扩展 Pack](/guides/packs/)
-- 遇到环境或端口问题？查看 [Windows / 常见排障](/guides/troubleshooting/)
+- 工具环与本地边界：[工作原理](/concepts/how-it-works/)
+- 四档权限：[工作模式](/guides/modes/)
+- 教 Agent 守约定：[如何选择扩展方式](/customize/chooser/)
+- PATH / 端口问题：[排障](/guides/troubleshooting/)

@@ -4,8 +4,6 @@ Local coding agent harness — policy-aware tools, session memory, and a streami
 
 ## Install (npm)
 
-Full product experience (Web workbench + four-mode profiles) ships via npm. The packages are equivalent:
-
 ```bash
 npm install -g @ciro-code/code
 # same as: npm install -g @ciro-code/cli
@@ -25,36 +23,31 @@ ciro pack list
 # then enable in Settings → Feature packs
 ```
 
-## Open Core
+## Open source (MIT)
 
-This repository is the **open Kernel** (shared types, core policy/session, Pi/Mock runtime, HTTP+SSE API, CLI, official Git pack).
+This repository publishes the **open Kernel**:
 
-| Surface | In this repo? |
-|---------|----------------|
-| Kernel + CLI + `ext-git` | Yes (MIT) |
-| Web UI source | No — shipped as built assets with the npm CLI |
-| Four-mode Profile source | No — product profiles ship with the npm CLI |
-
-Clone this repo to study or extend the Kernel. Install `@ciro-code/code` for the complete Ciro Code workbench.
+| Component | Notes |
+|-----------|-------|
+| Core Kernel | Policy sandbox, memory, context composer |
+| CLI (`ciro`) | Mode routing, doctor, pack manager |
+| HTTP + SSE API | Local harness server |
+| Extensibility | Rules, Skills, MCP configuration |
 
 ## Requirements
 
 - Node.js 20+
 - [pnpm](https://pnpm.io) 9+ (for building from source)
 
-## Build from source
+## Build
 
 ```sh
 git clone https://github.com/Raysolid/ciro-code.git
 cd ciro-code
 pnpm install
 pnpm run build
-
-# Mock agent (no API key) — API-only if UI assets are not present
 pnpm run dev:web:mock
-
-# Or with a real model
-pnpm run dev:web
+# or: pnpm run dev:web
 ```
 
 Health check: [http://127.0.0.1:5280/health](http://127.0.0.1:5280/health)
@@ -74,9 +67,7 @@ packages/
   harness-core/         # Config, policy, memory, skills, session
   harness-pi/           # Agent runtime (Pi + Mock)
   harness-web/          # Hono HTTP + SSE API
-  ext-git/              # Official Git Feature Pack
 examples/               # Starter workspaces (`ciro init --example …`)
-profiles/               # Optional config overlays
 ```
 
 ## Development
@@ -89,7 +80,7 @@ pnpm test
 
 | Command | Description |
 |---------|-------------|
-| `pnpm run build` | Build all packages |
+| `pnpm run build` | Build open packages |
 | `pnpm run dev:web:mock` | Local API with Mock agent |
 | `pnpm run dev:web` | Local API with Pi / LLM |
 | `pnpm test` | Run workspace tests |

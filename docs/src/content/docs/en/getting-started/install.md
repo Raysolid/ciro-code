@@ -17,7 +17,7 @@ npm install -g @ciro-code/code
 ciro web
 ```
 
-The CLI binary is `ciro` (same for `@ciro-code/cli`). Workbench: [http://127.0.0.1:3080](http://127.0.0.1:3080) · health: `/health`.
+The CLI binary is `ciro` (same for `@ciro-code/cli`). Workbench: [http://127.0.0.1:5280](http://127.0.0.1:5280) · health: `/health`.
 
 :::caution
 Install the scoped package `@ciro-code/code`. Do **not** use `npm i -g ciro`.
@@ -36,7 +36,7 @@ ciro web --mock --no-open
 In another terminal:
 
 ```powershell
-curl http://127.0.0.1:3080/health
+curl http://127.0.0.1:5280/health
 ```
 
 ### ExecutionPolicy
@@ -58,15 +58,15 @@ If `ciro` is not found after a global install:
 3. Open a **new** terminal after installing
 4. Re-run `npm install -g @ciro-code/code` if the shim was missing
 
-### Port 3080
+### Port 5280
 
-`ciro web` defaults to port **3080**. If the port is busy:
+`ciro web` defaults to port **5280**. If the port is busy:
 
 ```powershell
-netstat -ano | findstr 3080
+netstat -ano | findstr 5280
 ```
 
-Stop the conflicting process, or start with another port: `ciro web -p 3081`.
+Stop the conflicting process, or start with another port: `ciro web -p 5281`.
 
 ## Smoke test (no API key)
 
@@ -74,4 +74,4 @@ Stop the conflicting process, or start with another port: `ciro web -p 3081`.
 ciro web --mock --no-open
 ```
 
-Then open `http://127.0.0.1:3080/health` and confirm a successful response.
+Then open `http://127.0.0.1:5280/health` and confirm a successful response.

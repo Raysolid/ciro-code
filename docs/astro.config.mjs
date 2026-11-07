@@ -15,16 +15,43 @@ const sidebar = [
     ],
   },
   {
-    label: 'Using Ciro',
-    translations: { 'zh-CN': '使用指南' },
+    label: 'Concepts',
+    translations: { 'zh-CN': '心智模型' },
     items: [
+      { label: 'How it works', translations: { 'zh-CN': '工作原理' }, slug: 'concepts/how-it-works' },
       { label: 'Modes', translations: { 'zh-CN': '工作模式' }, slug: 'guides/modes' },
+      { label: 'Permissions', translations: { 'zh-CN': '权限与安全' }, slug: 'guides/permissions' },
+      { label: 'Data & privacy', translations: { 'zh-CN': '数据与隐私' }, slug: 'concepts/data-and-privacy' },
       { label: 'Workspace & sessions', translations: { 'zh-CN': '工作区与会话' }, slug: 'guides/workspace-session' },
+    ],
+  },
+  {
+    label: 'Surfaces',
+    translations: { 'zh-CN': '入口' },
+    items: [
+      { label: 'Web workbench', translations: { 'zh-CN': 'Web 工作台' }, slug: 'surfaces/web-workbench' },
+      { label: 'Terminal UI', translations: { 'zh-CN': '终端界面' }, slug: 'surfaces/terminal-tui' },
+    ],
+  },
+  {
+    label: 'Workflows',
+    translations: { 'zh-CN': '工作流' },
+    items: [
+      { label: 'Explore a codebase', translations: { 'zh-CN': '探索代码库' }, slug: 'workflows/explore-codebase' },
+      { label: 'Plan a change', translations: { 'zh-CN': '规划一次改动' }, slug: 'workflows/plan-a-change' },
+      { label: 'Implement and verify', translations: { 'zh-CN': '实现并验证' }, slug: 'workflows/implement-and-verify' },
+      { label: 'Debug a failure', translations: { 'zh-CN': '排查失败' }, slug: 'workflows/debug-a-failure' },
+    ],
+  },
+  {
+    label: 'Customize',
+    translations: { 'zh-CN': '定制' },
+    items: [
+      { label: 'Choose a mechanism', translations: { 'zh-CN': '如何选择扩展方式' }, slug: 'customize/chooser' },
       { label: 'Rules & skills', translations: { 'zh-CN': '规则与 Skills' }, slug: 'guides/rules-skills' },
       { label: 'MCP tools', translations: { 'zh-CN': 'MCP 工具' }, slug: 'guides/mcp' },
       { label: 'Feature packs', translations: { 'zh-CN': '扩展 Pack' }, slug: 'guides/packs' },
-      { label: 'Permissions', translations: { 'zh-CN': '权限与安全' }, slug: 'guides/permissions' },
-      { label: 'Troubleshooting', translations: { 'zh-CN': '常见问题' }, slug: 'guides/troubleshooting' },
+      { label: 'Providers & models', translations: { 'zh-CN': '模型与 Provider' }, slug: 'customize/providers-models' },
     ],
   },
   {
@@ -33,15 +60,24 @@ const sidebar = [
     items: [
       { label: 'CLI', translations: { 'zh-CN': '命令行' }, slug: 'reference/cli' },
       { label: 'Config', translations: { 'zh-CN': '配置' }, slug: 'reference/config' },
+      { label: 'Shortcuts', translations: { 'zh-CN': '快捷键' }, slug: 'reference/shortcuts' },
       { label: 'Changelog', translations: { 'zh-CN': '更新日志' }, slug: 'reference/changelog' },
     ],
   },
   {
-    label: 'Open Core & Contribute',
-    translations: { 'zh-CN': '开源与贡献' },
+    label: 'Trust & open source',
+    translations: { 'zh-CN': '信任与开源' },
     items: [
+      { label: 'Security', translations: { 'zh-CN': '安全' }, slug: 'trust/security' },
       { label: 'What is open source', translations: { 'zh-CN': '开源范围与承诺' }, slug: 'open-core/what-is-open' },
-      { label: 'Build from source', translations: { 'zh-CN': '从源码构建' }, slug: 'project/contributing' },
+      { label: 'Open Kernel', translations: { 'zh-CN': '开源 Kernel' }, slug: 'project/contributing' },
+    ],
+  },
+  {
+    label: 'Troubleshooting',
+    translations: { 'zh-CN': '排障' },
+    items: [
+      { label: 'Common issues', translations: { 'zh-CN': '常见问题' }, slug: 'guides/troubleshooting' },
     ],
   },
 ];
@@ -50,6 +86,12 @@ export default defineConfig({
   site: 'https://raysolid.github.io',
   base: '/ciro-code/docs',
   trailingSlash: 'always',
+  // destinations must include `base` — Astro does not prefix redirect targets
+  redirects: {
+    '/': '/ciro-code/docs/en/getting-started/overview/',
+    '/en/': '/ciro-code/docs/en/getting-started/overview/',
+    '/zh-cn/': '/ciro-code/docs/zh-cn/getting-started/overview/',
+  },
   markdown: {
     rehypePlugins: [rehypeBaseLocaleLinks],
   },
@@ -78,7 +120,6 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
       components: {
         Head: './src/components/Head.astro',
-        Hero: './src/components/Hero.astro',
         ThemeSelect: './src/components/ThemeSelect.astro',
         LanguageSelect: './src/components/LanguageSelect.astro',
         SiteTitle: './src/components/SiteTitle.astro',

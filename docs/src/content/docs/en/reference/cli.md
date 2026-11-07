@@ -8,6 +8,28 @@ ciro --help
 ciro -V
 ```
 
+With no subcommand, **TUI** starts (same as `ciro tui`). Use `ciro web` for the workbench.
+
+## `ciro` / `ciro tui`
+
+Fullscreen terminal session.
+
+| Option | Description |
+|--------|-------------|
+| `-w, --workspace <path>` | Workspace root (default: cwd) |
+| `--mode <mode>` | `ask` \| `plan` \| `agent` \| `debug` |
+| `--mock` | Mock agent |
+| `--continue` | Resume the most recent session |
+| `--resume <id>` | Resume a specific session |
+| `--profile <id>` | Profile overlay |
+| `--minimal` | No alternate screen |
+
+```bash
+ciro
+ciro --mode ask --mock
+ciro tui -w ./my-app
+```
+
 ## `ciro web`
 
 Start the local workbench server.
@@ -15,7 +37,7 @@ Start the local workbench server.
 | Option | Description |
 |--------|-------------|
 | `-w, --workspace <path>` | Workspace root (omit to restore last recent) |
-| `-p, --port <number>` | Port (default `3080`) |
+| `-p, --port <number>` | Port (default `5280`) |
 | `--mode <mode>` | Initial mode: `ask` \| `plan` \| `agent` \| `debug` |
 | `--profile <id>` | Profile overlay (for example `developer`) |
 | `--no-open` | Do not open a browser |
@@ -24,12 +46,12 @@ Start the local workbench server.
 ```bash
 ciro web
 ciro web --mock --no-open
-ciro web -w . -p 3080 --mode ask
+ciro web -w . -p 5280 --mode ask
 ```
 
 ## `ciro pack`
 
-Official Feature Packs.
+Install official Feature Packs (`@ciro-code/ext-*`). See [Feature packs](/guides/packs/).
 
 ```bash
 ciro pack add @ciro-code/ext-git

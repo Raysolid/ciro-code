@@ -5,16 +5,13 @@ interface Props {
 }
 
 const { copyLabel, copiedLabel } = Astro.props;
-const copyText = 'npm install -g @ciro-code/code && ciro web';
+const copyText = 'npm install -g @ciro-code/code';
 ---
 
 <div class="install-bar" data-command={copyText} data-copied={copiedLabel}>
   <div class="install-bar__code">
     <code class="install-bar__line">
       <span class="prompt">$</span> npm install -g <span class="pkg">@ciro-code/code</span>
-    </code>
-    <code class="install-bar__line">
-      <span class="prompt">&amp;&amp;</span> ciro web
     </code>
   </div>
   <button type="button" class="cmd-copy" data-copy aria-label={copyLabel} title={copyLabel}>

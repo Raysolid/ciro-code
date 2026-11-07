@@ -9,7 +9,7 @@ const { t } = Astro.props;
 const w = t.workbench;
 ---
 
-<div class="cw" data-cw aria-hidden="true">
+<div class="cw" data-cw data-active="0" aria-hidden="true">
   <aside class="cw__left">
     <div class="cw__brand" aria-label="Ciro">
       <svg class="cw__brand-mark" viewBox="0 0 388 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -124,19 +124,33 @@ const w = t.workbench;
     const sub = root.querySelector('[data-cw-subagent]');
     if (!user || !userText || !assistant || !think || !thinkLabel || !thinkDots || !reply || !sub) return;
 
-    let visible = true;
+    let intersecting = false;
     const io = new IntersectionObserver(
       ([entry]) => {
-        visible = Boolean(entry?.isIntersecting);
+        intersecting = Boolean(entry?.isIntersecting);
       },
       { threshold: 0.12 },
     );
     io.observe(root);
 
-    const waitVisible = () =>
+    const isActive = () => root.dataset.active === '1' && intersecting;
+
+    const waitActive = () =>
       new Promise((resolve) => {
         const check = () => {
-          if (!root.isConnected || visible) {
+          if (!root.isConnected || isActive()) {
+            resolve();
+            return;
+          }
+          window.setTimeout(check, 400);
+        };
+        check();
+      });
+
+    const waitInactive = () =>
+      new Promise((resolve) => {
+        const check = () => {
+          if (!root.isConnected || !isActive()) {
             resolve();
             return;
           }
@@ -146,10 +160,10 @@ const w = t.workbench;
       });
 
     const sleep = async (ms) => {
-      await waitVisible();
+      await waitActive();
       if (!root.isConnected) return;
       await new Promise((r) => window.setTimeout(r, ms));
-      await waitVisible();
+      await waitActive();
     };
 
     const typePlain = (el, plain, speed) =>
@@ -157,7 +171,7 @@ const w = t.workbench;
         let i = 0;
         el.textContent = '';
         const tick = async () => {
-          await waitVisible();
+          await waitActive();
           if (!root.isConnected) {
             resolve();
             return;
@@ -206,7 +220,10 @@ const w = t.workbench;
       think.classList.add('is-done');
     };
 
-    const reset = () => {
+    while (root.isConnected) {
+      await waitActive();
+      if (!root.isConnected) break;
+
       user.classList.remove('is-in');
       userText.textContent = '';
       assistant.hidden = true;
@@ -214,16 +231,19 @@ const w = t.workbench;
       sub.classList.remove('is-on');
       setThinking();
       reply.innerHTML = '';
-    };
 
-    while (root.isConnected) {
-      await waitVisible();
-      if (!root.isConnected) break;
-      reset();
       await sleep(450);
+      if (!isActive()) {
+        await waitInactive();
+        continue;
+      }
       userText.textContent = stream.user;
       user.classList.add('is-in');
       await sleep(1100);
+      if (!isActive()) {
+        await waitInactive();
+        continue;
+      }
       assistant.hidden = false;
       think.hidden = false;
       await sleep(900);
@@ -231,7 +251,7 @@ const w = t.workbench;
       await sleep(800);
       await streamSegments(stream.replySegments, 14);
       markThought();
-      await sleep(2800);
+      await waitInactive();
     }
 
     io.disconnect();

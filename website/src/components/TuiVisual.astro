@@ -1,0 +1,215 @@
+---
+import type { Messages } from '../i18n/en';
+
+interface Props {
+  t: Messages;
+}
+
+const { t } = Astro.props;
+const u = t.tui;
+---
+
+<div class="tv" data-tv data-active="0" aria-hidden="true">
+  <div class="tv__scroll">
+    <div class="tv__splash" data-tv-splash>
+      <div class="tv__splash-row">
+        <div class="tv__brand" aria-hidden="true">
+          <span class="tv__logo-c">C</span><span class="tv__logo-star">✦</span><span class="tv__logo-rest">iro</span>
+        </div>
+        <div class="tv__splash-copy">
+          <p class="tv__welcome">{u.welcome}</p>
+          <ul class="tv__hints">
+            {u.hints.map((hint) => <li>- {hint}</li>)}
+            <li class="tv__help">- {u.helpHint}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="tv__user" data-tv-user>
+      <span class="tv__ask-prompt">❯</span>
+      <span data-tv-user-text></span>
+    </div>
+
+    <div class="tv__assistant" data-tv-assistant hidden>
+      <div class="tv__think" data-tv-think hidden>
+        <span data-tv-think-label>{u.stream.thinking}</span>
+      </div>
+      <div class="tv__activity" data-tv-activity>
+        <span class="tv__spinner" aria-hidden="true">⠋</span>
+        <span>{u.stream.activity}</span>
+      </div>
+      <div class="tv__reply" data-tv-reply></div>
+      <p class="tv__meta" data-tv-meta hidden>{u.footerMeta}</p>
+    </div>
+  </div>
+
+  <div class="tv__dock">
+    <span class="tv__ctx">{u.ctxLabel}</span>
+  </div>
+
+  <div class="tv__composer">
+    <div class="tv__composer-input">
+      <span class="tv__ask-prompt">❯</span>
+      <span class="tv__composer-caret" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="tv__bottom">
+    <p class="tv__shortcuts">{u.shortcuts}</p>
+    <p class="tv__model-line">
+      <span class="tv__mode">{u.modeAsk}</span>
+      <span>· {u.modelLabel}</span>
+    </p>
+  </div>
+</div>
+
+<script define:vars={{ stream: u.stream, footerMeta: u.footerMeta }}>
+  function prefersReduce() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  async function runOnce(root) {
+    const user = root.querySelector('[data-tv-user]');
+    const userText = root.querySelector('[data-tv-user-text]');
+    const assistant = root.querySelector('[data-tv-assistant]');
+    const think = root.querySelector('[data-tv-think]');
+    const thinkLabel = root.querySelector('[data-tv-think-label]');
+    const activity = root.querySelector('[data-tv-activity]');
+    const reply = root.querySelector('[data-tv-reply]');
+    const meta = root.querySelector('[data-tv-meta]');
+    if (!user || !userText || !assistant || !think || !thinkLabel || !activity || !reply || !meta) return;
+
+    let intersecting = false;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        intersecting = Boolean(entry?.isIntersecting);
+      },
+      { threshold: 0.12 },
+    );
+    io.observe(root);
+
+    const isActive = () => root.dataset.active === '1' && intersecting;
+
+    const waitActive = () =>
+      new Promise((resolve) => {
+        const check = () => {
+          if (!root.isConnected || isActive()) {
+            resolve();
+            return;
+          }
+          window.setTimeout(check, 400);
+        };
+        check();
+      });
+
+    const waitInactive = () =>
+      new Promise((resolve) => {
+        const check = () => {
+          if (!root.isConnected || !isActive()) {
+            resolve();
+            return;
+          }
+          window.setTimeout(check, 400);
+        };
+        check();
+      });
+
+    const sleep = async (ms) => {
+      await waitActive();
+      if (!root.isConnected) return;
+      await new Promise((r) => window.setTimeout(r, ms));
+      await waitActive();
+    };
+
+    const typePlain = (el, plain, speed) =>
+      new Promise(async (resolve) => {
+        let i = 0;
+        el.textContent = '';
+        const tick = async () => {
+          await waitActive();
+          if (!root.isConnected) {
+            resolve();
+            return;
+          }
+          i += 1;
+          el.textContent = plain.slice(0, i);
+          if (i >= plain.length) {
+            resolve();
+            return;
+          }
+          window.setTimeout(tick, speed);
+        };
+        tick();
+      });
+
+    const streamSegments = async (segments, speed) => {
+      reply.innerHTML = '';
+      for (const html of segments) {
+        const seg = document.createElement('p');
+        seg.className = 'tv__seg';
+        reply.appendChild(seg);
+
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        const plain = tmp.textContent || '';
+
+        if (prefersReduce()) {
+          seg.innerHTML = html;
+        } else {
+          await typePlain(seg, plain, speed);
+          seg.innerHTML = html;
+          await sleep(220);
+        }
+      }
+    };
+
+    while (root.isConnected) {
+      await waitActive();
+      if (!root.isConnected) break;
+
+      user.classList.remove('is-in');
+      userText.textContent = '';
+      assistant.hidden = true;
+      think.hidden = true;
+      thinkLabel.textContent = stream.thinking;
+      think.classList.remove('is-done');
+      activity.classList.remove('is-on');
+      meta.hidden = true;
+      reply.innerHTML = '';
+
+      await sleep(450);
+      if (!isActive()) {
+        await waitInactive();
+        continue;
+      }
+      userText.textContent = stream.user;
+      user.classList.add('is-in');
+      await sleep(1100);
+      if (!isActive()) {
+        await waitInactive();
+        continue;
+      }
+      assistant.hidden = false;
+      think.hidden = false;
+      await sleep(900);
+      activity.classList.add('is-on');
+      await sleep(800);
+      activity.classList.remove('is-on');
+      await streamSegments(stream.replySegments, 14);
+      thinkLabel.textContent = stream.thought;
+      think.classList.add('is-done');
+      meta.hidden = false;
+      meta.textContent = footerMeta;
+      await waitInactive();
+    }
+
+    io.disconnect();
+  }
+
+  document.querySelectorAll('[data-tv]').forEach((root) => {
+    if (root.dataset.streamBound === '1') return;
+    root.dataset.streamBound = '1';
+    runOnce(root);
+  });
+</script>

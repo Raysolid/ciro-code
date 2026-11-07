@@ -43,3 +43,5 @@ ciro web
 4. Key 保存在本机 `~/.ciro/`（见 [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md)）。
 
 切勿把真实密钥提交到 git 或贴进公开 Issue。
+
+DeepSeek / OpenAI / 兼容端点菜谱与排错见 [模型与 Provider](/customize/providers-models/)。信任边界见 [安全](/trust/security/)。

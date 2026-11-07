@@ -1,86 +1,106 @@
 ---
 title: Rules & Skills
-description: Shape agent behavior using project rules and on-demand skills.
+description: AGENTS.md, Rules, and on-demand Skills—teach the agent with the smallest mechanism.
 ---
 
-Ciro Code provides a two-tiered extensibility system: **Rules** and **Skills**. They allow you to align the agent with your project's conventions without manual prompt engineering.
+When shaping behavior with persistent instructions, follow: **AGENTS.md → Rules → Skills**. Heavier MCP / Packs: [Choose a mechanism](/customize/chooser/).
 
----
+## When to use what
 
-## Project Rules
+| Need | Use |
+|------|-----|
+| Short always-on repo rules (3–7 bullets) | Root `AGENTS.md` |
+| Personal cross-project preferences | `~/.ciro/AGENTS.md` |
+| Path-scoped conventions (e.g. only `*.tsx`) | `.ciro/rules/*.md` |
+| Long, on-demand playbooks | Skill (`SKILL.md`) |
 
-Rules enforce coding standards, testing conventions, and architecture policies. When constructing reasoning context, Ciro Code dynamically attaches rules matching relevant files.
+## AGENTS.md
 
-### Storage locations
-
-- **Project-level rules**: `{workspace}/.ciro/rules/**/*.md` (shared with the team via Git)
-- **User-level rules**: `~/.ciro/rules/**/*.md` (personal conventions across all projects)
-- **Root instructions**: `AGENTS.md` in the workspace root
-
-### Rule file format
-
-Each rule is an independent Markdown file with frontmatter declaring path patterns (`globs`):
+Root `AGENTS.md` loads as project-level instructions. Write **short, enforceable rules**—not an entire design doc.
 
 ```markdown
-<!-- {workspace}/.ciro/rules/react-conventions.md -->
+# AGENTS.md
+
+- Public API changes must update tests
+- Never commit `.env` or secrets
+- Prefer editing `src/`; leave generated dirs alone
+```
+
+Global preferences live in `~/.ciro/AGENTS.md`.
+
+## Rules
+
+### Locations
+
+| Scope | Path |
+|-------|------|
+| Project (commit these) | `{workspace}/.ciro/rules/**/*.md` |
+| User | `~/.ciro/rules/**/*.md` |
+
+### Format
+
+Markdown with frontmatter. **Empty / omitted `globs`** → always-on; **with `globs`** → injected only when the message has matching path tokens.
+
+```markdown
 ---
-description: React component standards and state patterns
+description: React component conventions
 globs: ["src/components/**/*.tsx", "src/hooks/**/*.ts"]
 ---
 
-# React Conventions
+# React
 
-1. **Props**: Every component must declare an explicit TypeScript Props interface; `any` is forbidden.
-2. **Styling**: Use utility classes (Tailwind CSS); never write inline style objects.
-3. **Effects**: `useEffect` hooks must declare complete dependency arrays and return cleanup functions on unmount.
-4. **Testing**: Public UI components must include interaction tests under `__tests__/` with Vitest and Testing Library.
+1. Props need an explicit TypeScript interface; no `any`
+2. Prefer Tailwind; avoid inline style objects
+3. `useEffect` must list dependencies and clean up on unmount
 ```
 
-When Ciro reads or modifies files matching these `globs`, the rule text is injected into the prompt context automatically.
+## Skills
 
----
+Skills are **on-demand** playbooks: a folder with `SKILL.md` (or a single `.md` file). Metadata lives in **frontmatter** (there is no separate `meta.json`).
 
-## On-Demand Skills
+### Locations
 
-Skills are specialized runbooks for complex or multi-phase workflows. Unlike persistent rules, Skills are loaded **on demand** and bounded by strict token budgets.
+- Project: `{workspace}/.ciro/skills/<name>/SKILL.md`
+- User: `~/.ciro/skills/`
 
-### Key capabilities
-
-- **Trigger on intent**: Loaded only when the user's intent or task matches the skill's declared description.
-- **Dependency declaration**: Skills can declare `requiresMcp`. If the required MCP server is not active, the skill is safely skipped.
-- **Location**: Placed in `{workspace}/.ciro/skills/<skill-name>/` or globally in `~/.ciro/skills/`.
-
-### Skill structure example
+### Example
 
 ```text
-.ciro/skills/db-migrate/
-├── SKILL.md       # Step-by-step procedures and constraints
-└── meta.json      # Triggers, budgets, and dependencies
-```
-
-```json
-// .ciro/skills/db-migrate/meta.json
-{
-  "name": "db-migrate",
-  "description": "Database migration and Flyway SQL runbook",
-  "requiresMcp": ["postgres-mcp"],
-  "tokenBudget": 800
-}
+.ciro/skills/review/
+└── SKILL.md
 ```
 
 ```markdown
-<!-- .ciro/skills/db-migrate/SKILL.md -->
-# Database Migration Runbook
-
-1. Create versioned SQL scripts under `resources/db/migration/`: `V{yyyyMMdd_HHmm}__{name}.sql`.
-2. All DDL statements must remain backwards-compatible. Never issue destructive DROP COLUMN queries.
-3. Query schema lock status via `postgres-mcp` prior to running migrations.
-```
-
+---
+name: review
+description: Review diffs and test risk
+triggers: [@review]
+requiresMcp: []
 ---
 
-## Best practices
+# Review
 
-1. **Keep Rules actionable and short**: Rules define constraints, not full tutorial articles.
-2. **Use precise `globs`**: Avoid blanket injection; targeting specific folders saves context window capacity.
-3. **Commit project rules**: Check `{workspace}/.ciro/rules/` into Git so both developers and AI agents adhere to identical standards.
+1. List changed files and risks
+2. Call out missing tests
+3. Do not edit code unless the user asks
+```
+
+| Field | Meaning |
+|-------|---------|
+| `name` | Skill id (defaults to folder name) |
+| `description` | Short summary; used in matching |
+| `triggers` | e.g. `[@review]`; single-file skills without triggers default to `@name` |
+| `requiresMcp` | Session must have these MCP ids enabled or the skill is skipped |
+
+Invoke with trigger tokens (e.g. `@review`) or slash-style usage depending on the build. Injection is token-budgeted—keep Skills lean.
+
+## Practice
+
+1. Keep Rules short and strict; put detail in `@` files or Skills  
+2. Add `globs` only when path-specific; avoid always-on noise  
+3. Commit team norms in `.ciro/rules/` and `AGENTS.md`  
+4. Need external tools → [MCP](/guides/mcp/); need an official workbench capability (e.g. Git) → [Packs](/guides/packs/)
+
+## What's next
+
+[Choose a mechanism](/customize/chooser/) · [MCP](/guides/mcp/) · [Security](/trust/security/)

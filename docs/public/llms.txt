@@ -1,10 +1,10 @@
 # Ciro Code
 
-> Local coding agent with a Web workbench.
+> Local-first coding agent with a Web workbench. Inference goes only to providers you configure.
 
 Install: npm install -g @ciro-code/code
-CLI: ciro
-Workbench: http://127.0.0.1:3080
+CLI: ciro (default TUI) · ciro web (workbench)
+Workbench: http://127.0.0.1:5280
 Health: GET /health
 Smoke: ciro web --mock --no-open
 
@@ -13,41 +13,95 @@ Prefer package: @ciro-code/code (or @ciro-code/cli)
 
 ## Docs (English)
 
-- https://raysolid.github.io/ciro-code/docs/en/
+### Get started
 - https://raysolid.github.io/ciro-code/docs/en/getting-started/overview/
 - https://raysolid.github.io/ciro-code/docs/en/getting-started/install/
 - https://raysolid.github.io/ciro-code/docs/en/getting-started/quickstart/
 - https://raysolid.github.io/ciro-code/docs/en/getting-started/first-provider/
+
+### Concepts
+- https://raysolid.github.io/ciro-code/docs/en/concepts/how-it-works/
 - https://raysolid.github.io/ciro-code/docs/en/guides/modes/
+- https://raysolid.github.io/ciro-code/docs/en/guides/permissions/
+- https://raysolid.github.io/ciro-code/docs/en/concepts/data-and-privacy/
 - https://raysolid.github.io/ciro-code/docs/en/guides/workspace-session/
+
+### Surfaces
+- https://raysolid.github.io/ciro-code/docs/en/surfaces/web-workbench/
+- https://raysolid.github.io/ciro-code/docs/en/surfaces/terminal-tui/
+
+### Workflows
+- https://raysolid.github.io/ciro-code/docs/en/workflows/explore-codebase/
+- https://raysolid.github.io/ciro-code/docs/en/workflows/plan-a-change/
+- https://raysolid.github.io/ciro-code/docs/en/workflows/implement-and-verify/
+- https://raysolid.github.io/ciro-code/docs/en/workflows/debug-a-failure/
+
+### Customize
+- https://raysolid.github.io/ciro-code/docs/en/customize/chooser/
 - https://raysolid.github.io/ciro-code/docs/en/guides/rules-skills/
 - https://raysolid.github.io/ciro-code/docs/en/guides/mcp/
 - https://raysolid.github.io/ciro-code/docs/en/guides/packs/
-- https://raysolid.github.io/ciro-code/docs/en/guides/permissions/
-- https://raysolid.github.io/ciro-code/docs/en/guides/troubleshooting/
+- https://raysolid.github.io/ciro-code/docs/en/customize/providers-models/
+
+### Reference
 - https://raysolid.github.io/ciro-code/docs/en/reference/cli/
 - https://raysolid.github.io/ciro-code/docs/en/reference/config/
+- https://raysolid.github.io/ciro-code/docs/en/reference/shortcuts/
 - https://raysolid.github.io/ciro-code/docs/en/reference/changelog/
+
+### Trust & open source
+- https://raysolid.github.io/ciro-code/docs/en/trust/security/
+- https://raysolid.github.io/ciro-code/docs/en/open-core/what-is-open/
 - https://raysolid.github.io/ciro-code/docs/en/project/contributing/
+
+### Troubleshooting
+- https://raysolid.github.io/ciro-code/docs/en/guides/troubleshooting/
 
 ## Docs (简体中文)
 
-- https://raysolid.github.io/ciro-code/docs/zh-cn/
+### 开始使用
 - https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/overview/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/install/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/quickstart/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/first-provider/
+
+### 心智模型
+- https://raysolid.github.io/ciro-code/docs/zh-cn/concepts/how-it-works/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/guides/modes/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/permissions/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/concepts/data-and-privacy/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/guides/workspace-session/
+
+### 入口
+- https://raysolid.github.io/ciro-code/docs/zh-cn/surfaces/web-workbench/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/surfaces/terminal-tui/
+
+### 工作流
+- https://raysolid.github.io/ciro-code/docs/zh-cn/workflows/explore-codebase/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/workflows/plan-a-change/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/workflows/implement-and-verify/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/workflows/debug-a-failure/
+
+### 定制
+- https://raysolid.github.io/ciro-code/docs/zh-cn/customize/chooser/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/guides/rules-skills/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/guides/mcp/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/guides/packs/
-- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/permissions/
-- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/troubleshooting/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/customize/providers-models/
+
+### 参考
 - https://raysolid.github.io/ciro-code/docs/zh-cn/reference/cli/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/reference/config/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/reference/shortcuts/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/reference/changelog/
+
+### 信任与开源
+- https://raysolid.github.io/ciro-code/docs/zh-cn/trust/security/
+- https://raysolid.github.io/ciro-code/docs/zh-cn/open-core/what-is-open/
 - https://raysolid.github.io/ciro-code/docs/zh-cn/project/contributing/
+
+### 排障
+- https://raysolid.github.io/ciro-code/docs/zh-cn/guides/troubleshooting/
 
 ## Repo
 

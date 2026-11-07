@@ -69,4 +69,4 @@ permissions:
 - **Web 工具**：仅在安装了检索类扩展或配置了特定 MCP 时按需出网。
 - **Shell 防火墙**：策略引擎会主动拦截 Shell 命令行中未经许可的 `curl`、`wget`、PowerShell Web Cmdlet（如 `Invoke-WebRequest`），避免指令注入导致源码泄露。
 
-完整漏洞报告政策请参阅仓库 [SECURITY.md](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md)。
+总览与漏洞报告入口：[安全](/trust/security/)。仓库政策：[SECURITY.md](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md)。

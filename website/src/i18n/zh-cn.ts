@@ -5,7 +5,7 @@ export const zhCn: Messages = {
   lang: 'zh-CN',
   otherLocale: 'en',
   otherLocaleHref: '/ciro-code/',
-  docsHref: '/ciro-code/docs/zh-cn/',
+  docsHref: '/ciro-code/docs/zh-cn/getting-started/overview/',
   llmsHref: '/ciro-code/docs/llms.txt',
   nav: {
     product: '产品',
@@ -29,6 +29,20 @@ export const zhCn: Messages = {
     copiedLabel: '已复制',
     ctaDocs: '快速开始',
     ctaGithub: '在 GitHub 上 Star',
+  },
+  demo: {
+    termTitle: '终端 — zsh',
+    promptHost: '~/my-project',
+    closeLabel: '关闭窗口',
+    appWebTitle: 'Ciro Code — Web',
+    appTuiTitle: 'Ciro Code — TUI',
+    menu: ['终端', '文件', '编辑', '显示', '窗口', '帮助'],
+    clock: '周六 16:41',
+    dock: ['finder', 'safari', 'term', 'code', 'notes'] as const,
+    completions: [
+      { id: 'web' as const, cmd: 'ciro web', desc: '打开本地 Web 工作台' },
+      { id: 'tui' as const, cmd: 'ciro tui', desc: '启动全屏终端界面' },
+    ],
   },
   workbench: {
     brand: 'Ciro',
@@ -55,6 +69,28 @@ export const zhCn: Messages = {
         '2. 失败时目前只记录日志后继续。',
       ],
       subagent: '子代理 · 代码库检索',
+    },
+  },
+  tui: {
+    versionLine: 'Ciro Code v0.1.0 · ~/my-project',
+    welcome: '欢迎回来！可以从这里开始：',
+    hints: ['询问这个仓库的结构', '规划一次小重构', '排查一个复杂问题'],
+    helpHint: '/help 查看命令与快捷键',
+    modeAsk: 'Ask',
+    modelLabel: 'Ciro 2.5',
+    ctxLabel: 'ctx 12%',
+    shortcuts: 'Shift+Tab:模式 | /:命令 | @:文件 | Esc:停止',
+    footerMeta: 'Ask · Ciro 2.5 · 4s',
+    stream: {
+      user: 'src/app.ts 里的错误处理是怎么工作的？',
+      thinking: '思考中…',
+      thought: '已思考 2s',
+      activity: '检索代码库…',
+      replySegments: [
+        '已查看 <code>src/app.ts</code> 及相关导入。',
+        '1. 错误在启动路径中被捕获。',
+        '2. 失败时目前只记录日志后继续。',
+      ],
     },
   },
   modes: {
@@ -205,7 +241,12 @@ export const zhCn: Messages = {
   cta: {
     title: '开始使用 Ciro Code',
     lead: '探索代码库，构建新功能，修复错误，一切尽在掌控。',
-    command: 'npm install -g @ciro-code/code && ciro web',
+    termTitle: 'terminal',
+    comments: {
+      install: '# 安装',
+      web: '# Web 工作台',
+      tui: '# 终端界面',
+    },
     copyLabel: '复制',
     docs: '查看文档',
   },

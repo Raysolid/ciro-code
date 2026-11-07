@@ -17,7 +17,7 @@ npm install -g @ciro-code/code
 ciro web
 ```
 
-CLI 命令为 `ciro`（`@ciro-code/cli` 等价）。工作台：[http://127.0.0.1:3080](http://127.0.0.1:3080) · 健康检查：`/health`。
+CLI 命令为 `ciro`（`@ciro-code/cli` 等价）。工作台：[http://127.0.0.1:5280](http://127.0.0.1:5280) · 健康检查：`/health`。
 
 :::caution
 请安装作用域包 `@ciro-code/code`。不要使用 `npm i -g ciro`。
@@ -36,7 +36,7 @@ ciro web --mock --no-open
 另开终端：
 
 ```powershell
-curl http://127.0.0.1:3080/health
+curl http://127.0.0.1:5280/health
 ```
 
 ### ExecutionPolicy
@@ -58,15 +58,15 @@ Get-ExecutionPolicy -List
 3. 安装后**重新打开**终端
 4. 必要时再执行一次 `npm install -g @ciro-code/code`
 
-### 端口 3080
+### 端口 5280
 
-`ciro web` 默认端口为 **3080**。若被占用：
+`ciro web` 默认端口为 **5280**。若被占用：
 
 ```powershell
-netstat -ano | findstr 3080
+netstat -ano | findstr 5280
 ```
 
-结束占用进程，或换端口：`ciro web -p 3081`。
+结束占用进程，或换端口：`ciro web -p 5281`。
 
 ## 冒烟（无需 API Key）
 
@@ -74,4 +74,4 @@ netstat -ano | findstr 3080
 ciro web --mock --no-open
 ```
 
-然后访问 `http://127.0.0.1:3080/health`，确认返回成功。
+然后访问 `http://127.0.0.1:5280/health`，确认返回成功。

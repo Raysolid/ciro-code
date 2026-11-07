@@ -3,7 +3,7 @@ export const en = {
   lang: 'en',
   otherLocale: 'zh-cn' as const,
   otherLocaleHref: '/ciro-code/zh-cn/',
-  docsHref: '/ciro-code/docs/en/',
+  docsHref: '/ciro-code/docs/en/getting-started/overview/',
   llmsHref: '/ciro-code/docs/llms.txt',
   nav: {
     product: 'Product',
@@ -28,6 +28,20 @@ export const en = {
     copiedLabel: 'Copied',
     ctaDocs: 'Quick start',
     ctaGithub: 'Star on GitHub',
+  },
+  demo: {
+    termTitle: 'Terminal — zsh',
+    promptHost: '~/my-project',
+    closeLabel: 'Close window',
+    appWebTitle: 'Ciro Code — Web',
+    appTuiTitle: 'Ciro Code — TUI',
+    menu: ['Terminal', 'File', 'Edit', 'View', 'Window', 'Help'],
+    clock: 'Sat 16:41',
+    dock: ['finder', 'safari', 'term', 'code', 'notes'] as const,
+    completions: [
+      { id: 'web' as const, cmd: 'ciro web', desc: 'Open the local Web workbench' },
+      { id: 'tui' as const, cmd: 'ciro tui', desc: 'Launch the fullscreen terminal UI' },
+    ],
   },
   workbench: {
     brand: 'Ciro',
@@ -54,6 +68,32 @@ export const en = {
         '2. Failures currently log and continue.',
       ],
       subagent: 'Subagent · codebase search',
+    },
+  },
+  tui: {
+    versionLine: 'Ciro Code v0.1.0 · ~/my-project',
+    welcome: 'Welcome back! Get started with:',
+    hints: [
+      'Ask how this repo is structured',
+      'Plan a small refactor',
+      'Debug a complex issue',
+    ],
+    helpHint: '/help for commands & shortcuts',
+    modeAsk: 'Ask',
+    modelLabel: 'Ciro 2.5',
+    ctxLabel: 'ctx 12%',
+    shortcuts: 'Shift+Tab:mode | /:commands | @:files | Esc:stop',
+    footerMeta: 'Ask · Ciro 2.5 · 4s',
+    stream: {
+      user: 'How does error handling work in src/app.ts?',
+      thinking: 'Thinking…',
+      thought: 'Thought for 2s',
+      activity: 'Searching codebase…',
+      replySegments: [
+        'I inspected <code>src/app.ts</code> and related imports.',
+        '1. Errors are caught in the boot path.',
+        '2. Failures currently log and continue.',
+      ],
     },
   },
   modes: {
@@ -204,7 +244,12 @@ export const en = {
   cta: {
     title: 'Get started with Ciro Code',
     lead: 'Explore your codebase, build new features, fix bugs, and keep everything under your control.',
-    command: 'npm install -g @ciro-code/code && ciro web',
+    termTitle: 'terminal',
+    comments: {
+      install: '# install',
+      web: '# web workbench',
+      tui: '# terminal UI',
+    },
     copyLabel: 'Copy',
     docs: 'View docs',
   },

@@ -1,33 +1,36 @@
 ---
-title: MCP Tools Integration
-description: Connect and use Model Context Protocol (MCP) servers in Ciro Code.
+title: MCP tools
+description: Connect local MCP servers and enable them per session.
 ---
 
-The **Model Context Protocol (MCP)** is an open standard for connecting AI models to external tools and resources. By integrating MCP servers, you can equip Ciro Code with database querying, browser automation, and custom internal APIs.
+MCP (Model Context Protocol) attaches **external tool processes** to the agent. Use it for out-of-repo systems (issues, browsers, databases).  
+Prefer built-in shell + [permissions](/guides/permissions/) for local `git` / tests; use [Rules / Skills](/guides/rules-skills/) for prompts. See [Choose a mechanism](/customize/chooser/).
 
----
+## Before you begin
 
-## Configuring MCP Servers
+- Workbench or TUI starts  
+- Only add MCP commands you trust and can run locally
 
-MCP configurations are stored in `~/.ciro/mcp.json` or managed directly through the workbench under **Settings → MCP Tools**.
+## Configure
 
-### Configuration example (`~/.ciro/mcp.json`)
+Store servers in `~/.ciro/mcp.json` or **Settings → MCP tools**.
 
 ```json
 {
   "mcpServers": {
-    "playwright": {
+    "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
-      "env": {
-        "PUPPETEER_HEADLESS": "true"
-      }
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
-      "env": {}
-    },
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed"]
+    }
+  }
+}
+```
+
+Inject tokens via env—do not commit them. Illustrative example:
+
+```json
+{
+  "mcpServers": {
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
@@ -39,22 +42,32 @@ MCP configurations are stored in `~/.ciro/mcp.json` or managed directly through 
 }
 ```
 
----
+## Per-session enable
 
-## Per-Session Activation
+1. **Register** servers in Settings / `mcp.json`  
+2. When starting a session, **check** the MCP servers you need in the composer toolbar or **+** menu  
+3. Tools follow the active [mode](/guides/modes/); unchecked servers stay out of context
 
-To prevent context window saturation and tool confusion from loading dozens of tools simultaneously, Ciro Code utilizes **session-level on-demand activation**:
+If a Skill lists `requiresMcp`, it is skipped until those MCP ids are enabled for the session.
 
-1. **Global registration**: Register all available MCP servers in Settings or `mcp.json`.
-2. **Session toggle**: When starting a session, check the relevant MCP servers in the composer toolbar (or via the **+** menu).
-3. **Dynamic exposure**: Exposed tools and resources adapt to the active execution mode (Ask / Plan / Agent) under your policy constraints.
+## Safety
 
----
+- MCP-driven reads/writes/commands still pass workspace policy and approvals  
+- There is no “install any public MCP from a marketplace” path—only processes you configure locally  
+- Keep secrets local; see [Security](/trust/security/)
 
-## Security & Sandbox Boundaries
+## Success looks like
 
-Tools executed via MCP remain strictly monitored by the Ciro Code security engine:
+- Servers appear in Settings  
+- With a server checked, the model can call its tools  
+- Unchecked servers stay unavailable and keep context lean
 
-- **Policy enforcement**: File reads, writes, and shell operations invoked by an MCP tool are intercepted by the active workspace policy sandbox.
-- **Local credential isolation**: Third-party tokens (like GitHub PATs or DB connection strings) remain exclusively inside your local environment.
-- **No untrusted cloud registries**: Ciro Code does not connect to untrusted remote registries; it runs only explicitly configured local child processes.
+## If it fails
+
+- Process will not start → run the same `command` / `args` in your shell  
+- Permission denied → [Permissions](/guides/permissions/)  
+- Skill never loads → enable the MCP ids in `requiresMcp` for the session
+
+## What's next
+
+[Rules & Skills](/guides/rules-skills/) · [Feature packs](/guides/packs/) · [Security](/trust/security/)

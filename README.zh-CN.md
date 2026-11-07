@@ -37,7 +37,7 @@ Ask · Plan · Agent · Debug · 可见权限 · 可审阅的 diff。
 npm install -g @ciro-code/code
 # 等价包：npm install -g @ciro-code/cli
 
-ciro web                    # → http://127.0.0.1:3080
+ciro web                    # → http://127.0.0.1:5280
 ciro web --mock             # 无 API Key 先逛界面
 ciro web -w . --mode ask    # 指定工作区，只读启动
 ```
@@ -68,8 +68,9 @@ pnpm test
 | | |
 | :-- | :-- |
 | 入门 | [总览](https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/overview/) · [安装](https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/install/) · [快速开始](https://raysolid.github.io/ciro-code/docs/zh-cn/getting-started/quickstart/) |
-| 指南 | [模式](https://raysolid.github.io/ciro-code/docs/zh-cn/guides/modes/) · [权限](https://raysolid.github.io/ciro-code/docs/zh-cn/guides/permissions/) · [MCP](https://raysolid.github.io/ciro-code/docs/zh-cn/guides/mcp/) · [Packs](https://raysolid.github.io/ciro-code/docs/zh-cn/guides/packs/) |
-| 参考 | [CLI](https://raysolid.github.io/ciro-code/docs/zh-cn/reference/cli/) · [配置](https://raysolid.github.io/ciro-code/docs/zh-cn/reference/config/) |
+| 入口 / 工作流 | [Web](https://raysolid.github.io/ciro-code/docs/zh-cn/surfaces/web-workbench/) · [TUI](https://raysolid.github.io/ciro-code/docs/zh-cn/surfaces/terminal-tui/) · [探索](https://raysolid.github.io/ciro-code/docs/zh-cn/workflows/explore-codebase/) · [实现](https://raysolid.github.io/ciro-code/docs/zh-cn/workflows/implement-and-verify/) |
+| 心智 / 定制 | [工作原理](https://raysolid.github.io/ciro-code/docs/zh-cn/concepts/how-it-works/) · [扩展选型](https://raysolid.github.io/ciro-code/docs/zh-cn/customize/chooser/) · [模型](https://raysolid.github.io/ciro-code/docs/zh-cn/customize/providers-models/) · [安全](https://raysolid.github.io/ciro-code/docs/zh-cn/trust/security/) |
+| 参考 | [CLI](https://raysolid.github.io/ciro-code/docs/zh-cn/reference/cli/) · [配置](https://raysolid.github.io/ciro-code/docs/zh-cn/reference/config/) · [快捷键](https://raysolid.github.io/ciro-code/docs/zh-cn/reference/shortcuts/) |
 | Agent / CI | [`AGENTS.md`](./AGENTS.md) |
 
 ## 贡献与许可

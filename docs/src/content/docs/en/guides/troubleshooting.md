@@ -20,13 +20,13 @@ npm install -g @ciro-code/code
 
 ## Port already in use
 
-Default port is **3080**.
+Default port is **5280**.
 
 ```powershell
-netstat -ano | findstr 3080
+netstat -ano | findstr 5280
 ```
 
-Use another port: `ciro web -p 3081`, or stop the process holding 3080.
+Use another port: `ciro web -p 5281`, or stop the process holding 5280.
 
 ## Health check fails
 
@@ -37,14 +37,18 @@ ciro web --mock --no-open
 Then:
 
 ```bash
-curl http://127.0.0.1:3080/health
+curl http://127.0.0.1:5280/health
 ```
 
 You should see JSON with `"status":"ok"`. If the process exits immediately, read the terminal error (missing Node version, permission, etc.).
 
-## No API key warning
+## No API key / model unavailable
 
-Real models need a key or Settings provider. Use `--mock` to skip, or set `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` — see [First provider](/getting-started/first-provider/).
+Real models need a key or Settings provider. Use `--mock` to skip, or set `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` — see [Connect a model](/getting-started/first-provider/).
+
+## Permission denied on writes or shell
+
+Confirm Ask/Plan (read-only) vs Agent; check workspace `permissions` and approval prompts — see [Permissions](/guides/permissions/).
 
 ## ExecutionPolicy errors
 

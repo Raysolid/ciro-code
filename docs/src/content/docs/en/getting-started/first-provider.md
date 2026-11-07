@@ -45,3 +45,5 @@ ciro web
 4. Keys are stored locally under `~/.ciro/` (see [Security](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md)).
 
 Never commit real keys to git or paste them into public issues.
+
+DeepSeek / OpenAI / compatible-endpoint cookbooks: [Providers & models](/customize/providers-models/). Trust boundary: [Security](/trust/security/).

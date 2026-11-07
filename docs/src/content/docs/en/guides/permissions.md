@@ -69,4 +69,4 @@ When the agent attempts to execute an unlisted command or touch an edge path, th
 - **Web Tools**: Active only when search extensions or specialized MCP tools are deliberately configured.
 - **Shell Firewall**: The policy engine actively intercepts ad-hoc `curl`, `wget`, or PowerShell Web Cmdlets (`Invoke-WebRequest`) in generated shell scripts to prevent code leakage.
 
-See [SECURITY.md](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md) for full vulnerability reporting guidelines.
+Trust hub: [Security](/trust/security/). Repository policy: [SECURITY.md](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md).

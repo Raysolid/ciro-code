@@ -43,7 +43,7 @@ ciro web
 
 ## Docs site
 
-User-facing guides live under `docs/` (Starlight) and publish to [raysolid.github.io/ciro-code](https://raysolid.github.io/ciro-code/docs/en/). Prefer fixing docs in the same PR when you change public behaviour (modes, presets, CLI flags).
+User-facing guides live under `docs/` (Starlight) and publish to [raysolid.github.io/ciro-code](https://raysolid.github.io/ciro-code/docs/en/getting-started/overview/). Prefer fixing docs in the same PR when you change public behaviour (modes, presets, CLI flags).
 
 ## Security
 

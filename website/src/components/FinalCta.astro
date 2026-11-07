@@ -7,6 +7,12 @@ interface Props {
 
 const { t } = Astro.props;
 const c = t.cta;
+const copyText = ['npm install -g @ciro-code/code', 'ciro web', 'ciro tui'].join('\n');
+const bodyHtml = [
+  `<span class="final-cta__line"><span class="prompt">$</span> npm install -g <span class="pkg">@ciro-code/code</span> <span class="cmt">${c.comments.install}</span></span>`,
+  `<span class="final-cta__line"><span class="prompt">$</span> ciro <span class="cmt">${c.comments.tui}</span></span>`,
+  `<span class="final-cta__line"><span class="prompt">$</span> ciro web <span class="cmt">${c.comments.web}</span></span>`,
+].join('\n');
 ---
 
 <section class="section final-cta" id="start" data-reveal>
@@ -14,25 +20,52 @@ const c = t.cta;
     <h2 class="final-cta__title">{c.title}</h2>
     <p class="final-cta__lead">{c.lead}</p>
 
-    <div class="final-cta__cmd" data-command={c.command} data-copied={t.hero.copiedLabel}>
-      <div class="final-cta__code">
-        <code class="final-cta__line">
-          <span class="prompt">$</span> npm install -g <span class="pkg">@ciro-code/code</span>
-        </code>
-        <code class="final-cta__line">
-          <span class="prompt">&amp;&amp;</span> ciro web
-        </code>
+    <div class="final-cta__term" data-command={copyText} data-copied={t.hero.copiedLabel}>
+      <div class="final-cta__chrome">
+        <span class="final-cta__dots" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <span class="final-cta__chrome-title">{c.termTitle}</span>
+        <button
+          type="button"
+          class="final-cta__copy"
+          data-copy
+          aria-label={c.copyLabel}
+          title={c.copyLabel}
+        >
+          <svg
+            class="cmd-copy__idle"
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect width="14" height="14" x="8" y="8" rx="2"></rect>
+            <path d="M4 16V4a2 2 0 0 1 2-2h12"></path>
+          </svg>
+          <svg
+            class="cmd-copy__done"
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M20 6 9 17l-5-5"></path>
+          </svg>
+          <span data-copy-label>{c.copyLabel}</span>
+        </button>
       </div>
-      <button type="button" class="final-cta__copy" data-copy aria-label={c.copyLabel} title={c.copyLabel}>
-        <svg class="cmd-copy__idle" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="14" height="14" x="8" y="8" rx="2"></rect>
-          <path d="M4 16V4a2 2 0 0 1 2-2h12"></path>
-        </svg>
-        <svg class="cmd-copy__done" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 6 9 17l-5-5"></path>
-        </svg>
-        <span data-copy-label>{c.copyLabel}</span>
-      </button>
+      <pre class="final-cta__body" tabindex="0"><code set:html={bodyHtml} /></pre>
     </div>
 
     <a class="btn btn--solid final-cta__docs" href={t.docsHref}>{c.docs}</a>
@@ -40,7 +73,7 @@ const c = t.cta;
 </section>
 
 <script>
-  document.querySelectorAll<HTMLElement>('.final-cta__cmd').forEach((root) => {
+  document.querySelectorAll<HTMLElement>('.final-cta__term').forEach((root) => {
     const btn = root.querySelector<HTMLButtonElement>('[data-copy]');
     const label = btn?.querySelector<HTMLElement>('[data-copy-label]');
     if (!btn) return;

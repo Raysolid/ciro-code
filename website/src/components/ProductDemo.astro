@@ -1,20 +1,134 @@
 ---
 import type { Messages } from '../i18n/en';
 import WorkbenchVisual from './WorkbenchVisual.astro';
+import TuiVisual from './TuiVisual.astro';
 
 interface Props {
   t: Messages;
 }
 
 const { t } = Astro.props;
+const d = t.demo;
 ---
 
 <section class="product-demo" id="demo">
   <div class="wrap product-demo__wrap">
     <div class="product-demo__stage" data-demo-tilt>
       <div class="product-demo__frame">
-        <WorkbenchVisual t={t} />
+        <div class="demo-desktop" data-demo-desktop data-state="term">
+          <div class="demo-desktop__wallpaper" aria-hidden="true"></div>
+
+          <div class="demo-menubar" aria-hidden="true">
+            <div class="demo-menubar__left">
+              {
+                d.menu.map((item, i) => (
+                  <span class:list={['demo-menubar__item', i === 0 && 'is-strong']}>{item}</span>
+                ))
+              }
+            </div>
+            <div class="demo-menubar__right">
+              <span class="demo-menubar__status" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 3a6 6 0 0 0-6 6c0 4.5 6 12 6 12s6-7.5 6-12a6 6 0 0 0-6-6Zm0 8.2a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4Z"/></svg>
+              </span>
+              <span class="demo-menubar__status" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M2 10.5c2.8-3.2 6.2-4.8 10-4.8s7.2 1.6 10 4.8"/><path d="M5.5 13.5c2-2.2 4.2-3.3 6.5-3.3s4.5 1.1 6.5 3.3"/><circle cx="12" cy="17.5" r="1.4" fill="currentColor" stroke="none"/></svg>
+              </span>
+              <span class="demo-menubar__battery" aria-hidden="true"><i></i></span>
+              <span class="demo-menubar__clock">{d.clock}</span>
+            </div>
+          </div>
+
+          <div class="demo-term" data-demo-term>
+            <div class="demo-chrome">
+              <span class="demo-chrome__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="demo-chrome__title">{d.termTitle}</span>
+              <span class="demo-chrome__spacer"></span>
+            </div>
+            <div class="demo-term__body">
+              <p class="demo-term__cwd">{d.promptHost}</p>
+              <p class="demo-term__line">
+                <span class="demo-term__prompt">$</span>
+                <span class="demo-term__typed">ciro</span><span class="demo-term__caret" aria-hidden="true"></span>
+              </p>
+              <div class="demo-complete" role="listbox" aria-label="ciro">
+                {
+                  d.completions.map((item, i) => (
+                    <button
+                      type="button"
+                      class:list={['demo-complete__item', i === 0 && 'is-active']}
+                      role="option"
+                      data-demo-open={item.id}
+                      aria-selected={i === 0 ? 'true' : 'false'}
+                    >
+                      <span class="demo-complete__cmd">{item.cmd}</span>
+                      <span class="demo-complete__desc">{item.desc}</span>
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-app" data-demo-app="web" hidden>
+            <div class="demo-chrome demo-chrome--app">
+              <span class="demo-chrome__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="demo-chrome__title">{d.appWebTitle}</span>
+              <button
+                type="button"
+                class="demo-chrome__close"
+                data-demo-close
+                aria-label={d.closeLabel}
+                title={d.closeLabel}
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="demo-app__body">
+              <WorkbenchVisual t={t} />
+            </div>
+          </div>
+
+          <div class="demo-app" data-demo-app="tui" hidden>
+            <div class="demo-chrome demo-chrome--app">
+              <span class="demo-chrome__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="demo-chrome__title">{d.appTuiTitle}</span>
+              <button
+                type="button"
+                class="demo-chrome__close"
+                data-demo-close
+                aria-label={d.closeLabel}
+                title={d.closeLabel}
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="demo-app__body">
+              <TuiVisual t={t} />
+            </div>
+          </div>
+
+          <div class="demo-dock" aria-hidden="true">
+            <div class="demo-dock__shelf">
+              {
+                d.dock.map((item) => (
+                  <span class:list={['demo-dock__icon', item === 'term' && 'is-active']} data-dock={item}></span>
+                ))
+              }
+              <span class="demo-dock__sep"></span>
+              <span class="demo-dock__icon demo-dock__icon--trash" data-dock="trash"></span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  import { initDemoDesktop } from '../scripts/demo-desktop';
+  initDemoDesktop();
+</script>

@@ -1,86 +1,106 @@
 ---
-title: Rules 与 Skills
-description: 使用项目规则与按需技能塑造 Agent 的编码行为。
+title: 规则与 Skills
+description: AGENTS.md、Rules 与按需 Skills——用最小机制教好 Agent。
 ---
 
-Ciro Code 提供 **Rules（规则）** 与 **Skills（技能）** 两层扩展机制，帮助你在不修改提示词工程的前提下，使 Agent 完全适应你的技术栈与工程约定。
+用持久指令塑造行为时，按这条链选：**AGENTS.md → Rules → Skills**。更重的 MCP / Pack 见 [如何选择扩展方式](/customize/chooser/)。
 
----
+## 何时用哪个
 
-## 项目规则（Rules）
+| 需求 | 用 |
+|------|-----|
+| 全仓库始终遵守的短约定（3～7 条） | 根目录 `AGENTS.md` |
+| 个人跨项目偏好 | `~/.ciro/AGENTS.md` |
+| 按路径生效的规范（如仅 `*.tsx`） | `.ciro/rules/*.md` |
+| 长流程、按需加载的操作手册 | Skill（`SKILL.md`） |
 
-规则用于约定项目的代码风格、测试规范与架构偏好。Ciro Code 在构建思考上下文时，会根据匹配的文件路径自动挂载生效的规则。
+## AGENTS.md
 
-### 规则存放路径
-
-- **项目级规则**：`{workspace}/.ciro/rules/**/*.md`（针对当前项目，随 Git 共享）
-- **用户级通用规则**：`~/.ciro/rules/**/*.md`（跨所有项目生效的个人偏好）
-- **通用项目契约**：工作区根目录下的 `AGENTS.md`
-
-### 规则文件格式范例
-
-每个规则均为独立的 Markdown 文件，支持通过 Frontmatter 声明适用文件匹配规则（`globs`）：
+工作区根目录的 `AGENTS.md` 会作为项目级指令加载。写成**可执行的短规则**，不要贴整本设计文档。
 
 ```markdown
-<!-- {workspace}/.ciro/rules/react-conventions.md -->
+# AGENTS.md
+
+- 修改公共 API 必须同步更新测试
+- 禁止提交 `.env` 与密钥
+- 优先改 `src/`，不要动生成目录
+```
+
+全局偏好写在 `~/.ciro/AGENTS.md`（跨工作区）。
+
+## Rules
+
+### 位置
+
+| 范围 | 路径 |
+|------|------|
+| 项目（建议入库） | `{workspace}/.ciro/rules/**/*.md` |
+| 用户 | `~/.ciro/rules/**/*.md` |
+
+### 格式
+
+Markdown + frontmatter。`globs` **为空或不写** → 常驻注入；**有 globs** → 仅当消息里出现匹配路径 token 时注入。
+
+```markdown
 ---
-description: React 组件编写与状态管理规范
+description: React 组件约定
 globs: ["src/components/**/*.tsx", "src/hooks/**/*.ts"]
 ---
 
-# React 开发规范
+# React
 
-1. **组件设计**：每个组件必须声明明确的 TypeScript Props 接口，严禁使用 `any`。
-2. **样式约定**：优先使用 Tailwind CSS 原子类，严禁直接书写内联样式。
-3. **副作用控制**：`useEffect` 必须显式声明所有依赖项，并在组件卸载时返回清理函数。
-4. **单测要求**：新创建的公共 UI 组件需在 `__tests__/` 下编写对应的 Vitest + Testing Library 交互测试。
+1. Props 必须有明确 TypeScript 接口，禁止 `any`
+2. 样式优先 Tailwind，避免内联 style 对象
+3. `useEffect` 写全依赖并在卸载时清理
 ```
 
-当 Agent 读写匹配 `globs` 规则的文件时，规则内容会自动注入到系统提示词中，指导代码生成。
+## Skills
 
----
+Skills 是**按需**手册：目录内 `SKILL.md`（或单文件 `.md`），元数据在 **frontmatter**（没有单独的 `meta.json`）。
 
-## 按需技能（Skills）
+### 位置
 
-Skills 是专为特定复杂任务打造的“操作操作手册”。与常驻规则不同，Skills 采用**按需加载**机制，受严格的 Token 预算保护，避免上下文冗余。
+- 项目：`{workspace}/.ciro/skills/<name>/SKILL.md`
+- 用户：`~/.ciro/skills/`
 
-### 核心特性
-
-- **按需唤起**：仅当用户提问或任务意图与 Skill 声明的能力匹配时，才会动态加载具体操作步骤。
-- **声明依赖**：Skill 可以通过 `requiresMcp` 声明所需的 MCP 服务。当对应服务未就绪时，Skill 会被优雅跳过。
-- **存放位置**：存放在 `{workspace}/.ciro/skills/<skill-name>/` 或全局 `~/.ciro/skills/`。
-
-### Skill 范例结构
+### 范例
 
 ```text
-.ciro/skills/db-migrate/
-├── SKILL.md       # 详细操作指引与注意禁忌
-└── meta.json      # 触发词与依赖声明
-```
-
-```json
-// .ciro/skills/db-migrate/meta.json
-{
-  "name": "db-migrate",
-  "description": "数据库迁移与 Flyway 脚本编写指引",
-  "requiresMcp": ["postgres-mcp"],
-  "tokenBudget": 800
-}
+.ciro/skills/review/
+└── SKILL.md
 ```
 
 ```markdown
-<!-- .ciro/skills/db-migrate/SKILL.md -->
-# 数据库迁移指引
-
-1. 每次新建变更必须在 `resources/db/migration/` 下生成版本化 SQL 文件：`V{yyyyMMdd_HHmm}__{name}.sql`。
-2. 所有 DDL 必须支持向前兼容，禁止直接执行破坏性的 DROP COLUMN。
-3. 执行迁移前先使用 `postgres-mcp` 查询当前版本号与锁定状态。
-```
-
+---
+name: review
+description: 审 Diff 与测试风险
+triggers: [@review]
+requiresMcp: []
 ---
 
-## 最佳实践
+# Review
 
-1. **保持 Rules 简明精炼**：规则旨在立下边界，避免写成冗长的文档教程。
-2. **善用 `globs` 过滤**：不要将通用规则无差别注入全部文件，精准指定目录能显著节省模型上下文。
-3. **团队协作入库**：将 `{workspace}/.ciro/rules/` 纳入 Git 版本控制，使团队成员和 Agent 共享同一套工程底线。
+1. 列出变更文件与风险
+2. 指出缺测路径
+3. 不要直接改代码，除非用户明确要求
+```
+
+| 字段 | 含义 |
+|------|------|
+| `name` | Skill 名（可省略，默认用目录名） |
+| `description` | 简述；参与匹配 |
+| `triggers` | 如 `[@review]`；单文件无 triggers 时默认 `@name` |
+| `requiresMcp` | 会话须已启用这些 MCP id，否则跳过注入 |
+
+在对话里用触发词（如 `@review`）或 `/review` 类用法唤起；具体以当前版本匹配逻辑为准。注入有 token 预算，避免把百科写进 Skill。
+
+## 实践要点
+
+1. Rules 短、硬；细节用 `@` 文件或 Skill  
+2. 有路径差异再加 `globs`，避免处处常驻  
+3. 团队规范进仓库的 `.ciro/rules/` 与 `AGENTS.md`  
+4. 需要外部系统工具再上 [MCP](/guides/mcp/)；需要官方工作台能力（如 Git）再上 [Pack](/guides/packs/)
+
+## 接下来
+
+[如何选择扩展方式](/customize/chooser/) · [MCP](/guides/mcp/) · [安全](/trust/security/)

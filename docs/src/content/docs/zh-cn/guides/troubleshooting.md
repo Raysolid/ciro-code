@@ -20,13 +20,13 @@ npm install -g @ciro-code/code
 
 ## 端口被占用
 
-默认端口 **3080**。
+默认端口 **5280**。
 
 ```powershell
-netstat -ano | findstr 3080
+netstat -ano | findstr 5280
 ```
 
-换端口：`ciro web -p 3081`，或结束占用 3080 的进程。
+换端口：`ciro web -p 5281`，或结束占用 5280 的进程。
 
 ## 健康检查失败
 
@@ -37,14 +37,18 @@ ciro web --mock --no-open
 然后：
 
 ```bash
-curl http://127.0.0.1:3080/health
+curl http://127.0.0.1:5280/health
 ```
 
 应看到含 `"status":"ok"` 的 JSON。若进程立刻退出，查看终端报错（Node 版本、权限等）。
 
-## 无 API Key 警告
+## 无 API Key / 模型不可用
 
-真实模型需要 Key 或设置页 Provider。可用 `--mock`，或设置 `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` — 见 [配置模型](/getting-started/first-provider/)。
+真实模型需要 Key 或设置页 Provider。可用 `--mock`，或设置 `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` — 见 [连接模型](/getting-started/first-provider/)。
+
+## 权限拒绝写文件或 Shell
+
+确认当前是 Ask/Plan（只读）还是 Agent；检查工作区 `permissions` 与审批弹窗 — 见 [权限与安全](/guides/permissions/)。
 
 ## ExecutionPolicy 报错
 

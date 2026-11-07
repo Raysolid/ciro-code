@@ -8,6 +8,28 @@ ciro --help
 ciro -V
 ```
 
+无子命令时默认启动 **TUI**（与 `ciro tui` 相同）。Web 工作台用 `ciro web`。
+
+## `ciro` / `ciro tui`
+
+全屏终端会话。
+
+| 选项 | 说明 |
+|------|------|
+| `-w, --workspace <path>` | 工作区根（默认当前目录） |
+| `--mode <mode>` | `ask` \| `plan` \| `agent` \| `debug` |
+| `--mock` | Mock Agent |
+| `--continue` | 续最近会话 |
+| `--resume <id>` | 续指定会话 |
+| `--profile <id>` | Profile 叠加 |
+| `--minimal` | 无 alternate screen |
+
+```bash
+ciro
+ciro --mode ask --mock
+ciro tui -w ./my-app
+```
+
 ## `ciro web`
 
 启动本地工作台服务。
@@ -15,7 +37,7 @@ ciro -V
 | 选项 | 说明 |
 |------|------|
 | `-w, --workspace <path>` | 工作区根（省略则恢复最近一次） |
-| `-p, --port <number>` | 端口（默认 `3080`） |
+| `-p, --port <number>` | 端口（默认 `5280`） |
 | `--mode <mode>` | 初始模式：`ask` \| `plan` \| `agent` \| `debug` |
 | `--profile <id>` | Profile 叠加（如 `developer`） |
 | `--no-open` | 不打开浏览器 |
@@ -24,12 +46,12 @@ ciro -V
 ```bash
 ciro web
 ciro web --mock --no-open
-ciro web -w . -p 3080 --mode ask
+ciro web -w . -p 5280 --mode ask
 ```
 
 ## `ciro pack`
 
-官方 Feature Pack。
+安装官方 Feature Pack（`@ciro-code/ext-*`）。见 [Feature Packs](/guides/packs/)。
 
 ```bash
 ciro pack add @ciro-code/ext-git

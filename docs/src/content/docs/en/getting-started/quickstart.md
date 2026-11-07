@@ -17,7 +17,7 @@ The terminal prints the server address and automatically opens your default brow
 
 ```text
 ✓ Ciro Kernel initialized (mode: ask, policy: workspace-readonly)
-✓ Local Web Workbench running at http://127.0.0.1:3080
+✓ Local Web Workbench running at http://127.0.0.1:5280
 Opening browser...
 ```
 
@@ -27,7 +27,7 @@ If you do not have an API key ready yet, run in mock mode to explore the interfa
 ciro web --mock
 ```
 
-Your browser opens [http://127.0.0.1:3080](http://127.0.0.1:3080). Append `--no-open` if you prefer not to auto-launch the browser.
+Your browser opens [http://127.0.0.1:5280](http://127.0.0.1:5280). Append `--no-open` if you prefer not to auto-launch the browser.
 
 ## 2. Select a workspace
 
@@ -80,8 +80,18 @@ Whenever an agent modifies files, the **Changes** tab highlights the edits:
 1. Click the **Changes** tab to review side-by-side or inline diffs.
 2. Once the changes look clean and all tests pass, commit them with your normal Git workflow.
 
+## Success looks like
+
+- The browser opens `http://127.0.0.1:5280` (or your chosen port)
+- After a workspace is selected, the composer accepts messages
+- **Ask** tasks: retrieval / read steps appear, and project files stay unchanged
+- **Agent** tasks: diffs show under Changes; test output appears in the UI when tests ran
+
+Optional: for multi-step design, switch to **Plan**, review the steps, then switch to **Agent** to implement. See [Modes](/guides/modes/).
+
 ## What's next
 
-- Understand the trust boundaries: [Execution Modes](/guides/modes/)
-- Extend workbench capabilities via npm: [Feature Packs](/guides/packs/)
-- Experiencing port or PATH issues? See [Troubleshooting](/guides/troubleshooting/)
+- Tool loop and local boundary: [How it works](/concepts/how-it-works/)
+- Trust boundaries: [Modes](/guides/modes/)
+- Teach the agent your conventions: [Choose a mechanism](/customize/chooser/)
+- PATH / port issues: [Troubleshooting](/guides/troubleshooting/)
