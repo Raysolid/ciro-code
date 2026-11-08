@@ -1,58 +1,139 @@
 ---
-title: Config
-description: Config locations, merge precedence, and how to inspect effective values.
+title: Configuration Reference
+description: Priority cascade, file locations, and production-ready .ciro/config.yaml reference.
 ---
 
-## Precedence (later wins)
+Ciro Code uses a hierarchical configuration architecture. This page outlines configuration precedence, file locations, and a complete `.ciro/config.yaml` reference.
 
-For the same keys, layers merge in this order—**later overrides earlier**:
+---
 
-1. Built-in defaults  
-2. User config — `~/.ciro/config.yaml` (plus `providers.json`, `credentials/`, …)  
-3. Workspace config — `{workspace}/.ciro/config.yaml`  
-4. Environment — e.g. `DEEPSEEK_API_KEY`, `OPENAI_API_KEY`, `CIRO_AGENT_BACKEND`, `CIRO_PORT`  
-5. CLI flags — e.g. `--mode`, `--profile`, `-w`, `-p`
+## Configuration Precedence
 
-Inspect effective config and sources:
+When the same field is configured at multiple levels, **later layers override earlier ones**:
 
-```bash
-ciro config show -w .
-ciro config effective -w .
-ciro config validate -w .
+```text
+[1. Built-in Defaults]
+          ↓
+[2. User Global Config] (~/.ciro/config.yaml & credentials/)
+          ↓
+[3. Workspace Project Config] ({workspace}/.ciro/config.yaml)
+          ↓
+[4. Environment Variables] (DEEPSEEK_API_KEY, CIRO_PORT, etc.)
+          ↓
+[5. CLI Command Flags] (--mode, -w, -p, etc.)
 ```
 
-## Locations
+1. **Built-in Defaults**: Out-of-the-box security defaults and fallback ports.
+2. **User Global Config**: Stored in `~/.ciro/`, shared across all local projects (credentials, global preferences).
+3. **Workspace Project Config**: Stored in `{workspace}/.ciro/config.yaml` (recommended to check into Git), establishing team safety baselines.
+4. **Environment Variables**: Variables exported in the current shell session.
+5. **CLI Flags**: Explicit command-line arguments, carrying highest precedence.
 
-| Layer | Path / source |
-|-------|----------------|
-| User | `~/.ciro/` |
-| Workspace | `{workspace}/.ciro/` |
-| Environment | Shell environment variables |
-| CLI | `ciro` / `ciro web` options |
+---
 
-Directory meaning: [Data & privacy](/concepts/data-and-privacy/) · [Workspace & sessions](/guides/workspace-session/).
+## Annotated Configuration Template (`.ciro/config.yaml`)
 
-## Starter snippet
+Recommended template to drop into your workspace root:
+
+```yaml
+# {workspace}/.ciro/config.yaml
+# Ciro Code Workspace Baseline Configuration
+
+# 1. Default working mode (ask | plan | agent | debug)
+mode: agent
+
+# 2. Security policies and sandboxing
+permissions:
+  # Preset level: workspace-readonly | plan-readonly | workspace-write | debug-instrument
+  preset: workspace-write
+
+  # File system path access boundaries (workspace-relative globs)
+  fs:
+    allow:
+      - "src/**"
+      - "tests/**"
+      - "package.json"
+      - "tsconfig.json"
+      - "README.md"
+    deny:
+      - ".env*"
+      - "*.pem"
+      - "deploy/production/**"
+      - "secrets/**"
+
+  # Controlled Shell command execution
+  shell:
+    # Auto-approved commands (prefix or glob pattern)
+    allowlist:
+      - "git status"
+      - "git diff*"
+      - "git log*"
+      - "npm test*"
+      - "pnpm test*"
+      - "npm run build"
+      - "npx eslint *"
+      - "cargo check*"
+    # Strictly prohibited commands (always blocked)
+    deny:
+      - "rm -rf *"
+      - "curl *"
+      - "wget *"
+      - "Invoke-WebRequest *"
+      - "drop database *"
+    # Command execution timeout (seconds, default 60)
+    timeoutSeconds: 60
+
+# 3. Native tools to expose (omit to let mode manage tools)
+tools:
+  - read
+  - edit
+  - write
+  - list_files
+  - grep
+  - bash
+
+# 4. Workbench server preferences
+server:
+  port: 5280
+  openBrowser: true
+```
+
+---
+
+## Common Environment Variables
+
+| Variable | Description | Equivalent CLI / Config |
+|----------|-------------|-------------------------|
+| `DEEPSEEK_API_KEY` | DeepSeek inference key | DeepSeek key in Settings |
+| `OPENAI_API_KEY` | OpenAI inference key | OpenAI key in Settings |
+| `ANTHROPIC_API_KEY`| Anthropic Claude inference key | Claude key in Settings |
+| `CIRO_PORT` | Local Web Workbench port | `-p, --port` |
+| `CIRO_TUI_MINIMAL` | Terminal TUI inline streaming output | `--minimal` |
+
+---
+
+## Configuration Inspection Commands
+
+Inspect and validate effective configurations with CLI commands:
 
 ```bash
+# Print effective configuration with source origin per field
+ciro config show -w .
+
+# Output merged configuration as JSON
+ciro config effective -w .
+
+# Validate syntax and schema of .ciro/config.yaml
+ciro config validate -w .
+
+# Interactive wizard to generate starter config
 ciro config wizard -w .
 ```
 
-Example (read-only start):
+---
 
-```yaml
-mode: ask
-tools: [read, list_files, grep]
-permissions:
-  preset: workspace-readonly
-```
+## Next Steps
 
-Switch to Agent when you want edits (`mode: agent`, write tools, write preset). Prefer the workbench **Settings** UI for day-to-day changes.
-
-## Port
-
-Web defaults to port **5280** (avoids some Windows reserved ranges). Override with `-p` or `CIRO_PORT`.
-
-## Credentials
-
-See [SECURITY.md](https://github.com/Raysolid/ciro-code/blob/main/SECURITY.md). Never commit secrets.
+- [Permissions & Sandboxing](/guides/permissions/)
+- [Providers & Models Connection](/customize/providers-models/)
+- [CLI Reference](/reference/cli/)

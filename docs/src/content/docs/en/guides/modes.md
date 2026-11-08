@@ -1,50 +1,41 @@
 ---
-title: Execution Modes
-description: Understand permission boundaries and lifecycle workflows across Ask, Plan, Agent, and Debug.
+title: Modes
+description: Ask, Plan, Agent, and Debug—what each mode allows and when to use it.
 ---
 
-In Ciro Code:
-- **Mode** determines: **What behavioral constraints and tool permissions does the agent have right now?**
-- **Model** determines: **Which LLM weights supply reasoning?** (Configured and swapped independently in Settings).
+**Mode** and **model** are separate:
 
----
+- **Mode** — which tools are allowed and whether files may be written (Harness)  
+- **Model** — who reasons (**Settings → Models**)
 
-## Comparison Matrix
+## Comparison
 
-| Mode | Target Scenario | Active Tools & Permissions | Human Gate |
-|------|-----------------|----------------------------|------------|
-| **Ask** | Explore architecture, understand code, check docs | **Strictly read-only** (`workspace-readonly`)<br>Read / search / readonly bash / WebFetch / explore Task | Touches zero project files |
-| **Plan** | Complex refactors, architecture proposals, pre-flight reviews | **Planning-oriented** (`plan-readonly`)<br>Ask tools plus plan tools; no source-file writes | You review the plan, then switch to **Agent** to implement |
-| **Agent** | Feature implementation, refactoring, test execution | **Policy-bounded execution** (`workspace-write`)<br>Edits files and runs allowlisted shell commands | Sensitive commands and out-of-bound edits trigger modal approval |
-| **Debug** | Fix crashes, investigate test failures, fix defects | **Hypothesis-driven** (`debug-instrument`)<br>Write / edit plus session debug-log cleanup | Keep the blast radius small; verify with targeted traces |
+| Mode | Intent | Typical tools | You should check |
+|------|--------|---------------|------------------|
+| **Ask** | Explore architecture and docs | `read`, `list_files`, `grep`, read-scoped `bash`, `WebFetch` | No writes; Changes stays empty |
+| **Plan** | Design steps before editing | Ask tools + plan tools; source edits blocked | Review phases and blast radius |
+| **Agent** | Implement and verify | `edit`, `write`, allowlisted `bash` | Review Diffs in Changes; approve when prompted |
+| **Debug** | Fix failures with minimal blast radius | Read/write/edit + focused probes | Stay on the failing hypothesis |
 
----
-
-## Recommended Workflow Pipeline
-
-For complex feature development or refactoring, follow this multi-phase lifecycle:
+## Recommended lifecycle
 
 ```text
-[1. Ask] Understand Context  ──>  [2. Plan] Draft Proposals  ──>  [3. Agent] Execute & Test  ──>  [4. Debug] Targeted Fixes
+Ask → Plan → Agent → Debug (as needed)
 ```
 
-1. **Step 1: Ask (Explore first)**  
-   Ask Ciro to explain current modules, dependencies, and blast radius in read-only mode to prevent premature edits.
-2. **Step 2: Plan (Architect the steps)**  
-   Direct Ciro to generate a phased plan (plan tools only — no source-file writes in Plan mode).
-3. **Step 3: Agent (Execute under policy)**  
-   Switch to Agent mode. Let Ciro implement edits and run allowlisted commands under `workspace-write`. Review live diffs in the Changes tab.
-4. **Step 4: Debug (Contain the blast radius)**  
-   If unexpected test failures arise, switch to Debug mode and provide the stack trace to isolate root causes with a minimal patch.
+1. **Ask** — map the codebase without risk  
+2. **Plan** — get a structured plan; files stay write-protected  
+3. **Agent** — implement under sandbox + allowlist  
+4. **Debug** — if tests fail, supply the stack and ask for a minimal patch  
 
----
+## How to switch
 
-## Switching Modes
+- Web: mode tabs in the header  
+- Keyboard: `Shift+Tab`  
+- Slash: `/mode ask|plan|agent|debug`  
+- CLI: `ciro web --mode ask`  
+- Workspace default: `mode: ask` in `{workspace}/.ciro/config.yaml`
 
-- **In the Workbench**: Click the mode pills in the top bar (Ask / Plan / Agent / Debug) for instant switching.
-- **On CLI Launch**:
-  ```bash
-  ciro web --mode ask      # Start in read-only mode
-  ciro web --mode agent    # Start in agent execution mode
-  ```
-- **Workspace Config**: Set `mode: ask` in `{workspace}/.ciro/config.yaml` to pin project defaults.
+## What's next
+
+[Permissions](/guides/permissions/) · [Explore a codebase](/workflows/explore-codebase/) · [Plan a change](/workflows/plan-a-change/) · [How it works](/concepts/how-it-works/)

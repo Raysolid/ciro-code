@@ -59,7 +59,8 @@ ciro pack list
 ciro pack remove @ciro-code/ext-git
 ```
 
-Install does **not** enable the pack — use Settings → Feature packs.
+Install does **not** enable the pack — use Settings → Feature packs.  
+Local official tree: `ciro pack add @ciro-code/ext-git --from ./packages/ext-git`.
 
 ## `ciro init`
 

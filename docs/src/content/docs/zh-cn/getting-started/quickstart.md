@@ -39,12 +39,12 @@ ciro web --mock
   ciro web -w D:/workspace/my-app
   ```
 
-## 3. 连接模型（使用 Mock 可跳过）
+## 3. 连接模型
 
-要在实际开发中获得 AI 推理，需配置模型连接：
+使用 Mock 时可跳过本节。要获得真实推理，需配置模型连接：
 
-1. 点击工作台左下角 **设置 → 模型 (Providers)**。
-2. 添加你的模型提供商（如 DeepSeek、OpenAI、Ollama 或任意兼容端点），填入 API Key 并启用模型。
+1. 打开工作台左下角 **设置 → 模型**。
+2. 添加 Provider（如 DeepSeek、OpenAI、Ollama 或兼容端点），填入 API Key 并启用模型。
 3. 你的 API Key 仅保存在本机的 `~/.ciro/` 目录下，绝不上传到任何云端中转服务器。
 
 也可在终端启动前通过环境变量快捷注入：
@@ -55,7 +55,7 @@ export DEEPSEEK_API_KEY="sk-..."  # Windows pwsh: $env:DEEPSEEK_API_KEY="sk-..."
 
 ## 4. 执行你的第一个任务
 
-工作台顶部的模式栏默认处于 **Ask**（只读探索）模式。
+工作台顶部的模式栏默认处于 **Ask** 只读探索模式。
 
 ### 场景 A：探索与分析陌生代码（Ask 模式）
 
@@ -73,7 +73,7 @@ Ciro 会在发送第一条消息时自动创建会话，扫描相关文件并在
 
 在 Agent 模式下，Ciro 会在策略沙箱内读写文件、执行单测命令，并在控制台实时回传测试执行结果。
 
-## 5. 审查变更（Changes 面板）
+## 5. 审查 Changes
 
 当 Agent 模式修改了文件时，工作台将高亮提示 **Changes**：
 

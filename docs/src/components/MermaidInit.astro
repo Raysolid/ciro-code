@@ -1,0 +1,114 @@
+---
+/**
+ * Client Mermaid: lazy-load only when a page has ```mermaid fences.
+ * Important: the first .expressive-code block may own the shared EC stylesheet
+ * <link>; hoist it to <head> before replacing, or later code blocks lose styles.
+ */
+---
+
+<script>
+  function currentTheme() {
+    return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'neutral';
+  }
+
+  function hoistAssets(host) {
+    host.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+      const href = link.getAttribute('href');
+      if (!href) return;
+      const exists = [...document.head.querySelectorAll('link[rel="stylesheet"]')].some(
+        (l) => l.getAttribute('href') === href,
+      );
+      if (!exists) document.head.appendChild(link);
+      else link.remove();
+    });
+  }
+
+  function sourceFromHost(host) {
+    const fromCopy = host.querySelector('button[data-code]')?.getAttribute('data-code');
+    if (fromCopy) return fromCopy.replace(/\u007f/g, '\n').replace(/\r\n/g, '\n').trim();
+
+    const code = host.querySelector('code') || host;
+    return (code.textContent || '').replace(/\r\n/g, '\n').trim();
+  }
+
+  function discover() {
+    const out = [];
+    const seen = new Set();
+
+    const hosts = [
+      ...document.querySelectorAll('.expressive-code:has(pre[data-language="mermaid"])'),
+      ...document.querySelectorAll('pre[data-language="mermaid"]'),
+      ...document.querySelectorAll('pre > code.language-mermaid'),
+      ...document.querySelectorAll('.docs-mermaid[data-source]'),
+    ];
+
+    for (const node of hosts) {
+      const host = node.matches('code.language-mermaid')
+        ? node.closest('.expressive-code') || node.closest('pre') || node
+        : node.closest?.('.expressive-code') && node.matches('pre[data-language="mermaid"]')
+          ? node.closest('.expressive-code')
+          : node;
+
+      if (!host || seen.has(host)) continue;
+      seen.add(host);
+
+      const source = host.classList?.contains('docs-mermaid')
+        ? host.dataset.source || ''
+        : sourceFromHost(host);
+      if (!source) continue;
+      out.push({ el: host, source });
+    }
+
+    return out;
+  }
+
+  async function render() {
+    const blocks = discover();
+    if (!blocks.length) return;
+
+    const { default: mermaid } = await import('mermaid');
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: currentTheme(),
+      securityLevel: 'loose',
+      flowchart: { curve: 'basis', htmlLabels: false },
+    });
+
+    await Promise.all(
+      blocks.map(async ({ el, source }, index) => {
+        const id = `docs-mmd-${index}-${Math.random().toString(36).slice(2, 9)}`;
+        try {
+          const { svg } = await mermaid.render(id, source);
+          const wrap = document.createElement('div');
+          wrap.className = 'docs-mermaid';
+          wrap.dataset.source = source;
+          wrap.setAttribute('role', 'img');
+          wrap.innerHTML = svg;
+          hoistAssets(el);
+          el.replaceWith(wrap);
+        } catch (err) {
+          console.warn('[mermaid]', err);
+        }
+      }),
+    );
+  }
+
+  const boot = () => {
+    void render();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+
+  new MutationObserver((mutations) => {
+    if (mutations.some((m) => m.attributeName === 'data-theme')) {
+      void render();
+    }
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+</script>

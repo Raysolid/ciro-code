@@ -59,7 +59,8 @@ ciro pack list
 ciro pack remove @ciro-code/ext-git
 ```
 
-安装**不会**启用 Pack — 请到设置 → Feature packs。
+安装**不会**启用 Pack — 请到设置 → Feature packs。  
+本地官方目录：`ciro pack add @ciro-code/ext-git --from ./packages/ext-git`。
 
 ## `ciro init`
 

@@ -1,36 +1,70 @@
 ---
 title: 排查失败
-description: 用 Debug 模式做假设驱动的最小修复。
+description: 用 Debug 模式做假设驱动排查，定位根因并做最小修复。
 ---
 
-## 开始前
+单测失败、偶发异常或难读堆栈时，直接让 Agent「随便修」容易牵连无关重构。**Debug 模式**要求先列假设、再验证、再最小改动，把修改范围压到复现与根因附近。
 
-- 能稳定复现：失败命令、报错栈或红测输出
-- 已知大致相关路径（可用 Ask 先定位）
+---
 
-## 步骤
+## 排障四步
 
-1. 切到 **Debug**：
-   ```bash
-   ciro web -w . --mode debug
-   ```
-2. 粘贴复现步骤与完整错误，例如：  
-   「运行 `npm test -- auth` 失败，栈如下。先给假设，再做最小修复并验证。」
-3. 要求 Ciro：**列假设 → 选最可能的 → 最小改动 → 再跑同一命令**。
-4. 在 Changes 审 Diff；拒绝无关重构。
-5. 通过后切回 Ask/Agent 做收尾，或提交。
+```mermaid
+flowchart LR
+  A[贴完整报错] --> B[列出 2～3 个假设]
+  B --> C[定向验证与最小修复]
+  C --> D[重跑复现命令]
+```
 
-## 成功时你应看到
+### 1. 切换到 Debug
+顶栏选 **Debug**，或输入 `/mode debug`。
 
-- 假设与验证步骤写清楚
-- Diff 集中在根因路径；同一复现命令结果改善或通过
+### 2. 提供报错与复现命令
 
-## 失败时
+复制下面提示词，换成你的命令与堆栈：
 
-- 仍无法复现 → 补充环境、分支、相关 `@` 文件
-- 改动面失控 → 明确「禁止重构，只修当前失败」；必要时回退 Diff 重来
-- 权限挡住必要命令 → [权限](/guides/permissions/)
+```text
+运行命令 npm test -- user-service 失败。
+
+复现命令：
+npm test -- tests/services/user.test.ts -t "should handle token expiry"
+
+完整报错输出：
+TypeError: Cannot read properties of undefined (reading 'refreshToken')
+    at AuthService.verifyToken (src/services/auth.ts:42:18)
+    at UserService.getUser (src/services/user.ts:15:31)
+
+要求：
+1. 先列出导致此失败的 2～3 个可能假设；
+2. 定位根因，只做最小修复；
+3. 禁止无关重构，只改根因相关代码；
+4. 重新运行上述复现命令，直到测试通过。
+```
+
+### 3. 审阅假设
+动手改码前，Agent 应先给出思考过程，例如：
+- **假设 1**：Token 格式异常或被提前清除，payload 为 undefined；
+- **假设 2**：Mock 数据缺少 `refreshToken`；
+- **验证**：阅读 `src/services/auth.ts:42` 等处，确认哪条成立。
+
+### 4. 审查 Diff 并清理调试痕迹
+在右侧 **Changes** 核对：
+- [ ] 改动是否尽量少（常见是几行空值防护或逻辑判断）？
+- [ ] 是否留下临时 `console.log`？（会话日志可能已清，源文件仍要看一眼）
+- [ ] 同一复现命令已通过。
+
+---
+
+## 常见误区
+
+- ❌ **只说「测试挂了，帮我修」**：没有复现命令和完整堆栈，容易盲改无关文件；
+- ❌ **顺带重构**：排障时禁止顺手改风格或重写整函数，否则会掩盖真正回归；
+- ❌ **修好却不补防回归**：若原测试未覆盖该边界，让 Agent 补上对应断言。
+
+---
 
 ## 接下来
 
-[实现并验证](/workflows/implement-and-verify/) · [工作模式](/guides/modes/) · [排障](/guides/troubleshooting/)
+- 日常实现：[实现并验证](/workflows/implement-and-verify/)
+- 环境与端口：[排障指南](/guides/troubleshooting/)
+- 模式说明：[工作模式](/guides/modes/)

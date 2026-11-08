@@ -55,9 +55,18 @@
   --sl-font-system: var(--font);
   --sl-font-mono: var(--mono);
   --sl-line-height: 1.65;
+  /* Wider prose, narrower TOC than Starlight defaults */
+  --sl-content-width: 54rem;
+  --sl-sidebar-width: 15.5rem;
+  --docs-toc-width: 12rem;
+  --docs-scrollbar-size: 8px;
+  --docs-scrollbar-thumb: color-mix(in srgb, var(--ink-mute) 50%, transparent);
+  --docs-scrollbar-thumb-hover: color-mix(in srgb, var(--ink-mute) 75%, transparent);
   font-family: var(--font);
   font-feature-settings: 'cv11', 'ss01';
   font-size: 15px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--docs-scrollbar-thumb) transparent;
 }
 
 :root[data-theme='dark'],
@@ -358,11 +367,72 @@ starlight-lang-select {
   z-index: 50;
 }
 
+/* —— Scrollbars（勿覆盖 .expressive-code pre，否则会出现裁切残条） —— */
+html,
+body,
+.sidebar-pane,
+.right-sidebar,
+.main-frame,
+.sl-markdown-content :where(table) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--docs-scrollbar-thumb) transparent;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.sidebar-pane::-webkit-scrollbar,
+.right-sidebar::-webkit-scrollbar,
+.main-frame::-webkit-scrollbar,
+.sl-markdown-content :where(table)::-webkit-scrollbar {
+  width: var(--docs-scrollbar-size);
+  height: var(--docs-scrollbar-size);
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+.sidebar-pane::-webkit-scrollbar-track,
+.right-sidebar::-webkit-scrollbar-track,
+.main-frame::-webkit-scrollbar-track,
+.sl-markdown-content :where(table)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+.sidebar-pane::-webkit-scrollbar-thumb,
+.right-sidebar::-webkit-scrollbar-thumb,
+.main-frame::-webkit-scrollbar-thumb,
+.sl-markdown-content :where(table)::-webkit-scrollbar-thumb {
+  background-color: var(--docs-scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+.sidebar-pane::-webkit-scrollbar-thumb:hover,
+.right-sidebar::-webkit-scrollbar-thumb:hover,
+.main-frame::-webkit-scrollbar-thumb:hover,
+.sl-markdown-content :where(table)::-webkit-scrollbar-thumb:hover {
+  background-color: var(--docs-scrollbar-thumb-hover);
+}
+
+.sidebar-pane::-webkit-scrollbar,
+.right-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.right-sidebar {
+  /* Override Starlight hiding the TOC scrollbar entirely */
+  scrollbar-width: thin !important;
+}
+
 /* —— Sidebar —— */
 .sidebar-pane {
   background: var(--raised) !important;
   border-inline-end: 1px solid var(--line) !important;
-  width: 16rem;
+  width: var(--sl-sidebar-width);
 }
 
 .sidebar-content .group-label .large {
@@ -399,11 +469,52 @@ starlight-lang-select {
 }
 
 .sl-container {
-  max-width: 47.5rem;
+  max-width: var(--sl-content-width);
 }
 
 [data-has-hero] .sl-container {
-  max-width: 47.5rem;
+  max-width: var(--sl-content-width);
+}
+
+/* Give prose more room; keep on-this-page rail compact */
+@media (min-width: 72rem) {
+  .right-sidebar-container {
+    width: calc(
+      var(--docs-toc-width) + max(0rem, (100% - var(--sl-content-width) - var(--docs-toc-width)) / 2)
+    ) !important;
+  }
+
+  [data-has-sidebar][data-has-toc] .main-pane {
+    width: calc(
+      var(--sl-content-width) + max(0rem, (100% - var(--sl-content-width) - var(--docs-toc-width)) / 2)
+    ) !important;
+  }
+
+  .right-sidebar-panel .sl-container {
+    width: calc(var(--docs-toc-width) - 2 * var(--sl-sidebar-pad-x)) !important;
+    max-width: calc(var(--docs-toc-width) - 2 * var(--sl-sidebar-pad-x)) !important;
+  }
+}
+
+/* Tables: avoid mid-token wraps in command columns; allow horizontal scroll if needed */
+.sl-markdown-content :where(table) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.sl-markdown-content :where(th, td) {
+  vertical-align: top;
+}
+
+.sl-markdown-content :where(td:first-child, th:first-child) {
+  white-space: nowrap;
+}
+
+.sl-markdown-content :where(td, th) :where(code) {
+  white-space: nowrap;
 }
 
 .sl-markdown-content {
@@ -443,16 +554,26 @@ starlight-lang-select {
   font-family: var(--mono);
 }
 
-.sl-markdown-content pre,
+/* Expressive Code：用变量改主题，避免同时给 wrapper + pre 描边导致贴边/残滚动条 */
 .expressive-code {
-  background: var(--code-bg) !important;
-  border: 1px solid var(--code-line) !important;
-  border-radius: var(--radius) !important;
-  box-shadow: none !important;
+  --ec-brdRad: var(--radius);
+  --ec-brdCol: var(--code-line);
+  --ec-codeBg: var(--code-bg);
+  --ec-codeFg: var(--code-fg);
+  --ec-frm-edBg: var(--code-bg);
+  --ec-frm-trmBg: var(--code-bg);
+  --ec-frm-frameBoxShdCssVal: none;
+  --ec-codePadBlk: 1rem;
+  --ec-codePadInl: 1.15rem;
 }
 
-.sl-markdown-content pre {
-  color: var(--code-fg);
+/* 提示词等 text 块自动换行，避免无意义横向滚动条 */
+.expressive-code pre[data-language='text'] .ec-line .code,
+.expressive-code pre[data-language='plaintext'] .ec-line .code,
+.expressive-code pre[data-language='txt'] .ec-line .code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 .sl-markdown-content blockquote {
@@ -476,6 +597,29 @@ starlight-lang-select {
 
 .card .title {
   color: var(--ink);
+}
+
+/* Mermaid diagrams */
+.docs-mermaid {
+  margin: 1rem 0 1.25rem;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--raised);
+}
+
+.docs-mermaid svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+/* Hide raw mermaid fences until client script replaces them */
+.expressive-code:has([data-language='mermaid']),
+pre:has(> code.language-mermaid) {
+  opacity: 0.35;
 }
 
 /* TOC */

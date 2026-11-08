@@ -39,12 +39,12 @@ Until a directory is chosen, the message composer is locked to prevent accidenta
   ciro web -w ~/code/my-app
   ```
 
-## 3. Connect a model (skip if using mock)
+## 3. Connect a model
 
-To get real AI inferences for coding tasks:
+Skip this section when using Mock. For real inference:
 
-1. Click **Settings → Providers** in the bottom-left corner of the workbench.
-2. Add your provider (DeepSeek, OpenAI, Ollama, or any compatible endpoint), enter your API key, and enable your models.
+1. Open **Settings → Models** in the bottom-left corner of the workbench.
+2. Add a provider (DeepSeek, OpenAI, Ollama, or any compatible endpoint), enter your API key, and enable models.
 3. Your API keys are stored strictly in `~/.ciro/` on your machine and are never uploaded to a cloud proxy.
 
 You can also export keys in your shell prior to startup:
@@ -55,7 +55,7 @@ See the [Connect a model guide](/getting-started/first-provider/) for details.
 
 ## 4. Run your first task
 
-The top mode switcher defaults to **Ask** (read-only) mode.
+The top mode switcher defaults to **Ask** read-only mode.
 
 ### Scenario A: Explore and understand a codebase (Ask mode)
 
@@ -73,7 +73,7 @@ When you are ready for Ciro to write code, click the mode bar to switch to **Age
 
 In Agent mode, Ciro modifies files within workspace sandbox boundaries, executes the test command, and reports live test execution results in the UI.
 
-## 5. Review Changes (Changes tab)
+## 5. Review Changes
 
 Whenever an agent modifies files, the **Changes** tab highlights the edits:
 

@@ -1,85 +1,86 @@
 ---
-title: Providers & models
-description: Cookbooks for DeepSeek, OpenAI, and compatible endpoints—env vars and Settings.
+title: Providers & Models Guide
+description: Connecting DeepSeek, OpenAI, Claude, local Ollama, and OpenAI-compatible gateways.
 ---
 
-Inference goes only to **endpoints you configure**. Mode controls permissions; the model reasons—pick them independently. For the shortest path see [Connect a model](/getting-started/first-provider/); this page is cookbooks and recovery.
+Ciro Code is **BYOK (Bring Your Own Key)**: inference goes from your machine straight to the endpoint you configure—no Ciro cloud proxy.
 
-Prefer the smallest customization first: [Choose a mechanism](/customize/chooser/).
+**Mode** controls tool permissions; **model** controls reasoning. Switch them independently.
 
-## Before you begin
+---
 
-- You can start `ciro web` or `ciro`
-- You have a provider API key (or use `--mock`)
+## Connection options
 
-## Options
-
-| Option | Best for | Entry |
+| Method | Best for | Where |
 |--------|----------|-------|
-| Mock | UI without a key | `ciro web --mock` |
-| Environment variables | Machine defaults, CI / scripts | `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` |
-| Settings UI | Multiple providers, model pick, Base URL | **Settings → Models** |
-| Compatible endpoint | Self-hosted / proxy / other OpenAI-compatible APIs | Custom Base URL in Settings |
+| **Mock mode** | Explore the UI without a key | `ciro web --mock` |
+| **Workbench settings** | Multi-provider, custom Base URL, connectivity checks | **Settings → Models** |
+| **Environment variables** | Fixed local setup, scripts, CI | `DEEPSEEK_API_KEY`, `OPENAI_API_KEY`, etc. |
 
-Keys live under `~/.ciro/credentials/`; provider list in `~/.ciro/providers.json` (no plaintext keys on disk). Never commit secrets or paste them into public issues. See [Security](/trust/security/).
+Keys saved in the workbench are encrypted under `~/.ciro/credentials/`. Non-sensitive provider defs live in `~/.ciro/providers.json`.
 
-## Cookbook: DeepSeek
+---
 
-1. Create an API key on the [DeepSeek platform](https://platform.deepseek.com/).  
-2. Either:
+## Provider setup examples
 
-```bash
-# bash / zsh
-export DEEPSEEK_API_KEY=sk-...
-ciro web
-```
+### 1. DeepSeek (strong coding, good cost balance)
 
-```powershell
-# pwsh
-$env:DEEPSEEK_API_KEY = "sk-..."
-ciro web
-```
+1. Create an API key at [DeepSeek Open Platform](https://platform.deepseek.com/).
+2. **Option A — Workbench**
+   ```text
+   ciro web → Settings → Models → Add Provider → DeepSeek preset
+   → paste API key → fetch & enable models (e.g. deepseek-chat / deepseek-coder)
+   ```
+3. **Option B — Environment variables**
+   ```bash
+   # bash / zsh
+   export DEEPSEEK_API_KEY="sk-..."
+   ciro web
 
-Or: open the workbench → **Settings → Models** → add the DeepSeek preset → paste the key → fetch/enable models (default Base URL is typically `https://api.deepseek.com/v1`).
+   # Windows pwsh
+   $env:DEEPSEEK_API_KEY = "sk-..."
+   ciro web
+   ```
 
-3. Confirm the session model is a DeepSeek model.  
-4. Send an Ask message to verify; on failure check the terminal and Settings connectivity test.
+### 2. OpenAI / Azure OpenAI
 
-## Cookbook: OpenAI
+- Env: `OPENAI_API_KEY="sk-..."`
+- Default Base URL: `https://api.openai.com/v1`
+- Common models: `gpt-4o`, `o3-mini`
 
-```bash
-export OPENAI_API_KEY=sk-...
-ciro web
-```
+### 3. Anthropic Claude
 
-Or pick the OpenAI preset in Settings (`https://api.openai.com/v1`), paste the key, and enable models.
+- Env: `ANTHROPIC_API_KEY="sk-ant-..."`
+- Common models: `claude-3-7-sonnet-20250219`, `claude-3-5-haiku`
 
-## Cookbook: OpenAI-compatible endpoint
+### 4. Local inference (Ollama / vLLM / LM Studio)
 
-For local gateways or third-party compatible APIs:
+Any OpenAI-compatible local or self-hosted gateway:
 
-1. **Settings → Models → Add**, set a name and **Base URL** (public `https://…`; loopback addresses are usually rejected).  
-2. Paste the API key the endpoint expects.  
-3. Fetch the model list (if supported) or add model ids manually.  
-4. Enable and send a short message to verify.
+1. Start Ollama (default OpenAI-compatible URL: `http://localhost:11434/v1`)
+2. **Settings → Models → Add Provider**:
+   - **Name**: `Ollama Local`
+   - **Base URL**: `http://localhost:11434/v1`
+   - **API Key**: any placeholder (e.g. `ollama`)
+3. Add or fetch local models (e.g. `qwen2.5-coder:32b`) and enable them.
 
-Anthropic and other presets, when shown in Settings, follow the same flow—trust the UI of your installed version.
+---
 
-## Success looks like
+## Connectivity troubleshooting
 
-- Settings shows the provider configured (key masked)
-- Non-mock sessions return real model replies
-- `ciro web --mock` still works without a key
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| **401 Unauthorized** | Bad or expired key | Re-copy the key; check account quota |
+| **404 / Cannot POST** | Wrong Base URL path | Ensure `/v1` (e.g. `https://api.deepseek.com/v1`) |
+| **Timeout (ETIMEDOUT)** | Proxy / firewall | Check `HTTP_PROXY` / `HTTPS_PROXY` |
+| **Env var ignored** | Different shell session | Start `ciro web` in the same terminal where you exported the var |
+| **Garbled or cut-off replies** | Context overflow | `/compact`, or switch to a larger-context model |
 
-## If it fails
+---
 
-| Symptom | What to try |
-|---------|-------------|
-| No key / model unavailable | Export env vars in the **same** shell, or use Settings |
-| Base URL rejected | Use public HTTPS; avoid disallowed `127.0.0.1` |
-| Timeout / 401 | Check key, quota, corporate proxy |
-| UI-only check | `--mock` — see [Troubleshooting](/guides/troubleshooting/) |
+## Next steps
 
-## What's next
-
-- [Quickstart](/getting-started/quickstart/) · [Modes](/guides/modes/) · [Config precedence](/reference/config/) · [Data & privacy](/concepts/data-and-privacy/)
+- [Quickstart](/getting-started/quickstart/)
+- [Modes & sandbox](/guides/modes/)
+- [Rules & Skills](/guides/rules-skills/)
+- [Security & credentials](/trust/security/)

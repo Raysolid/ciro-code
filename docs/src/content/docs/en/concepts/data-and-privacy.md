@@ -9,8 +9,8 @@ Ciro Code is **local-first**: work products stay on disk by default; egress is m
 
 | Path | Contents |
 |------|----------|
-| `~/.ciro/` | User config, credentials, installed packs, cross-project preferences |
-| `{workspace}/.ciro/` | Workspace sessions, workspace config, project rules, and related state |
+| `~/.ciro/` | User config, credentials, packs, session dir `sessions/`, cross-project preferences |
+| `{workspace}/.ciro/` | Workspace config, rules, memory, plans, and related project state |
 
 API keys stay on your machine (user config or environment variables). They are **not** relayed through a Ciro cloud proxy.
 

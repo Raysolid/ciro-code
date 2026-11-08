@@ -1,52 +1,60 @@
 ---
 title: 工作原理
-description: 本地进程、工作区、会话与工具环——Ciro Code 如何干活。
+description: 本地进程、工作区、会话、工具环，以及模式与模型的区别。
 ---
 
-Ciro Code 是套在模型外的 **agentic harness**：模型负责推理，本机工具负责读文件、搜代码、改文件、跑命令。你给目标，它在循环里搜集上下文、行动、核对结果；你随时可以打断或改方向。
+Ciro Code 是围绕模型的 **Agentic Harness**：模型负责推理，本地工具负责读、搜、改、跑命令。给出目标后，系统循环搜集上下文、执行并核对结果；可随时中断或调整方向。
+
+推理只发往你配置的 Provider，不经过 Ciro 云端代理。
 
 ## 工具环
 
-一次任务大致三步，会反复交错：
+```text
+搜集上下文 → 策略裁决 → 受控执行 → 验证 → 循环
+```
 
-1. **搜集上下文** — 搜索与阅读相关文件、看报错与测试输出  
-2. **行动** — 在当前[模式](/guides/modes/)与[权限](/guides/permissions/)允许的范围内编辑或执行命令  
-3. **核对** — 再跑测试、读 Diff、根据结果修正  
+1. **搜集上下文** — 使用 `read`、`list_files`、`grep`，并按需注入匹配的 [Rules / Skills](/guides/rules-skills/)
+2. **策略裁决** — 由 [模式](/guides/modes/) 与 [权限](/guides/permissions/) 决定放行、拒绝或弹窗审批
+3. **执行** — 在允许时使用 `edit`、`write`、`bash`，限制在工作区沙箱内
+4. **验证** — 审阅 Diff、测试与报错，继续迭代或等待指示
 
-复杂任务会多圈循环；只读提问可能只停在第 1 步。
+只读问题可能在第 1 步结束；复杂任务会多轮循环。
 
-## 本机上有什么
+## 可访问资源
 
-在项目目录启动时，Ciro 能触及：
-
-| 资源 | 含义 |
+| 资源 | 说明 |
 |------|------|
-| 工作区文件 | 当前目录及子目录（越界写入受策略与审批约束） |
-| 终端能力 | 与你本机相同的命令环境（受 Shell 白名单 / 审批约束） |
-| Git 状态 | 分支、未提交改动等（若已安装 Git） |
-| 项目指令 | 如根目录 `AGENTS.md`、`.ciro/rules`（见[定制](/customize/chooser/)） |
-| 会话历史 | 保存在本机，便于续聊（见[工作区与会话](/guides/workspace-session/)） |
+| 工作区文件 | 当前项目树；写入受模式与审批约束 |
+| 本机 Shell | 本地命令环境；经 `bash`、白名单与审批 |
+| Git 状态 | 有 Git 时的分支与脏工作区 |
+| 项目指令 | 根目录 `AGENTS.md`、`.ciro/rules`、Skills；见 [如何选择扩展方式](/customize/chooser/) |
+| 会话历史 | `~/.ciro/sessions/`；见 [工作区与会话](/guides/workspace-session/) |
 
-推理请求只发往你配置的 Provider；工具默认不擅自把源码发到第三方。细节见[数据与隐私](/concepts/data-and-privacy/)。
+## 内置工具
 
-## 两个入口，同一套内核
+| 工具 | 作用 |
+|------|------|
+| `read` | 读文件 |
+| `list_files` | 列目录 |
+| `grep` | 工作区搜索 |
+| `bash` | 执行 Shell；受白名单与审批约束 |
+| `edit` / `write` | 定点修改或创建覆盖；需可写模式 |
+| `WebFetch` / `Task` / 计划类工具 | 视模式额外开放 |
+
+## 入口与内核
 
 | 入口 | 命令 | 适合 |
 |------|------|------|
-| Web 工作台 | `ciro web` | 看 Diff、改模式、管 Provider / Pack 的日常开发 |
-| 终端界面 | `ciro` / `ciro tui` | 留在终端里的全屏会话 |
+| Web 工作台 | `ciro web` | Diff、设置、Pack、较长审阅 |
+| 终端 TUI | `ciro` / `ciro tui` | 终端内全屏会话 |
 
-权限、模式与工作区策略对两套入口一致；界面能力差集见 [Web 工作台](/surfaces/web-workbench/) 与 [终端界面](/surfaces/terminal-tui/)。
+## 模式与模型
 
-## 模式 vs 模型
-
-- **模式**决定「此刻能用哪些工具、写不写得了文件」  
-- **模型**决定「谁来推理」——在设置里单独切换  
+- **模式** — 允许哪些工具、能否写文件
+- **模型** — 谁来推理；在 **设置 → 模型** 中独立切换
 
 不要用换模型代替换模式：只读探索用 Ask，落地改码用 Agent。
 
-## 接下来
+## 相关文档
 
-- 第一次上手：[快速开始](/getting-started/quickstart/)  
-- 四档权限边界：[工作模式](/guides/modes/)  
-- 沙箱与审批：[权限与安全](/guides/permissions/)  
+[快速开始](/getting-started/quickstart/) · [工作模式](/guides/modes/) · [权限](/guides/permissions/) · [Web 工作台](/surfaces/web-workbench/) · [终端界面](/surfaces/terminal-tui/)

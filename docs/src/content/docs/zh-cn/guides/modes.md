@@ -1,50 +1,41 @@
 ---
-title: 工作模式详解
-description: 深入理解 Ask、Plan、Agent 与 Debug 四档工作模式的权限与流转。
+title: 工作模式
+description: Ask、Plan、Agent、Debug——各模式允许什么、何时使用。
 ---
 
-在 Ciro Code 中：
-- **模式 (Mode)** 决定了：**此刻 Agent 的行为准则与工具有哪些权限？**
-- **模型 (Model)** 决定了：**由哪颗大语言模型提供推理能力？**（在工作台设置中独立自由切换）
+**模式**与**模型**是两回事：
 
----
+- **模式** — 允许哪些工具、能不能写文件（Harness）  
+- **模型** — 谁来推理（**设置 → 模型**）
 
-## 四档模式权责对照
+## 对照
 
-| 模式 | 目标场景 | 允许工具与权限 | 人工把关点 |
-|------|----------|----------------|------------|
-| **Ask** | 摸清架构、探索代码、查阅文档 | **严格只读**（`workspace-readonly`）<br>读 / 搜索 / 只读 bash / WebFetch / explore Task | 不改任何项目文件 |
-| **Plan** | 复杂重构、架构设计、方案预审 | **方案规划导向**（`plan-readonly`）<br>Ask 工具 + 计划工具；不写源文件 | 审阅计划后切到 **Agent** 落地 |
-| **Agent** | 编码实现、日常重构、单测闭环 | **策略约束执行**（`workspace-write`）<br>在沙箱内写文件、跑白名单 Shell | 敏感命令与边界外文件弹窗人工审批 |
-| **Debug** | 解决报错、排查单测失败、修复缺陷 | **假设驱动**（`debug-instrument`）<br>可写 / 改，并清理会话 debug log | 控制爆炸半径，用定向追踪验证 |
+| 模式 | 意图 | 常见工具 | 你应核对 |
+|------|------|----------|----------|
+| **Ask** | 探索架构与文档 | `read`、`list_files`、`grep`、只读向 `bash`、`WebFetch` | 无写入；Changes 为空 |
+| **Plan** | 改码前做方案 | Ask 工具 + 计划工具；源码写入关闭 | 审阶段划分与影响面 |
+| **Agent** | 实现并验证 | `edit`、`write`、白名单 `bash` | 看 Changes Diff；按提示审批 |
+| **Debug** | 最小改动范围修失败 | 读写改 + 定向探测 | 盯住失败假设 |
 
----
-
-## 推荐工程工作流：四模式流转流水线
-
-对于复杂的功能开发或重构，推荐采用标准生命周期流水线：
+## 推荐流水线
 
 ```text
-[1. Ask] 探索上下文  ──>  [2. Plan] 制定方案与 Diff 清单  ──>  [3. Agent] 受控执行与测试  ──>  [4. Debug] 针对性修偏
+Ask → Plan → Agent → Debug（按需）
 ```
 
-1. **第 1 步：Ask 摸清现状**  
-   先以只读方式向 Ciro 询问现有逻辑、依赖结构与潜在影响面，避免 Agent 在不理解全貌时盲目修改。
-2. **第 2 步：Plan 谋定后动**  
-   要求 Ciro 产出分步骤计划（Plan 模式仅计划工具，不写源文件）。由你审查方案是否符合团队设计规范。
-3. **第 3 步：Agent 受控执行**  
-   切至 Agent 模式，在 `workspace-write` 策略下按计划改代码并跑白名单命令。在 Changes 面板核对实时 Diff。
-4. **第 4 步：Debug 最小修偏**  
-   若测试遇到偶发报错，切到 Debug 模式，提供报错栈并指令 Ciro 生成最小修复补丁。
+1. **Ask** — 零风险摸清仓库  
+2. **Plan** — 结构化计划；文件仍不可写  
+3. **Agent** — 在沙箱与白名单下落地  
+4. **Debug** — 测试失败时贴栈，要最小补丁  
 
----
+## 如何切换
 
-## 如何切换模式
+- Web：顶栏模式标签  
+- 键盘：`Shift+Tab`  
+- Slash：`/mode ask|plan|agent|debug`  
+- CLI：`ciro web --mode ask`  
+- 工作区默认：`{workspace}/.ciro/config.yaml` 里写 `mode: ask`
 
-- **在工作台界面**：直接点击顶部导航栏中的模式标签（Ask / Plan / Agent / Debug），即时无缝切换。
-- **命令行初始指定**：
-  ```bash
-  ciro web --mode ask      # 以只读模式启动
-  ciro web --mode agent    # 以受控执行模式启动
-  ```
-- **工作区默认配置**：在 `.ciro/config.yaml` 中设置 `mode: ask` 锁定团队默认模式。
+## 接下来
+
+[权限](/guides/permissions/) · [探索代码库](/workflows/explore-codebase/) · [规划一次改动](/workflows/plan-a-change/) · [工作原理](/concepts/how-it-works/)

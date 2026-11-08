@@ -1,11 +1,13 @@
 ---
 import Default from '@astrojs/starlight/components/Head.astro';
+import MermaidInit from './MermaidInit.astro';
 
 const fontsHref =
   'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap';
 ---
 
 <Default><slot /></Default>
+<MermaidInit />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href={fontsHref} media="print" onload="this.media='all'" />

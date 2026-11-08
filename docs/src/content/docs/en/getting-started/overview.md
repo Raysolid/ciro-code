@@ -1,34 +1,42 @@
 ---
 title: What is Ciro Code
-description: What Ciro Code is, what it is not, and where to start.
+description: Positioning, boundaries, and where to start.
 ---
 
-Ciro Code is a **local-first** coding agent: it reads files, runs commands, and edits code in projects on your machine. Inference goes only to **LLM endpoints you configure**—there is no Ciro cloud proxy.
+Ciro Code is a **local-first** coding agent: it reads files, runs commands, and edits code in projects on your machine. Inference goes only to LLM endpoints you configure—there is no Ciro cloud proxy.
 
-## You will like it if
+## When it fits
 
-- You want source, secrets, and sessions to stay local (`~/.ciro/` and `{workspace}/.ciro/`)
-- You switch trust by task: Ask (read-only) → Plan (plan first) → Agent (guardrailed edits) → Debug (hypothesis-driven fixes)
-- Your daily entry points are the local **Web workbench** (`ciro web`) or the terminal UI (`ciro`)
+- Source, secrets, and sessions should stay local: user dir `~/.ciro/`, project dir `{workspace}/.ciro/`
+- You switch trust by task: Ask → Plan → Agent → Debug
+- Daily entry points are the Web workbench `ciro web` or the terminal UI `ciro`
 
-## What it is not
+## Boundaries
 
 - Not a hosted service that uploads your repo to edit it in the cloud
-- Not a single-vendor IDE lock-in; you bring your own providers (BYOK / compatible endpoints)
+- Not a single-vendor IDE lock-in; bring your own keys or compatible endpoints
 
-## Get productive in three steps
+## vs hosted agents
+
+| | Typical hosted agents | Ciro Code |
+|--|----------------------|-----------|
+| Code location | Often synced or uploaded | Stays on your machine |
+| Models | Often tied to one vendor | BYOK or compatible endpoints |
+| Risk control | Coarse or opaque | Modes, permissions, and approvals |
+
+## Get started
 
 1. [Install](/getting-started/install/) `ciro`
-2. Follow the [Quickstart](/getting-started/quickstart/) to open the workbench and finish a first task
-3. [Connect a model](/getting-started/first-provider/) when you need inference (or start with `ciro web --mock`)
+2. [Quickstart](/getting-started/quickstart/) — open the workbench and finish a first task
+3. [Connect a model](/getting-started/first-provider/); or start with `ciro web --mock`
 
-## Where to go next
+## Related pages
 
-| If you want to… | Read |
-|-----------------|------|
-| Understand the tool loop, workspace, and sessions | [How it works](/concepts/how-it-works/) |
-| Pick Ask / Plan / Agent / Debug | [Modes](/guides/modes/) |
-| Learn the Web / terminal surfaces | [Web workbench](/surfaces/web-workbench/) · [Terminal UI](/surfaces/terminal-tui/) |
-| Follow a task recipe | [Explore a codebase](/workflows/explore-codebase/) |
-| Teach the agent your repo conventions | [Choose a mechanism](/customize/chooser/) |
-| See where data lives and what leaves the machine | [Data & privacy](/concepts/data-and-privacy/) |
+| Topic | Page |
+|-------|------|
+| Tool loop | [How it works](/concepts/how-it-works/) |
+| Ask / Plan / Agent / Debug | [Modes](/guides/modes/) |
+| Web / TUI | [Web workbench](/surfaces/web-workbench/) · [Terminal UI](/surfaces/terminal-tui/) |
+| Conventions and extensions | [Choose a mechanism](/customize/chooser/) |
+| Official packs such as Git | [Feature packs](/guides/packs/) |
+| MIT open surface | [What is open source](/open-core/what-is-open/) |

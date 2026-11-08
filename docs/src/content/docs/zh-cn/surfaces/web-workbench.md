@@ -25,7 +25,7 @@ ciro web --no-open       # 不自动打开浏览器
 | 主对话区 | 思考过程、工具调用、回复 |
 | 右侧面板 | 文件树、**Changes**（Diff）等 |
 | 底部 Composer | 发消息；`/` 命令、`@` 引用文件 |
-| 设置 | Provider、权限、MCP、Feature packs |
+| 设置 | 模型、权限、MCP、Feature packs |
 
 未选定工作区时，Composer 处于锁定，避免误操作。
 

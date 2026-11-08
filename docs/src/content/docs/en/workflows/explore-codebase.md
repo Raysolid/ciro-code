@@ -1,39 +1,63 @@
 ---
-title: Explore a codebase
-description: Orient in an unfamiliar repo with Ask mode (read-only).
+title: Explore a Codebase
+description: Use Ask mode to read-only map an unfamiliar repo, layers, and core dependencies.
 ---
 
-## Before you begin
+On a new repo or a cross-module call chain, avoid editing first. **Ask mode** keeps the Kernel in a read-only sandbox so analysis never writes files.
 
-- [Install](/getting-started/install/) `ciro`
-- Open the repo root (or pass `-w`)
-- Have a model configured, or use `--mock` to practice the flow
+---
 
-## Steps
+## Quick start
 
-1. Start read-only:
+1. Launch read-only from the repo root:
    ```bash
    ciro web -w . --mode ask
-   # or: ciro --mode ask
+   # or TUI: ciro --mode ask
    ```
-2. Confirm the mode is **Ask** (`Shift+Tab` cycles modes).
-3. Ask concrete questions, for example:
-   - “What are the entry points and main modules?”
-   - “Where does authentication start?”
-   - “Which scripts in `package.json` run tests locally?”
-4. Use `@path` to pull specific files into context.
-5. Follow up on boundaries and dependencies—**do not** ask for edits in Ask.
+2. Confirm the top bar shows **Ask** (toggle with `Shift + Tab`).
 
-## Success looks like
+---
 
-- Tool use is mostly search / read
-- No project-file edits; Changes stays empty
+## Prompt templates
 
-## If it fails
+Clear goals and bounds produce better answers. Copy and adapt:
 
-- Unexpected errors → [Troubleshooting](/guides/troubleshooting/)
-- Files start changing → switch back to Ask, or check you did not enable a write mode
+### Scenario 1: Stack and entrypoints
 
-## What's next
+```text
+Read the root build manifests (e.g. package.json / pom.xml) and main entry files. Summarize the tech stack, module layering, and local build/test commands.
+```
 
-Once oriented: [Plan a change](/workflows/plan-a-change/) · [Implement and verify](/workflows/implement-and-verify/)
+### Scenario 2: Vertical call chain
+
+```text
+Trace the flow from login to JWT issuance. Start at @src/controllers/auth.ts, follow related services and mappers, and outline the call chain.
+```
+
+### Scenario 3: Change impact
+
+```text
+If I change the UserRole enum in @src/types/user.ts, which modules and tests in this repo are affected? List impacted files and main risks.
+```
+
+---
+
+## What to check
+
+- **Tool stream**: mostly `grep`, `list_files`, `read` (plus read-scoped `bash` / `WebFetch` when needed);
+- **No writes**: **Changes** on the right should stay empty;
+- **Steer**: if the model wanders into `.git` or build output, press `Esc` and narrow the path scope.
+
+---
+
+## Common mistakes
+
+- ❌ **Ask for edits in Ask mode**: writes are denied; you burn a turn;
+- ❌ **Paste whole files**: prefer `@path` so the Kernel reads with line budgeting.
+
+---
+
+## Next steps
+
+- Plan the change: [Plan a Change](/workflows/plan-a-change/)
+- Small implementation: [Implement and Verify](/workflows/implement-and-verify/)

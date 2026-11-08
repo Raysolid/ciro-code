@@ -32,7 +32,7 @@ AGENTS.md / Rules  →  Skills  →  MCP  →  官方 Pack
 - 用 MCP 替代本机已有的 `git` / 测试命令 → 先靠默认 Shell 与权限白名单  
 - 把整本设计文档贴进 `AGENTS.md` → 拆短规则，细节用 `@` 文件或 Skill  
 
-## 深读
+## 相关文档
 
 - [规则与 Skills](/guides/rules-skills/)  
 - [MCP 工具](/guides/mcp/)  

@@ -1,52 +1,60 @@
 ---
 title: How it works
-description: Local process, workspace, sessions, and the tool loop behind Ciro Code.
+description: Local process, workspace, sessions, tool loop, and mode vs model.
 ---
 
-Ciro Code is an **agentic harness** around a model: the model reasons; local tools read, search, edit, and run commands. You state a goal; it loops through gathering context, acting, and checking results. You can interrupt or steer at any time.
+Ciro Code is an **agentic harness** around a model: the model reasons; local tools read, search, edit, and run commands. After you state a goal, it loops through gathering context, acting, and checking results. You can interrupt or redirect at any time.
+
+Inference goes to providers you configure. There is no Ciro cloud proxy.
 
 ## The tool loop
 
-A task usually cycles through three phases:
+```text
+Gather context → Policy check → Sandboxed action → Verify → repeat
+```
 
-1. **Gather context** — search and read files, inspect errors and test output  
-2. **Act** — edit or run commands within the active [mode](/guides/modes/) and [permissions](/guides/permissions/)  
-3. **Verify** — re-run checks, review diffs, correct course  
+1. **Gather context** — `read`, `list_files`, `grep`, plus matching [Rules & Skills](/guides/rules-skills/)
+2. **Policy check** — [mode](/guides/modes/) and [permissions](/guides/permissions/) decide allow, deny, or approval
+3. **Act** — `edit`, `write`, `bash` when allowed, inside the workspace sandbox
+4. **Verify** — review diffs, tests, and errors; iterate or wait
 
-Harder tasks loop many times; a read-only question may stop after step 1.
+A read-only question may stop after step 1. Harder tasks loop many times.
 
 ## What it can access
 
-When you start in a project directory, Ciro can reach:
-
-| Resource | Meaning |
-|----------|---------|
-| Workspace files | The current tree (out-of-tree writes are gated by policy and approvals) |
-| Your terminal | The same command environment you have locally (shell allowlists / approvals apply) |
+| Resource | Notes |
+|----------|-------|
+| Workspace files | Current project tree; writes gated by mode and approvals |
+| Local shell | Your local command environment via `bash`, allowlist, and approvals |
 | Git state | Branch and dirty tree when Git is available |
-| Project instructions | e.g. root `AGENTS.md` and `.ciro/rules` (see [Customize](/customize/chooser/)) |
-| Session history | Stored on disk so you can resume (see [Workspace & sessions](/guides/workspace-session/)) |
+| Project instructions | Root `AGENTS.md`, `.ciro/rules`, Skills; see [Choose a mechanism](/customize/chooser/) |
+| Session history | `~/.ciro/sessions/`; see [Workspace & sessions](/guides/workspace-session/) |
 
-Inference goes only to providers you configure; tools do not ship source to third parties by default. Details: [Data & privacy](/concepts/data-and-privacy/).
+## Built-in tools
 
-## Two surfaces, one kernel
+| Tool | Role |
+|------|------|
+| `read` | Read a file |
+| `list_files` | List directories |
+| `grep` | Search the workspace |
+| `bash` | Run a shell command; allowlist and approvals apply |
+| `edit` / `write` | Targeted edit or create/overwrite; writable modes only |
+| `WebFetch` / `Task` / plan tools | Extra surfaces depending on mode |
+
+## Surfaces and kernel
 
 | Surface | Command | Best for |
 |---------|---------|----------|
-| Web workbench | `ciro web` | Daily work with diffs, mode switching, providers, and packs |
-| Terminal UI | `ciro` / `ciro tui` | Full-screen sessions that stay in the terminal |
-
-Modes, permissions, and workspace policy are shared; UI differences are listed in [Web workbench](/surfaces/web-workbench/) and [Terminal UI](/surfaces/terminal-tui/).
+| Web workbench | `ciro web` | Diffs, settings, packs, longer reviews |
+| Terminal UI | `ciro` / `ciro tui` | Fullscreen sessions in the terminal |
 
 ## Mode vs model
 
-- **Mode** controls which tools are allowed and whether files may be written  
-- **Model** controls who reasons—switch it independently in Settings  
+- **Mode** — which tools are allowed and whether files may be written
+- **Model** — who reasons; switch under **Settings → Models**
 
-Do not swap models when you meant to swap modes: explore read-only in Ask; implement in Agent.
+Do not swap models when you meant to swap modes: explore in Ask; implement in Agent.
 
-## What's next
+## Related pages
 
-- First win: [Quickstart](/getting-started/quickstart/)  
-- Trust boundaries: [Modes](/guides/modes/)  
-- Sandbox and approvals: [Permissions](/guides/permissions/)  
+[Quickstart](/getting-started/quickstart/) · [Modes](/guides/modes/) · [Permissions](/guides/permissions/) · [Web workbench](/surfaces/web-workbench/) · [Terminal UI](/surfaces/terminal-tui/)

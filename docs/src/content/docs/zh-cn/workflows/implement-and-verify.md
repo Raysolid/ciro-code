@@ -1,37 +1,68 @@
 ---
 title: 实现并验证
-description: 在 Agent 模式下受控改码，并用测试 / Diff 核对。
+description: 在 Agent 模式下受控改码，自动跑测，并在 Changes 中核对 Diff。
 ---
 
-## 开始前
+**Agent 模式**用于实际改码：Kernel 在 `workspace-write` 策略下可在路径沙箱内编辑、跑白名单命令，并按测试结果自修正。
 
-- 任务范围清楚，或已有 [计划](/workflows/plan-a-change/)
-- 了解工作区 [权限](/guides/permissions/)（默认 Agent 为可写策略 + 敏感操作审批）
-- 知道本地如何跑测试（如 `npm test`）
+---
 
-## 步骤
+## 实现流程
 
-1. 切到 **Agent**：
-   ```bash
-   ciro web -w . --mode agent
-   ```
-2. 给出可验证目标，例如：  
-   「按计划改 `src/…`，跑 `npm test`，失败则修好再停。」
-3. 关注工具调用与审批弹窗；敏感 Shell / 越界路径需你确认。
-4. 打开 **Changes**（Web）核对 Diff；必要时让 Ciro 再跑测试或缩小改动。
-5. 用本机 Git 提交；不要在未审 Diff 时直接推远程。
+```mermaid
+flowchart LR
+  A[目标 + 验证命令] --> B[沙箱内改码]
+  B --> C[自动跑测]
+  C --> D[审阅 Changes]
+  D --> E[本地 Git 提交]
+```
 
-## 成功时你应看到
+### 1. 切换到 Agent
+顶栏点 **Agent**，或 `Shift + Tab`，或 `/mode agent`。
 
-- Changes 中的 Diff 与目标一致
-- 约定的检查命令已跑过且结果符合预期（或失败原因已解释）
+### 2. 给出可验证指令
 
-## 失败时
+好提示词包含：**目标 + 范围 + 验证命令**。可复制改写：
 
-- 权限拒绝 → 收紧或调整白名单，见 [权限](/guides/permissions/)
-- 测试红 → 留在 Agent 修，或转 [排查失败](/workflows/debug-a-failure/)
-- Diff 过大 → 要求拆步、回退无关文件
+```text
+为 @src/utils/format.ts 中的 formatCurrency 增加国际化货币符号配置。
+
+要求：
+1. 在 @tests/utils/format.test.ts 补充单元测试；
+2. 自动运行 npm test -- format，确认全部通过；
+3. 若有失败自行修复，全部通过后再停止。
+```
+
+### 3. 人工审批
+执行中：
+- **白名单命令**（如 `git status`、`npm test`）自动放行并流式展示日志；
+- **敏感或未知命令**（装依赖、改构建脚本、越界路径等）会暂停并弹出审批：允许一次 / 记住并允许 / 拒绝。
+
+### 4. 在 Changes 核对 Diff
+- **并排对比**：查看增删行；
+- **范围确认**：确认未顺带改无关格式或加多余依赖；
+- **回退**：偏离预期时可在面板逐文件撤销。
+
+### 5. 本地提交
+验证通过后按你的常规 Git 流程提交：
+
+```bash
+git add src/ tests/
+git commit -m "feat(utils): add international currency formatting"
+```
+
+---
+
+## 常见误区
+
+- ❌ **一次塞过大任务**：如「整仓改成 TypeScript」，应拆成可验证的小步；
+- ❌ **不带验证命令**：缺少 `npm test` 等，难以发现细微运行时错误；
+- ❌ **未看 Diff 就 push**：先在 Changes 核对再推远程。
+
+---
 
 ## 接下来
 
-[排查失败](/workflows/debug-a-failure/) · [Web 工作台](/surfaces/web-workbench/) · [扩展选型](/customize/chooser/)
+- 难复现失败：[排查失败](/workflows/debug-a-failure/)
+- Shell 白名单：[权限与安全](/guides/permissions/)
+- Changes 交互：[Web 工作台](/surfaces/web-workbench/)

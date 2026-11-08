@@ -7,7 +7,7 @@ Ciro Code 将安全性置于首位。Agent 并不是无限制运行的高权限�
 
 ---
 
-## 策略预设（Presets）
+## 策略预设
 
 在 `{workspace}/.ciro/config.yaml` 或工作台设置中，你可以为工作区指定安全预设级别：
 

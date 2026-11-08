@@ -1,85 +1,86 @@
 ---
-title: 模型与 Provider
-description: DeepSeek、OpenAI 与兼容端点的连接菜谱；环境变量与设置页。
+title: 模型与 Provider 连接指南
+description: DeepSeek、OpenAI、Claude、本地 Ollama 与自建兼容端点的连接配置与故障排查。
 ---
 
-推理只发往**你配置的端点**。模式管权限，模型管推理——二者独立。最短路径仍见 [连接模型](/getting-started/first-provider/)；本页是常用菜谱与排错。
+Ciro Code 采用 **BYOK（自带密钥）**：推理请求由本机直连你配置的模型端点，不经 Ciro 云端中转。
 
-先确认不需要先上 MCP / Pack：[如何选择扩展方式](/customize/chooser/)。
+**工作模式**决定工具权限，**模型**决定推理能力，两者可独立切换。
 
-## 开始前
+---
 
-- 已能启动 `ciro web` 或 `ciro`
-- 准备好 Provider 的 API Key（或先用 `--mock`）
+## 连接方式总览
 
-## 方式对照
+| 方式 | 适用场景 | 配置入口 |
+|------|---------|----------|
+| **Mock 模式** | 无 Key 时熟悉界面 | `ciro web --mock` |
+| **工作台设置** | 多模型、自定义 Base URL、测通 | **设置 → 模型** |
+| **环境变量** | 本机固定开发、脚本或 CI | `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` 等 |
 
-| 方式 | 适合 | 命令 / 入口 |
-|------|------|-------------|
-| Mock | 无 Key 逛界面 | `ciro web --mock` |
-| 环境变量 | 本机默认、CI / 脚本 | `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` |
-| 设置页 | 多 Provider、选模型、改 Base URL | **设置 → 模型** |
-| 兼容端点 | 自建 / 代理 / 其他 OpenAI 兼容 API | 设置里自定义 Base URL |
+工作台保存的 API 密钥加密存放在 `~/.ciro/credentials/`；非敏感 Provider 配置在 `~/.ciro/providers.json`。
 
-密钥落在 `~/.ciro/credentials/`；Provider 列表在 `~/.ciro/providers.json`（磁盘上不落明文 Key）。切勿提交 Git 或贴进公开 Issue。见 [安全](/trust/security/)。
+---
 
-## 菜谱：DeepSeek
+## 常用 Provider 配置示例
 
-1. 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 创建 API Key。  
-2. 任选其一：
+### 1. DeepSeek（代码能力与成本较均衡）
 
-```bash
-# bash / zsh
-export DEEPSEEK_API_KEY=sk-...
-ciro web
-```
+1. 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 获取 API Key。
+2. **方式 A：工作台**
+   ```text
+   ciro web → 设置 → 模型 → 添加 Provider → DeepSeek 预设
+   → 粘贴 API Key → 拉取并启用模型（如 deepseek-chat / deepseek-coder）
+   ```
+3. **方式 B：环境变量**
+   ```bash
+   # bash / zsh
+   export DEEPSEEK_API_KEY="sk-..."
+   ciro web
 
-```powershell
-# pwsh
-$env:DEEPSEEK_API_KEY = "sk-..."
-ciro web
-```
+   # Windows pwsh
+   $env:DEEPSEEK_API_KEY = "sk-..."
+   ciro web
+   ```
 
-或：打开工作台 → **设置 → 模型** → 添加 DeepSeek 预设 → 粘贴 Key → 拉取/启用模型（默认 Base URL 一般为 `https://api.deepseek.com/v1`）。
+### 2. OpenAI / Azure OpenAI
 
-3. 在会话里确认当前模型已切换到 DeepSeek 系列。  
-4. 发一条 Ask 消息验证；失败时看终端报错与设置页连通测试。
+- 环境变量：`OPENAI_API_KEY="sk-..."`
+- 工作台默认 Base URL：`https://api.openai.com/v1`
+- 常用模型：`gpt-4o`、`o3-mini`
 
-## 菜谱：OpenAI
+### 3. Anthropic Claude
 
-```bash
-export OPENAI_API_KEY=sk-...
-ciro web
-```
+- 环境变量：`ANTHROPIC_API_KEY="sk-ant-..."`
+- 常用模型：`claude-3-7-sonnet-20250219`、`claude-3-5-haiku`
 
-或在设置中选 OpenAI 预设（`https://api.openai.com/v1`），粘贴 Key 并启用模型。
+### 4. 本地推理（Ollama / vLLM / LM Studio）
 
-## 菜谱：OpenAI 兼容端点
+支持 OpenAI 兼容协议的本地或自建网关：
 
-适用于本地网关、第三方兼容 API 等：
+1. 启动 Ollama（默认 OpenAI 兼容口：`http://localhost:11434/v1`）
+2. **设置 → 模型 → 添加 Provider**：
+   - **名称**：`Ollama Local`
+   - **Base URL**：`http://localhost:11434/v1`
+   - **API Key**：任意占位（如 `ollama`）
+3. 添加或拉取本地模型（如 `qwen2.5-coder:32b`），勾选启用。
 
-1. **设置 → 模型 → 添加**，填名称与 **Base URL**（须为公网可达的 `https://…`；本机回环地址通常会被拒绝）。  
-2. 粘贴该端点要求的 API Key。  
-3. 拉取模型列表（若端点支持）或手动添加模型 id。  
-4. 启用后发一条短消息验证。
+---
 
-Anthropic 等预设若出现在设置中，按同样流程填写 Key；以当前版本设置页为准。
+## 连通性排障对照
 
-## 成功时你应看到
+| 现象 | 常见原因 | 处理 |
+|------|----------|------|
+| **401 Unauthorized** | Key 无效或过期 | 核对 Key；确认账户额度 |
+| **404 / Cannot POST** | Base URL 路径不对 | 补上 `/v1`（如 `https://api.deepseek.com/v1`） |
+| **连接超时 (ETIMEDOUT)** | 代理或防火墙 | 检查 `HTTP_PROXY` / `HTTPS_PROXY` |
+| **环境变量未生效** | 终端会话不一致 | 在导出变量的同一终端启动 `ciro web` |
+| **回复乱码或截断** | 上下文过长 | `/compact`，或换更大上下文窗口的模型 |
 
-- 设置里 Provider 显示已配置（Key 被掩码）
-- 非 Mock 会话能返回真实模型回复
-- `ciro web --mock` 仍可不依赖 Key
-
-## 失败时
-
-| 现象 | 处理 |
-|------|------|
-| 无 Key / 模型不可用 | 查环境变量是否在**同一终端**导出；或改用设置页 |
-| Base URL 被拒 | 换公网 HTTPS；勿用未允许的 `127.0.0.1` |
-| 超时 / 401 | 核对 Key、套餐额度、公司代理 |
-| 只想验证 UI | `--mock`，见 [排障](/guides/troubleshooting/) |
+---
 
 ## 接下来
 
-- [快速开始](/getting-started/quickstart/) · [工作模式](/guides/modes/) · [配置优先级](/reference/config/) · [数据与隐私](/concepts/data-and-privacy/)
+- [快速上手](/getting-started/quickstart/)
+- [工作模式与沙箱](/guides/modes/)
+- [规则与 Skills](/guides/rules-skills/)
+- [安全与凭据](/trust/security/)

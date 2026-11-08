@@ -35,3 +35,4 @@ Current sidebar and page map for `ciro-code/docs` (Starlight). Historical drafts
 
 - P0–P2: narrative IA through customize + security
 - P3: Packs = user install/enable; Open Core = positive open inventory only
+- Post-P3 polish: short how-it-works / overview; real Kernel tool names (`read`/`grep`/`bash`/…); Settings → Models; sessions under `~/.ciro/sessions/`; Packs restore official `--from`

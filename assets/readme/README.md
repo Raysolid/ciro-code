@@ -1,11 +1,11 @@
 # README assets
 
-Referenced from [`README.md`](../../README.md) / [`README.zh-CN.md`](../../README.zh-CN.md).
+Used by root [`README.md`](../../README.md) and [`README.zh-CN.md`](../../README.zh-CN.md).
 
-| Asset | Path | Notes |
-|-------|------|--------|
-| Logo (light) | `logo.png` | Transparent PNG — navy body + blue accents (for light UI / GitHub light) |
-| Logo (dark) | `logo-dark.png` | Derived light-ink variant for dark UI / GitHub dark |
-| Hero | `hero-workbench.png` | Workbench screenshot |
+| Asset | File | Use |
+|-------|------|-----|
+| Logo (light) | `logo.png` | Wordmark for light GitHub / light UI |
+| Logo (dark) | `logo-dark.png` | Wordmark for dark GitHub / dark UI |
+| Hero | `hero-workbench.png` | Workbench screenshot under the fold |
 
-**Why PNG:** the wordmark uses soft glows / gradients; PNG preserves them. README uses `<picture>` to switch light/dark.
+`<picture>` switches logo by `prefers-color-scheme`. Prefer PNG so soft glows on the wordmark stay intact.

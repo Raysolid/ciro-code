@@ -19,11 +19,11 @@ ciro web -w /path/to/project
 - 启动时会清理空会话。
 - 历史保存在本机产品目录（见下）。
 
-## 落盘路径（用户可见）
+## 落盘路径
 
 | 路径 | 用途 |
 |------|------|
 | `{workspace}/.ciro/` | 项目配置、记忆、规则、计划 |
-| `~/.ciro/` | 用户配置、密钥、Pack、会话 |
+| `~/.ciro/` | 用户配置、密钥、Pack、聊天会话目录 `sessions/` |
 
 迁移期内仍可能读取旧的 `.pi` / `~/.pi/agent`。有旧数据时用 `ciro doctor` 与 `ciro migrate` — 见 [CLI](/reference/cli/)。

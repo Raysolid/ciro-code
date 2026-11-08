@@ -3,8 +3,8 @@ title: Feature Packs
 description: 安装并启用官方工作台 Feature Pack。
 ---
 
-官方 Feature Pack 为工作台提供可选能力（例如 Git 面板）。  
-只加提示词 → [Rules / Skills](/guides/rules-skills/)；接外部系统 → [MCP](/guides/mcp/)。选型：[如何选择扩展方式](/customize/chooser/)。
+官方 Feature Pack 为工作台提供可选能力，例如 Git 面板。  
+只加提示词见 [Rules / Skills](/guides/rules-skills/)；接外部系统见 [MCP](/guides/mcp/)。选型见 [如何选择扩展方式](/customize/chooser/)。
 
 ## 原则
 
@@ -12,8 +12,10 @@ description: 安装并启用官方工作台 Feature Pack。
 |------|------|
 | 装在用户目录 | `~/.ciro/packs/`，不污染项目 `package.json` |
 | 安装 ≠ 启用 | 必须在 **设置 → Feature packs** 显式打开 |
-| 官方 id | 例如 `@ciro-code/ext-git` |
+| 官方 id | 如 `@ciro-code/ext-git` |
 | 仍受沙箱约束 | 运行时读写服从 [权限](/guides/permissions/) |
+
+只安装你信任的官方 Pack。
 
 ## 安装与管理
 
@@ -21,6 +23,12 @@ description: 安装并启用官方工作台 Feature Pack。
 ciro pack add @ciro-code/ext-git
 ciro pack list
 ciro pack remove @ciro-code/ext-git
+```
+
+本地官方包目录（id 须一致）：
+
+```bash
+ciro pack add @ciro-code/ext-git --from ./packages/ext-git
 ```
 
 `list` 会显示版本与是否已启用。

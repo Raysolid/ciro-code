@@ -19,11 +19,11 @@ Recent workspaces are restored on the next launch when you omit `-w` (if the fol
 - Empty sessions are cleaned up on startup.
 - History is stored locally under the product directories (see below).
 
-## On-disk layout (user-facing)
+## On-disk layout
 
 | Path | Purpose |
 |------|---------|
 | `{workspace}/.ciro/` | Project config, memory, rules, plans |
-| `~/.ciro/` | User config, credentials, packs, sessions |
+| `~/.ciro/` | User config, credentials, packs, chat session dir `sessions/` |
 
 Legacy `.pi` / `~/.pi/agent` paths may still be readable during migration. Use `ciro doctor` and `ciro migrate` if you have old data — see [CLI](/reference/cli/).

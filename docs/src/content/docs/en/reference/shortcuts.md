@@ -1,50 +1,94 @@
 ---
-title: Shortcuts
-description: Common shortcuts and input conventions for Web and TUI.
+title: Shortcuts & Slash Commands
+description: Keyboard shortcuts, input conventions, and complete slash command reference for Web Workbench and Terminal TUI.
 ---
 
-Details may shift by release; prefer in-app `/help` and footer hints when they differ.
+Ciro Code delivers a keyboard-first development experience consistent across both the Web Workbench and the Terminal TUI. This page indexes all input conventions, navigation keybindings, and slash commands.
 
-## Shared input conventions
+---
 
-| Input | Action |
-|-------|--------|
-| `@` | Search and mention a workspace file |
-| `/` | Open slash commands (for example `/help`) |
-| `Shift+Tab` | Cycle modes (Ask → Plan → Agent → Debug) |
-| `Esc` | Stop the current turn / cancel in-flight generation |
+## Input conventions
 
-Composer placeholders usually look like: `Message Ciro… /commands · @files`.
+| Input | Context | Behavior |
+|-------|---------|----------|
+| `@` | Composer | Fuzzy-search and mention workspace files |
+| `/` | Composer | Open the slash command menu |
+| `Shift + Tab` | Global | Cycle Ask → Plan → Agent → Debug |
+| `Esc` | Global / active turn | Stop generation, dismiss modals, or cancel approvals |
 
-## Terminal TUI
+---
 
-| Key / command | Action |
-|---------------|--------|
-| `Shift+Tab` | Switch mode |
-| `/help` | Commands and shortcut help |
-| `@` | Mention files |
-| `Esc` | Stop |
+## Slash commands
 
-Footer hint often reads: `Shift+Tab:mode | /:commands | @:files | Esc:stop`.
+Type `/` in Composer or TUI to complete:
 
-Resume sessions:
+| Command | Arguments | Description |
+|---------|-----------|-------------|
+| `/help` | - | Show slash commands and keybinding help |
+| `/new` | - | Start a new session and reset working context |
+| `/mode` | `[ask\|plan\|agent\|debug]` | Switch mode, e.g. `/mode agent` |
+| `/model` | - | Open the model switcher |
+| `/session` | `[id]` | Session picker; aliases `/sessions`, `/resume` |
+| `/compact` | - | Manually compact context and trim history |
+| `/clear` | - | Clear on-screen history; disk sessions kept |
+| `/settings` | - | Quick settings: scroll, Vim, theme |
+| `/theme` | `[dark\|light]` | Switch light / dark theme |
+| `/mcp` | - | Manage session MCP; configure before first message |
+| `/minimal` | - | TUI: leave alternate screen; inline streaming |
+| `/fullscreen` | - | TUI: enter alternate screen |
+| `/quit` | - | Quit; TUI alias `/exit` |
 
-```bash
-ciro --continue
-ciro --resume <session-id>
-```
+---
 
-## Web workbench
+## Terminal TUI Keybindings
 
-| Action | Purpose |
-|--------|---------|
-| Mode tabs | Switch Ask / Plan / Agent / Debug |
-| `@` / `/` in the composer | Same as the shared table |
-| **Changes** tab | Review Agent diffs |
-| Settings | Providers, permissions, MCP, packs |
+Keybindings available when running `ciro` or `ciro tui`:
 
-Browser shortcuts (copy, find, …) follow the OS and browser.
+### 1. Global Navigation & Control
+| Keybinding | Action |
+|------------|--------|
+| `Ctrl + C` | Interrupt active task execution or model generation |
+| `Ctrl + D` | Exit the terminal TUI |
+| `Ctrl + S` | Toggle session picker overlay |
+| `Ctrl + G` | Toggle Changes / Diff review panel |
+| `Ctrl + T` | Toggle Subagent tasks view |
+| `Ctrl + L` | Redraw terminal screen |
+| `Ctrl + Q` | Clear queued messages |
 
-## Related
+### 2. Composer & Message Editing
+| Keybinding | Action |
+|------------|--------|
+| `Enter` | Submit and send current message |
+| `Shift + Enter` / `Alt + Enter` | Insert newline in composer |
+| `Shift + Tab` | Cycle modes (Ask / Plan / Agent / Debug) |
+| `Up` / `Down` | Navigate through prompt input history |
+| `Ctrl + V` | Paste clipboard text or image |
 
-- [Web workbench](/surfaces/web-workbench/) · [Terminal UI](/surfaces/terminal-tui/) · [Modes](/guides/modes/) · [CLI](/reference/cli/)
+### 3. Changes & Diff Review Overlay (`Ctrl + G`)
+When inspecting diffs written by Agent mode:
+| Keybinding | Action |
+|------------|--------|
+| `a` | Accept modification on the currently focused file |
+| `r` | Reject and revert modification on the currently focused file |
+| `A` | Accept all modifications across the workspace |
+| `R` | Reject and revert all modifications across the workspace |
+| `Tab` | Switch focus between file list and diff view |
+
+---
+
+## Web Workbench Interactions
+
+When accessing `http://127.0.0.1:5280`:
+
+- **Mode Tabs in Header**: Click to seamlessly switch between Ask, Plan, Agent, and Debug;
+- **Changes Tab**: Review modifications in Side-by-Side or Inline diff view;
+- **File Tree & Mentions**: Click files or type `@` in Composer to pull files into context;
+- **Approval Modals**: Approvals appear centered with options: *Allow Once*, *Always Allow*, or *Deny*.
+
+---
+
+## Next Steps
+
+- [Modes in Depth](/guides/modes/)
+- [CLI Reference](/reference/cli/)
+- [Configuration Reference](/reference/config/)

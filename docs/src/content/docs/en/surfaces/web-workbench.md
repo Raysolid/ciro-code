@@ -25,7 +25,7 @@ Default URL: `http://127.0.0.1:5280` (override with `-p`). Health: `GET /health`
 | Main thread | Thinking, tool calls, replies |
 | Right pane | Files, **Changes** (diffs), and related panels |
 | Composer | Send messages; `/` commands, `@` file mentions |
-| Settings | Providers, permissions, MCP, Feature packs |
+| Settings | Models, permissions, MCP, Feature packs |
 
 Until a workspace is selected, the composer stays locked.
 

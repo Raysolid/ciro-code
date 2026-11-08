@@ -32,7 +32,7 @@ AGENTS.md / Rules  →  Skills  →  MCP  →  official Packs
 - Using MCP instead of local `git` / test commands → rely on shell + allowlists first  
 - Pasting an entire design doc into `AGENTS.md` → keep rules short; detail via `@` files or Skills  
 
-## Go deeper
+## Related pages
 
 - [Rules & skills](/guides/rules-skills/)  
 - [MCP tools](/guides/mcp/)  

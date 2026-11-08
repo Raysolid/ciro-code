@@ -1,37 +1,68 @@
 ---
-title: Implement and verify
-description: Make guardrailed edits in Agent mode, then check tests and diffs.
+title: Implement and Verify
+description: Edit under Agent mode, run tests automatically, and review Diffs in Changes.
 ---
 
-## Before you begin
+**Agent mode** is for real edits: under `workspace-write`, the Kernel can change files inside the path sandbox, run allowlisted commands, and self-correct from test feedback.
 
-- Scope is clear, or you already have a [plan](/workflows/plan-a-change/)
-- You know workspace [permissions](/guides/permissions/) (Agent defaults to a write preset with approvals for sensitive actions)
-- You know how to run local checks (for example `npm test`)
+---
 
-## Steps
+## Implementation flow
 
-1. Switch to **Agent**:
-   ```bash
-   ciro web -w . --mode agent
-   ```
-2. Give a verifiable goal, for example:  
-   “Implement the plan in `src/…`, run `npm test`, and stop only when it passes.”
-3. Watch tool calls and approval prompts; confirm sensitive shell or out-of-tree paths yourself.
-4. Open **Changes** (Web) to review diffs; ask for another test run or a smaller patch if needed.
-5. Commit with local Git; do not push unreviewed diffs.
+```mermaid
+flowchart LR
+  A[Goal + verify command] --> B[Sandboxed edits]
+  B --> C[Auto tests]
+  C --> D[Review Changes]
+  D --> E[Local Git commit]
+```
 
-## Success looks like
+### 1. Switch to Agent
+Click **Agent**, or `Shift + Tab`, or `/mode agent`.
 
-- Diffs under Changes match the goal
-- Agreed checks ran with the expected outcome (or failures are explained)
+### 2. Issue a verifiable prompt
 
-## If it fails
+Strong prompts include **goal + scope + verification**. Copy and adapt:
 
-- Permission denied → tighten or adjust allowlists; see [Permissions](/guides/permissions/)
-- Tests red → stay in Agent to fix, or move to [Debug a failure](/workflows/debug-a-failure/)
-- Diff too large → ask to split steps or revert unrelated files
+```text
+Add international currency-symbol support to formatCurrency in @src/utils/format.ts.
 
-## What's next
+Requirements:
+1. Add unit tests in @tests/utils/format.test.ts;
+2. Run npm test -- format and ensure all assertions pass;
+3. Fix failures yourself; stop only when everything passes.
+```
 
-[Debug a failure](/workflows/debug-a-failure/) · [Web workbench](/surfaces/web-workbench/) · [Choose a mechanism](/customize/chooser/)
+### 3. Human approval
+During the run:
+- **Allowlisted commands** (e.g. `git status`, `npm test`) stream automatically;
+- **Sensitive or unknown commands** (install deps, touch build scripts, out-of-bound paths) pause for Allow once / Always allow / Deny.
+
+### 4. Review Diffs in Changes
+- **Side-by-side**: inspect additions and deletions;
+- **Scope**: confirm no drive-by formatting or extra deps;
+- **Revert**: roll back individual files from the panel if needed.
+
+### 5. Local commit
+After verification:
+
+```bash
+git add src/ tests/
+git commit -m "feat(utils): add international currency formatting"
+```
+
+---
+
+## Common mistakes
+
+- ❌ **One huge unbounded task**: avoid “rewrite the whole repo”; slice into verifiable steps;
+- ❌ **No verification command**: without `npm test` (or similar), subtle runtime errors slip through;
+- ❌ **Push without reviewing Diff**: check Changes first.
+
+---
+
+## Next steps
+
+- Stubborn failures: [Debug a Failure](/workflows/debug-a-failure/)
+- Shell allowlist: [Permissions](/guides/permissions/)
+- Changes UX: [Web workbench](/surfaces/web-workbench/)
